@@ -24,6 +24,10 @@ from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional
 
 TIMEOUT = 60
+# Some providers sit behind Cloudflare and reject urllib's default
+# "Python-urllib/3.x" agent outright (Groq returns 403 code 1010). Identify
+# ourselves like a normal client instead.
+USER_AGENT = "model-drift/1.0 (+https://github.com/egnaro9/model-drift)"
 
 
 @dataclass(frozen=True)
@@ -46,7 +50,8 @@ class ProviderError(RuntimeError):
 
 
 def _post(url: str, headers: Dict[str, str], body: dict) -> dict:
-    req = urllib.request.Request(url, data=json.dumps(body).encode(), headers=headers, method="POST")
+    req = urllib.request.Request(url, data=json.dumps(body).encode(),
+                                 headers={"User-Agent": USER_AGENT, **headers}, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
             return json.loads(r.read().decode())
@@ -142,7 +147,7 @@ def call(model: Model, prompt: str, task_id: str = "") -> str:
 
 
 def _get(url: str, headers: Dict[str, str]) -> dict:
-    req = urllib.request.Request(url, headers=headers, method="GET")
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, **headers}, method="GET")
     try:
         with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
             return json.loads(r.read().decode())
