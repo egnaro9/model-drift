@@ -21,7 +21,7 @@ import urllib.request
 from collections import defaultdict
 from typing import Dict, List, Optional
 
-from .providers import Model, ProviderError, call, load_registry
+from .providers import Model, ProviderError, call, list_models, load_registry
 from .suite import SUITE, SUITE_VERSION, suite_hash
 
 # Every prompt in the suite is benign, so a response that reads like a refusal is
@@ -160,6 +160,22 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument("--metrics", default="dashboard/metrics.json",
                    help="time-series file for latency/verbosity the dashboard reads")
     args = p.parse_args(argv)
+
+    if args.list_models:
+        seen = set()
+        for m in load_registry(args.registry):
+            tag = (m.provider, m.key_env, m.base_url)
+            if m.provider == "mock" or not m.available or tag in seen:
+                continue
+            seen.add(tag)
+            try:
+                ids = list_models(m)
+                print(f"\n{m.key_env} ({m.provider}) — {len(ids)} models:")
+                for i in sorted(ids):
+                    print(f"    {i}")
+            except ProviderError as e:
+                print(f"\n{m.key_env} ({m.provider}) — could not list: {e}")
+        return 0
 
     key = os.environ.get("EVAL_HISTORY_WRITE_KEY", "").strip()
     models = [m for m in load_registry(args.registry) if m.available]

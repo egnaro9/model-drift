@@ -141,6 +141,37 @@ def call(model: Model, prompt: str, task_id: str = "") -> str:
     return fn(model, prompt)
 
 
+def _get(url: str, headers: Dict[str, str]) -> dict:
+    req = urllib.request.Request(url, headers=headers, method="GET")
+    try:
+        with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
+            return json.loads(r.read().decode())
+    except urllib.error.HTTPError as e:
+        body = " ".join(e.read().decode().split())[:300]
+        raise ProviderError(f"{url} -> {e.code}: {body}")
+    except urllib.error.URLError as e:
+        raise ProviderError(f"{url} unreachable: {e.reason}")
+
+
+def list_models(m: Model) -> List[str]:
+    """The model IDs this provider actually exposes to your key.
+
+    Model IDs churn and vary by account tier — guessing them costs a failed run
+    and a confusing 0%. This asks the provider instead.
+    """
+    key = os.environ[m.key_env].strip()
+    if m.provider == "anthropic":
+        d = _get("https://api.anthropic.com/v1/models?limit=100",
+                 {"x-api-key": key, "anthropic-version": "2023-06-01"})
+        return [x["id"] for x in d.get("data", [])]
+    if m.provider == "gemini":
+        d = _get(f"https://generativelanguage.googleapis.com/v1beta/models?key={key}&pageSize=200", {})
+        return [x["name"].removeprefix("models/") for x in d.get("models", [])]
+    base = (m.base_url or "https://api.openai.com/v1").rstrip("/")
+    d = _get(f"{base}/models", {"Authorization": f"Bearer {key}"})
+    return [x["id"] for x in d.get("data", [])]
+
+
 def load_registry(path: Optional[str] = None) -> List[Model]:
     """Load the model registry (models.json). Bundled default is overridable."""
     from pathlib import Path
