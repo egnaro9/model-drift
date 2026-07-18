@@ -178,7 +178,7 @@ const esc = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"
 // to re-serve a same-origin copy; raw sidesteps that entirely.
 const METRICS_URL = "https://raw.githubusercontent.com/egnaro9/model-drift/main/dashboard/metrics.json";
 
-// The three tracked metrics. Accuracy comes from eval-history; speed + verbosity
+// The five tracked metrics. Accuracy comes from eval-history; speed + verbosity
 // from metrics.json. betterUp says which direction is "good" (latency: lower).
 const METRICS = {   // eps = the delta below which a change counts as "stable" (fractions: tiny; counts: 0.5)
   accuracy:  { label:"Accuracy", betterUp:true, eps:1e-9, frac:true,
@@ -235,7 +235,7 @@ async function fetchAll() {
 }
 
 function renderLegend() {
-  // group models by company into one row each, so 13 chips read as 5 tidy rows
+  // group models by company into one row each, so 16 chips read as 5 tidy rows
   const order = [], byGroup = new Map();
   for (const m of MODELS) {
     if (!byGroup.has(m.group)) { byGroup.set(m.group, []); order.push(m.group); }

@@ -45,10 +45,12 @@ def probe(model: Model) -> dict:
     eval-history's `faithfulness` metric so the existing regression comparison
     works unchanged — for a drift probe "faithfulness" reads as "still correct".
 
-    Two more numbers ride along for free, measured on the same calls: **latency**
-    (median per-call wall-clock — "is it getting slower?") and **verbosity** (mean
-    answer length in characters — "is it getting chattier / pricier?"). Both are
-    byproducts of calls already being made, so they cost nothing extra.
+    Four more numbers ride along for free, measured on the same calls:
+    **latency** (median per-call wall-clock — "is it getting slower?"),
+    **verbosity** (mean answer length — "is it getting chattier / pricier?"),
+    **reliability** (share of calls that succeeded) and **refusal rate** (share of
+    benign prompts declined). All four are byproducts of calls already being
+    made, so they cost nothing extra.
     """
     cases, errors, first_error = [], 0, None
     latencies, out_lens, refusals = [], [], 0   # over successful calls only
@@ -125,7 +127,7 @@ def _post(api: str, key: str, payload: dict) -> Optional[str]:
 
 def update_metrics_file(path: str, results: List[dict], stamp: str, cap: int = 104) -> None:
     """Accumulate the extra metrics (latency, verbosity) into a small time-series
-    JSON the dashboard reads directly. Kept in the repo and served same-origin —
+    JSON the dashboard reads directly. Kept in the repo and read from raw.githubusercontent —
     no database column, no CORS, and adding a future metric is one more key here.
 
     Only models that actually responded get a point; a totally-failed probe

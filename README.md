@@ -26,11 +26,11 @@ frozen suite ──►  live model APIs  ──►  deterministic grader  ──
 
 ## Why it's trustworthy
 
-- **The grader is not a model.** Every one of the 22 tasks is graded by exact match, regex, or a numeric compare. If the judge were an LLM you couldn't tell a real regression from the judge having a bad day; here a score change means the *model* moved. ([`suite.py`](modeldrift/suite.py))
+- **The grader is not a model.** Every one of the 22 tasks is graded mechanically — exact match, substring, regex, or a numeric compare. If the judge were an LLM you couldn't tell a real regression from the judge having a bad day; here a score change means the *model* moved. ([`suite.py`](modeldrift/suite.py))
 - **Hard enough that flagships have headroom.** Some tasks are deliberate failure modes for strong models — counting letters in "strawberry", numeric-vs-lexical sorting, 9.9 vs 9.11 — so a top model's line can actually move instead of flatlining at 100%.
 - **The suite is frozen and versioned.** A drift chart only means something if the questions never change under it. `SUITE_VERSION` is stamped on every run, and [`suite_hash()`](modeldrift/suite.py) fingerprints the exact questions so a silent edit is detectable.
 - **Deterministic where the model allows it.** Every task has a single indisputable answer, so a drop is a real drop, not grader noise. Temperature is pinned to `0` on models that accept it; flagships that reject the param (Opus 4.8, GPT-5) run at their default — set per-model in [`models.json`](modeldrift/models.json).
-- **Per-capability breakdown.** Not just "it dropped" but *which kind* dropped — instruction-following, factual recall, arithmetic, reasoning, counting, string manipulation, formatting, refusal calibration — because that's the useful part.
+- **Per-capability breakdown.** Not just "it dropped" but *which kind* dropped — instruction-following, factual recall, arithmetic, reasoning, counting, string manipulation, formatting, extraction, refusal calibration — because that's the useful part.
 - **It's all here.** The suite, the graders, and the runner are open and auditable; the numbers are reproducible.
 
 ## Add a model — no code, just a secret
@@ -43,9 +43,9 @@ The runner **only probes a model whose API key is present**, so you fund exactly
 | Anthropic — Fable 5 · Opus 4.8 · Sonnet 5 · Haiku 4.5 | `ANTHROPIC_API_KEY` |
 | Google — Gemini 3.1 Pro · 3.5 Flash · 3.1 Flash-Lite | `GEMINI_API_KEY` |
 | xAI — Grok 4.5 · 4.3 · 4 Fast | `XAI_API_KEY` |
-| Meta — Llama 3.3 70B (open-weights; served free via Groq) | `GROQ_API_KEY` |
+| Meta — Llama 3.3 70B · Llama 3.1 8B (open-weights; served free via Groq) | `GROQ_API_KEY` |
 
-Plus `EVAL_HISTORY_WRITE_KEY` to record runs. Each provider is tracked across the tiers it actually has — **heavy → flagship → mid → mini → nano** — so you can see whether a cheap tier keeps pace with the top model (tiers are only added where a real model exists; Google and xAI have no model above their flagship on the API, so they stay at three — no padding). Edit [`models.json`](modeldrift/models.json) to change models; any OpenAI-compatible endpoint works with a `base_url`, and a model that rejects a `temperature` param (Fable 5, Opus 4.8, Sonnet 5, GPT-5 / mini / nano) sets `"temperature": null`. **14 models**, ~22 prompts each, weekly — still **cents per run** (Fable 5 is the priciest at ~$10/$50 per 1M, but the tiny token count keeps it under a cent) on the free GitHub Actions cron.
+Plus `EVAL_HISTORY_WRITE_KEY` to record runs. Each provider is tracked across the tiers it actually has — **heavy → flagship → mid → mini → nano** — so you can see whether a cheap tier keeps pace with the top model (tiers are only added where a real model exists; Google and xAI have no model above their flagship on the API, so they stay at three — no padding). Edit [`models.json`](modeldrift/models.json) to change models; any OpenAI-compatible endpoint works with a `base_url`, and a model that rejects a `temperature` param (Fable 5, Opus 4.8, Sonnet 5, GPT-5 / mini / nano, Grok 4.5 / 4.3 / 4 Fast) sets `"temperature": null`. **16 models**, ~22 prompts each, weekly — still **cents per run** (Fable 5 is the priciest at ~$10/$50 per 1M, but the tiny token count keeps it under a cent) on the free GitHub Actions cron.
 
 ```bash
 pip install -e .

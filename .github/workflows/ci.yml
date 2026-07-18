@@ -19,4 +19,4 @@ jobs:
       - run: pip install -e ".[dev]"
       - run: pytest -q
       - name: The probe runs end to end on the mock (no keys, no spend)
-        run: python -m modeldrift.run | tee /dev/stderr | grep -q "accuracy 100.0%"
+        run: python -m modeldrift.run | tee /dev/stderr | grep -q "acc 100%"

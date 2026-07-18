@@ -1,5 +1,5 @@
 {
- "updated": "2026-07-18T19:23:15Z",
+ "updated": "2026-07-18T22:28:23Z",
  "series": {
   "mock:stable": [
    {
@@ -66,6 +66,22 @@
    },
    {
     "t": "2026-07-18T19:23:15Z",
+    "acc": 1.0,
+    "latency_ms": 0.0,
+    "out_chars": 4.6,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T22:27:49Z",
+    "acc": 1.0,
+    "latency_ms": 0.0,
+    "out_chars": 4.6,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T22:28:23Z",
     "acc": 1.0,
     "latency_ms": 0.0,
     "out_chars": 4.6,
