@@ -155,12 +155,15 @@ def update_metrics_file(path: str, results: List[dict], stamp: str, cap: int = 1
 def main(argv: Optional[List[str]] = None) -> int:
     import argparse
     from datetime import datetime, timezone
+    from pathlib import Path
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--api", default="https://eval-history.onrender.com")
     p.add_argument("--registry", default=None)
     p.add_argument("--out", default=None, help="also write results as JSON")
     p.add_argument("--metrics", default="dashboard/metrics.json",
                    help="time-series file for latency/verbosity the dashboard reads")
+    p.add_argument("--narrative", default="dashboard/narrative.json",
+                   help="generated prose summary of the board, for the portfolio")
     p.add_argument("--list-models", action="store_true",
                    help="print the model IDs each provider exposes to your key, then exit")
     args = p.parse_args(argv)
@@ -212,6 +215,24 @@ def main(argv: Optional[List[str]] = None) -> int:
     stamp = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     update_metrics_file(args.metrics, results, stamp)
     print(f"\nwrote latency/verbosity to {args.metrics}")
+
+    # Rebuild the portfolio's paragraph from the numbers just written, so the
+    # prose can't drift from the board the way a hand-written one did. Wrapped
+    # because a formatting bug in a *summary* must never fail the probe that
+    # produced the data — the run is the product, the sentence is a view of it.
+    try:
+        from .narrative import narrate
+        registry = json.loads(
+            (Path(args.registry) if args.registry
+             else Path(__file__).parent / "models.json").read_text(encoding="utf-8"))
+        metrics_now = json.loads(Path(args.metrics).read_text(encoding="utf-8"))
+        blurb = narrate(metrics_now, registry)
+        out = Path(args.narrative)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(blurb, indent=1) + "\n", encoding="utf-8")
+        print(f"wrote {blurb['claims_fired']} generated claim(s) to {args.narrative}")
+    except Exception as e:                     # noqa: BLE001 - never fail the probe
+        print(f"    (narrative not written: {e})")
 
     if args.out:
         with open(args.out, "w", encoding="utf-8") as fh:

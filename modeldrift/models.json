@@ -1,135 +1,186 @@
 [
-  {
-    "id": "mock:stable",
-    "label": "Mock (stable)",
-    "provider": "mock",
-    "model": "mock",
-    "key_env": "NONE"
-  },
-  {
-    "id": "openai:gpt-5",
-    "label": "GPT-5",
-    "provider": "openai",
-    "model": "gpt-5",
-    "key_env": "OPENAI_API_KEY",
-    "temperature": null
-  },
-  {
-    "id": "openai:gpt-5-mini",
-    "label": "GPT-5 mini",
-    "provider": "openai",
-    "model": "gpt-5-mini",
-    "key_env": "OPENAI_API_KEY",
-    "temperature": null
-  },
-  {
-    "id": "openai:gpt-4o-mini",
-    "label": "GPT-4o mini",
-    "provider": "openai",
-    "model": "gpt-4o-mini",
-    "key_env": "OPENAI_API_KEY"
-  },
-  {
-    "id": "openai:gpt-5-nano",
-    "label": "GPT-5 nano",
-    "provider": "openai",
-    "model": "gpt-5-nano",
-    "key_env": "OPENAI_API_KEY",
-    "temperature": null
-  },
-  {
-    "id": "anthropic:claude-fable-5",
-    "label": "Claude Fable 5",
-    "provider": "anthropic",
-    "model": "claude-fable-5",
-    "key_env": "ANTHROPIC_API_KEY",
-    "temperature": null
-  },
-  {
-    "id": "anthropic:claude-opus-4-8",
-    "label": "Claude Opus 4.8",
-    "provider": "anthropic",
-    "model": "claude-opus-4-8",
-    "key_env": "ANTHROPIC_API_KEY",
-    "temperature": null
-  },
-  {
-    "id": "anthropic:claude-sonnet-5",
-    "label": "Claude Sonnet 5",
-    "provider": "anthropic",
-    "model": "claude-sonnet-5",
-    "key_env": "ANTHROPIC_API_KEY",
-    "temperature": null
-  },
-  {
-    "id": "anthropic:claude-haiku-4-5",
-    "label": "Claude Haiku 4.5",
-    "provider": "anthropic",
-    "model": "claude-haiku-4-5",
-    "key_env": "ANTHROPIC_API_KEY"
-  },
-  {
-    "id": "google:gemini-3.1-pro",
-    "label": "Gemini 3.1 Pro",
-    "provider": "gemini",
-    "model": "gemini-3.1-pro-preview",
-    "key_env": "GEMINI_API_KEY"
-  },
-  {
-    "id": "google:gemini-3.5-flash",
-    "label": "Gemini 3.5 Flash",
-    "provider": "gemini",
-    "model": "gemini-3.5-flash",
-    "key_env": "GEMINI_API_KEY"
-  },
-  {
-    "id": "google:gemini-3.1-flash-lite",
-    "label": "Gemini 3.1 Flash-Lite",
-    "provider": "gemini",
-    "model": "gemini-3.1-flash-lite",
-    "key_env": "GEMINI_API_KEY"
-  },
-  {
-    "id": "xai:grok-4.5",
-    "label": "Grok 4.5",
-    "provider": "openai-compatible",
-    "model": "grok-4.5",
-    "key_env": "XAI_API_KEY",
-    "base_url": "https://api.x.ai/v1",
-    "temperature": null
-  },
-  {
-    "id": "xai:grok-4.3",
-    "label": "Grok 4.3",
-    "provider": "openai-compatible",
-    "model": "grok-4.3",
-    "key_env": "XAI_API_KEY",
-    "base_url": "https://api.x.ai/v1",
-    "temperature": null
-  },
-  {
-    "id": "xai:grok-4-fast",
-    "label": "Grok 4 Fast",
-    "provider": "openai-compatible",
-    "model": "grok-4-fast-non-reasoning",
-    "key_env": "XAI_API_KEY",
-    "base_url": "https://api.x.ai/v1",
-    "temperature": null
-  },
-  {
-    "id": "meta:llama-3.3-70b",
-    "label": "Llama 3.3 70B",
-    "provider": "openai-compatible",
-    "model": "llama-3.3-70b-versatile",
-    "key_env": "GROQ_API_KEY",
-    "base_url": "https://api.groq.com/openai/v1"
-  },
-  {
-    "id": "meta:llama-3.1-8b",
-    "label": "Llama 3.1 8B",
-    "provider": "openai-compatible",
-    "model": "llama-3.1-8b-instant",
-    "key_env": "GROQ_API_KEY",
-    "base_url": "https://api.groq.com/openai/v1"
-  }
+ {
+  "id": "mock:stable",
+  "label": "Mock (stable)",
+  "provider": "mock",
+  "model": "mock",
+  "key_env": "NONE",
+  "group": "Mock",
+  "tier": "mock",
+  "color": "#8b8b8b"
+ },
+ {
+  "id": "openai:gpt-5",
+  "label": "GPT-5",
+  "provider": "openai",
+  "model": "gpt-5",
+  "key_env": "OPENAI_API_KEY",
+  "temperature": null,
+  "group": "OpenAI",
+  "tier": "flagship",
+  "color": "#2fb8a0"
+ },
+ {
+  "id": "openai:gpt-5-mini",
+  "label": "GPT-5 mini",
+  "provider": "openai",
+  "model": "gpt-5-mini",
+  "key_env": "OPENAI_API_KEY",
+  "temperature": null,
+  "group": "OpenAI",
+  "tier": "mid",
+  "color": "#48c1ac"
+ },
+ {
+  "id": "openai:gpt-4o-mini",
+  "label": "GPT-4o mini",
+  "provider": "openai",
+  "model": "gpt-4o-mini",
+  "key_env": "OPENAI_API_KEY",
+  "group": "OpenAI",
+  "tier": "mini",
+  "color": "#7bd7c6"
+ },
+ {
+  "id": "openai:gpt-5-nano",
+  "label": "GPT-5 nano",
+  "provider": "openai",
+  "model": "gpt-5-nano",
+  "key_env": "OPENAI_API_KEY",
+  "temperature": null,
+  "group": "OpenAI",
+  "tier": "nano",
+  "color": "#a6e7db"
+ },
+ {
+  "id": "anthropic:claude-fable-5",
+  "label": "Claude Fable 5",
+  "provider": "anthropic",
+  "model": "claude-fable-5",
+  "key_env": "ANTHROPIC_API_KEY",
+  "temperature": null,
+  "group": "Anthropic",
+  "tier": "heavy",
+  "color": "#d97e12"
+ },
+ {
+  "id": "anthropic:claude-opus-4-8",
+  "label": "Claude Opus 4.8",
+  "provider": "anthropic",
+  "model": "claude-opus-4-8",
+  "key_env": "ANTHROPIC_API_KEY",
+  "temperature": null,
+  "group": "Anthropic",
+  "tier": "flagship",
+  "color": "#e8912a"
+ },
+ {
+  "id": "anthropic:claude-sonnet-5",
+  "label": "Claude Sonnet 5",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5",
+  "key_env": "ANTHROPIC_API_KEY",
+  "temperature": null,
+  "group": "Anthropic",
+  "tier": "mid",
+  "color": "#f2a53c"
+ },
+ {
+  "id": "anthropic:claude-haiku-4-5",
+  "label": "Claude Haiku 4.5",
+  "provider": "anthropic",
+  "model": "claude-haiku-4-5",
+  "key_env": "ANTHROPIC_API_KEY",
+  "group": "Anthropic",
+  "tier": "mini",
+  "color": "#f7cd8a"
+ },
+ {
+  "id": "google:gemini-3.1-pro",
+  "label": "Gemini 3.1 Pro",
+  "provider": "gemini",
+  "model": "gemini-3.1-pro-preview",
+  "key_env": "GEMINI_API_KEY",
+  "group": "Google",
+  "tier": "flagship",
+  "color": "#3b82f6"
+ },
+ {
+  "id": "google:gemini-3.5-flash",
+  "label": "Gemini 3.5 Flash",
+  "provider": "gemini",
+  "model": "gemini-3.5-flash",
+  "key_env": "GEMINI_API_KEY",
+  "group": "Google",
+  "tier": "mid",
+  "color": "#60a5fa"
+ },
+ {
+  "id": "google:gemini-3.1-flash-lite",
+  "label": "Gemini 3.1 Flash-Lite",
+  "provider": "gemini",
+  "model": "gemini-3.1-flash-lite",
+  "key_env": "GEMINI_API_KEY",
+  "group": "Google",
+  "tier": "mini",
+  "color": "#a9cdfb"
+ },
+ {
+  "id": "xai:grok-4.5",
+  "label": "Grok 4.5",
+  "provider": "openai-compatible",
+  "model": "grok-4.5",
+  "key_env": "XAI_API_KEY",
+  "base_url": "https://api.x.ai/v1",
+  "temperature": null,
+  "group": "xAI",
+  "tier": "flagship",
+  "color": "#d6488a"
+ },
+ {
+  "id": "xai:grok-4.3",
+  "label": "Grok 4.3",
+  "provider": "openai-compatible",
+  "model": "grok-4.3",
+  "key_env": "XAI_API_KEY",
+  "base_url": "https://api.x.ai/v1",
+  "temperature": null,
+  "group": "xAI",
+  "tier": "mid",
+  "color": "#e06c9f"
+ },
+ {
+  "id": "xai:grok-4-fast",
+  "label": "Grok 4 Fast",
+  "provider": "openai-compatible",
+  "model": "grok-4-fast-non-reasoning",
+  "key_env": "XAI_API_KEY",
+  "base_url": "https://api.x.ai/v1",
+  "temperature": null,
+  "group": "xAI",
+  "tier": "mini",
+  "color": "#f0aecb"
+ },
+ {
+  "id": "meta:llama-3.3-70b",
+  "label": "Llama 3.3 70B",
+  "provider": "openai-compatible",
+  "model": "llama-3.3-70b-versatile",
+  "key_env": "GROQ_API_KEY",
+  "base_url": "https://api.groq.com/openai/v1",
+  "group": "Meta",
+  "tier": "flagship",
+  "color": "#c084fc"
+ },
+ {
+  "id": "meta:llama-3.1-8b",
+  "label": "Llama 3.1 8B",
+  "provider": "openai-compatible",
+  "model": "llama-3.1-8b-instant",
+  "key_env": "GROQ_API_KEY",
+  "base_url": "https://api.groq.com/openai/v1",
+  "group": "Meta",
+  "tier": "mini",
+  "color": "#d8b4fe"
+ }
 ]

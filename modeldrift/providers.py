@@ -39,6 +39,13 @@ class Model:
     key_env: str       # env var holding the api key
     base_url: Optional[str] = None      # for openai-compatible providers (xAI, Groq, …)
     temperature: Optional[float] = 0.0  # None → omit it (flagships that reject the param)
+    # Presentation + comparison metadata. These used to be duplicated in a hand-kept
+    # array in dashboard/index.html, which meant adding a model here left it tracked
+    # but invisible on the board. The registry is the one source now; the dashboard
+    # and the narrative generator both read it.
+    group: str = ""                     # the lab, e.g. "OpenAI" — one legend row each
+    tier: str = ""                      # heavy | flagship | mid | mini | nano | mock
+    color: str = "#8b8b8b"              # legend/series colour
 
     @property
     def available(self) -> bool:
