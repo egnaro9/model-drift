@@ -1,5 +1,5 @@
 {
- "updated": "2026-07-18T10:17:23Z",
+ "updated": "2026-07-18T17:29:32Z",
  "series": {
   "mock:stable": [
    {
@@ -10,6 +10,14 @@
    },
    {
     "t": "2026-07-18T10:17:23Z",
+    "acc": 1.0,
+    "latency_ms": 0.0,
+    "out_chars": 4.6,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T17:29:32Z",
     "acc": 1.0,
     "latency_ms": 0.0,
     "out_chars": 4.6,
@@ -31,6 +39,14 @@
     "out_chars": 4.5,
     "reliability": 1.0,
     "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T17:29:32Z",
+    "acc": 1.0,
+    "latency_ms": 1999.9,
+    "out_chars": 4.5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
    }
   ],
   "openai:gpt-5-mini": [
@@ -44,6 +60,14 @@
     "t": "2026-07-18T10:17:23Z",
     "acc": 1.0,
     "latency_ms": 1347.4,
+    "out_chars": 4.5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T17:29:32Z",
+    "acc": 1.0,
+    "latency_ms": 1631.9,
     "out_chars": 4.5,
     "reliability": 1.0,
     "refusal_rate": 0.0
@@ -63,6 +87,14 @@
     "out_chars": 6.3,
     "reliability": 1.0,
     "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T17:29:32Z",
+    "acc": 0.7727,
+    "latency_ms": 463.6,
+    "out_chars": 6.4,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
    }
   ],
   "openai:gpt-5-nano": [
@@ -79,6 +111,14 @@
     "out_chars": 4.4,
     "reliability": 1.0,
     "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T17:29:32Z",
+    "acc": 1.0,
+    "latency_ms": 1768.3,
+    "out_chars": 4.5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
    }
   ],
   "anthropic:claude-fable-5": [
@@ -92,6 +132,14 @@
     "t": "2026-07-18T10:17:23Z",
     "acc": 1.0,
     "latency_ms": 3342.0,
+    "out_chars": 4.6,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T17:29:32Z",
+    "acc": 1.0,
+    "latency_ms": 3305.0,
     "out_chars": 4.6,
     "reliability": 1.0,
     "refusal_rate": 0.0
@@ -111,6 +159,14 @@
     "out_chars": 4.6,
     "reliability": 1.0,
     "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T17:29:32Z",
+    "acc": 1.0,
+    "latency_ms": 1003.4,
+    "out_chars": 4.6,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
    }
   ],
   "anthropic:claude-sonnet-5": [
@@ -127,6 +183,14 @@
     "out_chars": 12.1,
     "reliability": 1.0,
     "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T17:29:32Z",
+    "acc": 0.8636,
+    "latency_ms": 1368.7,
+    "out_chars": 14.3,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
    }
   ],
   "anthropic:claude-haiku-4-5": [
@@ -140,6 +204,14 @@
     "t": "2026-07-18T10:17:23Z",
     "acc": 0.8636,
     "latency_ms": 712.7,
+    "out_chars": 5.7,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T17:29:32Z",
+    "acc": 0.8636,
+    "latency_ms": 713.1,
     "out_chars": 5.7,
     "reliability": 1.0,
     "refusal_rate": 0.0
