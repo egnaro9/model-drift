@@ -43,7 +43,7 @@ The runner **only probes a model whose API key is present**, so you fund exactly
 | Anthropic — Fable 5 · Opus 4.8 · Sonnet 5 · Haiku 4.5 | `ANTHROPIC_API_KEY` |
 | Google — Gemini 2.5 Pro · Flash · Flash-Lite | `GEMINI_API_KEY` |
 | xAI — Grok 4 Heavy · 4.5 · 4.3 · 4.1 Fast | `XAI_API_KEY` |
-| Groq — Llama 3.3 70B (free tier) | `GROQ_API_KEY` |
+| Meta — Llama 3.3 70B (open-weights; served free via Groq) | `GROQ_API_KEY` |
 
 Plus `EVAL_HISTORY_WRITE_KEY` to record runs. Each provider is tracked across the tiers it actually has — **heavy → flagship → mid → mini → nano** — so you can see whether a cheap tier keeps pace with the top model (tiers are only added where a real model exists; Google has no model above Pro or below Flash-Lite, so it stays at three — no padding). Edit [`models.json`](modeldrift/models.json) to change models; any OpenAI-compatible endpoint works with a `base_url`, and a model that rejects a `temperature` param (Fable 5, Opus 4.8, Sonnet 5, GPT-5 / mini / nano) sets `"temperature": null`. **16 series**, ~22 prompts each, weekly — still **cents per run** (Fable 5 is the priciest at ~$10/$50 per 1M, but the tiny token count keeps it under a cent) on the free GitHub Actions cron.
 

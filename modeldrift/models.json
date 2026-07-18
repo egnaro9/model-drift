@@ -117,8 +117,8 @@
     "temperature": null
   },
   {
-    "id": "groq:llama-3.3-70b",
-    "label": "Llama 3.3 70B (Groq)",
+    "id": "meta:llama-3.3-70b",
+    "label": "Llama 3.3 70B",
     "provider": "openai-compatible",
     "model": "llama-3.3-70b-versatile",
     "key_env": "GROQ_API_KEY",
