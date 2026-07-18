@@ -34,14 +34,15 @@ def test_gemini_temperature_is_conditional():
 def test_registry_parses_flagships_with_null_temperature():
     reg = {m.id: m for m in load_registry()}
     # every known param-strict model must load with temperature omitted
-    for pid in ("openai:gpt-5", "openai:gpt-5-mini",
-                "anthropic:claude-opus-4-8", "anthropic:claude-sonnet-5"):
+    for pid in ("openai:gpt-5", "openai:gpt-5-mini", "openai:gpt-5-nano",
+                "anthropic:claude-fable-5", "anthropic:claude-opus-4-8", "anthropic:claude-sonnet-5"):
         assert reg[pid].temperature is None, pid
     # a mini that accepts the param keeps the deterministic default
     assert reg["openai:gpt-4o-mini"].temperature == 0.0
-    # three tiers tracked for each of the big four
-    for prefix in ("openai:", "anthropic:", "google:", "xai:"):
-        assert sum(1 for k in reg if k.startswith(prefix)) == 3, prefix
+    # tier depth per big-four provider (only where a real model exists — no padding)
+    expected = {"openai:": 4, "anthropic:": 4, "google:": 3, "xai:": 4}
+    for prefix, n in expected.items():
+        assert sum(1 for k in reg if k.startswith(prefix)) == n, prefix
     # Grok routes through the OpenAI-compatible path with xAI's base url
     assert reg["xai:grok-4.5"].provider == "openai-compatible"
     assert reg["xai:grok-4.5"].base_url == "https://api.x.ai/v1"

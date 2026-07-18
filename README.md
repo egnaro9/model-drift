@@ -27,15 +27,15 @@ frozen suite ──►  live model APIs  ──►  deterministic grader  ──
 
 The runner **only probes a model whose API key is present**, so you fund exactly what you choose. Add the secret in the repo's Settings → Secrets → Actions and it appears on the next run:
 
-| Provider (three tiers tracked) | Secret |
+| Provider (tiers tracked) | Secret |
 | --- | --- |
-| OpenAI — GPT-5 · GPT-5 mini · GPT-4o mini | `OPENAI_API_KEY` |
-| Anthropic — Claude Opus 4.8 · Sonnet 5 · Haiku 4.5 | `ANTHROPIC_API_KEY` |
+| OpenAI — GPT-5 · GPT-5 mini · GPT-4o mini · GPT-5 nano | `OPENAI_API_KEY` |
+| Anthropic — Fable 5 · Opus 4.8 · Sonnet 5 · Haiku 4.5 | `ANTHROPIC_API_KEY` |
 | Google — Gemini 2.5 Pro · Flash · Flash-Lite | `GEMINI_API_KEY` |
-| xAI — Grok 4.5 · 4.3 · 4.1 Fast | `XAI_API_KEY` |
+| xAI — Grok 4 Heavy · 4.5 · 4.3 · 4.1 Fast | `XAI_API_KEY` |
 | Groq — Llama 3.3 70B (free tier) | `GROQ_API_KEY` |
 
-Plus `EVAL_HISTORY_WRITE_KEY` to record runs. Each of the big four is tracked across **three tiers** — flagship (the headline), mid, and mini — so you can see whether a provider's cheap tier keeps pace with its top model. Edit [`models.json`](modeldrift/models.json) to change models; any OpenAI-compatible endpoint works with a `base_url`, and a model that rejects a `temperature` param (Opus 4.8, Sonnet 5, GPT-5, GPT-5 mini) sets `"temperature": null`. The suite is ~22 prompts × a dozen models, weekly — **cents per run**, on the free GitHub Actions cron.
+Plus `EVAL_HISTORY_WRITE_KEY` to record runs. Each provider is tracked across the tiers it actually has — **heavy → flagship → mid → mini → nano** — so you can see whether a cheap tier keeps pace with the top model (tiers are only added where a real model exists; Google has no model above Pro or below Flash-Lite, so it stays at three — no padding). Edit [`models.json`](modeldrift/models.json) to change models; any OpenAI-compatible endpoint works with a `base_url`, and a model that rejects a `temperature` param (Fable 5, Opus 4.8, Sonnet 5, GPT-5 / mini / nano) sets `"temperature": null`. **16 series**, ~22 prompts each, weekly — still **cents per run** (Fable 5 is the priciest at ~$10/$50 per 1M, but the tiny token count keeps it under a cent) on the free GitHub Actions cron.
 
 ```bash
 pip install -e .

@@ -7,7 +7,11 @@
    "model": "gpt-5-mini", "key_env": "OPENAI_API_KEY", "temperature": null},
   {"id": "openai:gpt-4o-mini", "label": "GPT-4o mini", "provider": "openai",
    "model": "gpt-4o-mini", "key_env": "OPENAI_API_KEY"},
+  {"id": "openai:gpt-5-nano", "label": "GPT-5 nano", "provider": "openai",
+   "model": "gpt-5-nano", "key_env": "OPENAI_API_KEY", "temperature": null},
 
+  {"id": "anthropic:claude-fable-5", "label": "Claude Fable 5", "provider": "anthropic",
+   "model": "claude-fable-5", "key_env": "ANTHROPIC_API_KEY", "temperature": null},
   {"id": "anthropic:claude-opus-4-8", "label": "Claude Opus 4.8", "provider": "anthropic",
    "model": "claude-opus-4-8", "key_env": "ANTHROPIC_API_KEY", "temperature": null},
   {"id": "anthropic:claude-sonnet-5", "label": "Claude Sonnet 5", "provider": "anthropic",
@@ -22,6 +26,8 @@
   {"id": "google:gemini-2.5-flash-lite", "label": "Gemini 2.5 Flash-Lite", "provider": "gemini",
    "model": "gemini-2.5-flash-lite", "key_env": "GEMINI_API_KEY"},
 
+  {"id": "xai:grok-4-heavy", "label": "Grok 4 Heavy", "provider": "openai-compatible",
+   "model": "grok-4-heavy", "key_env": "XAI_API_KEY", "base_url": "https://api.x.ai/v1"},
   {"id": "xai:grok-4.5", "label": "Grok 4.5", "provider": "openai-compatible",
    "model": "grok-4.5", "key_env": "XAI_API_KEY", "base_url": "https://api.x.ai/v1"},
   {"id": "xai:grok-4.3", "label": "Grok 4.3", "provider": "openai-compatible",
