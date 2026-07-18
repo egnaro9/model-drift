@@ -1,8 +1,11 @@
 name: track
 on:
   schedule:
-    - cron: "17 8 * * 1"      # every Monday 08:17 UTC
+    - cron: "17 8 * * 1"      # every Monday 08:17 UTC — the automatic weekly run
   workflow_dispatch:           # or run it by hand from the Actions tab
+permissions:
+  contents: write              # to commit the updated RESULTS.md
+  issues: write                # to open a regression alert issue
 jobs:
   probe:
     runs-on: ubuntu-latest
@@ -12,13 +15,47 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -e .
+
       - name: Probe the models that have a key set
         env:
           # Each is optional — the runner skips any model whose key is absent,
-          # so you fund exactly the models you choose to add here as secrets.
+          # so you fund exactly the models you add here as secrets.
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           EVAL_HISTORY_WRITE_KEY: ${{ secrets.EVAL_HISTORY_WRITE_KEY }}
         run: python -m modeldrift.run
+
+      - name: Report — update standings, alert only on a regression
+        id: report
+        run: |
+          python -m modeldrift.report \
+            --results RESULTS.md \
+            --alert "$RUNNER_TEMP/alert.md" \
+            --draft "$RUNNER_TEMP/draft.md"
+
+      - name: Commit the updated standings
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add RESULTS.md
+          git diff --cached --quiet || git commit -m "chore: update drift standings [skip ci]"
+          git push || true
+
+      # ── news, not schedule: the next two only fire on a real regression ──
+      - name: Open a regression alert issue
+        if: steps.report.outputs.regressed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title=$(head -1 "$RUNNER_TEMP/alert.md")
+          body=$(tail -n +3 "$RUNNER_TEMP/alert.md")
+          gh issue create --title "$title" --body "$body" --label drift || true
+
+      - name: Upload the ready-to-post draft (post it by hand, if it's worth saying)
+        if: steps.report.outputs.regressed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: social-draft
+          path: ${{ runner.temp }}/draft.md

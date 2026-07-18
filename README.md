@@ -2,7 +2,7 @@
 
 [![ci](https://github.com/egnaro9/model-drift/actions/workflows/ci.yml/badge.svg)](https://github.com/egnaro9/model-drift/actions/workflows/ci.yml)
 [![python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org/)
-[![tests](https://img.shields.io/badge/tests-7-brightgreen)](tests)
+[![tests](https://img.shields.io/badge/tests-13-brightgreen)](tests)
 
 **A public LLM regression tracker. A frozen suite runs against live models on a schedule; every score is kept, so you can watch each model's quality over time — and see when it drops.**
 
@@ -42,6 +42,16 @@ OPENAI_API_KEY=... EVAL_HISTORY_WRITE_KEY=... python -m modeldrift.run
 python -m modeldrift.run
 ```
 
+## Automatic — but signal, not noise
+
+The [weekly workflow](.github/workflows/track.yml) runs on its own (Monday cron), and after each probe it:
+
+- **updates [`RESULTS.md`](RESULTS.md)** — the current standings, committed to the repo, every run;
+- **opens a GitHub issue *only when a model regressed*** week-over-week — the automatic "go look" trigger;
+- **attaches a ready-to-post writeup** to the run when there's a regression, for you to publish by hand.
+
+That last part is deliberate. A drift post is worth making when a model *actually drifted* — "Claude dropped 8 points this week" — not on a fixed clock; a weekly "nothing changed" post is spam. So the machine runs, records, and raises the alarm automatically; the outward-facing post stays a human decision, on real news. Automate the launches, never the approval.
+
 ## Honest about being free
 
 The tracker runs weekly on a free cron and a small spend. The dashboard shows **"last updated"** plainly, so if a run is skipped you see it — a drift tracker that hides its own staleness would be the very thing it warns about.
@@ -51,7 +61,7 @@ The tracker runs weekly on a free cron and a small spend. The dashboard shows **
 Built on the pieces it needed already: [eval-history](https://github.com/egnaro9/eval-history) stores the runs and computes the run-to-run comparison; the scoring mirrors [rag-eval-lab](https://github.com/egnaro9/rag-eval-lab). stdlib `urllib` only — no SDKs, no dependencies.
 
 ```bash
-pip install -e ".[dev]" && pytest -q     # 7 tests, stdlib only
+pip install -e ".[dev]" && pytest -q     # 13 tests, stdlib only
 ```
 
 ---
