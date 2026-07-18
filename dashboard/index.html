@@ -170,7 +170,10 @@ const MODELS = [
   { id: "groq:llama-3.3-70b",            label: "Llama 3.3 70B",      color: "#c084fc", group: "Groq",      tier: "open" },
 ];
 const esc = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
-const METRICS_URL = "./metrics.json";  // written by the weekly runner, served same-origin
+// read the metrics time series straight from the repo (raw is CORS-open and always
+// current) — the weekly runner commits it with [skip ci], so Pages never rebuilds
+// to re-serve a same-origin copy; raw sidesteps that entirely.
+const METRICS_URL = "https://raw.githubusercontent.com/egnaro9/model-drift/main/dashboard/metrics.json";
 
 // The three tracked metrics. Accuracy comes from eval-history; speed + verbosity
 // from metrics.json. betterUp says which direction is "good" (latency: lower).
