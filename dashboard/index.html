@@ -46,7 +46,20 @@
   .num{font-family:var(--mono); font-variant-numeric:tabular-nums}
   .badge{font-family:var(--mono); font-size:11px; padding:2px 8px; border-radius:3px; border:1px solid currentColor}
   .b-good{color:var(--good)} .b-bad{color:var(--bad)} .b-warn{color:var(--fg-faint)}
-  .legend{display:flex; flex-wrap:wrap; gap:14px; margin-top:12px; font-size:12.5px; color:var(--fg-dim); font-family:var(--mono)}
+
+  /* interactive legend — click a chip to show/hide that model */
+  .controls{display:flex; align-items:center; gap:14px; margin-top:16px;
+    font-family:var(--mono); font-size:11.5px; color:var(--fg-faint)}
+  .controls button{cursor:pointer; color:var(--fg-faint); background:transparent; border:0; padding:0;
+    font:inherit; border-bottom:1px dashed var(--line)}
+  .controls button:hover{color:var(--fg)}
+  .legend{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+  .legend button{display:inline-flex; align-items:center; gap:7px; cursor:pointer; font-family:var(--mono);
+    font-size:12px; color:var(--fg-dim); background:transparent; border:1px solid var(--line);
+    border-radius:20px; padding:4px 11px 4px 9px; transition:opacity .12s, border-color .12s, color .12s}
+  .legend button:hover{border-color:var(--fg-faint); color:var(--fg)}
+  .legend button.off{opacity:.38; text-decoration:line-through}
+
   .note{color:var(--fg-dim); font-size:14px; max-width:64ch}
   .empty{color:var(--fg-faint); font-family:var(--mono); font-size:13px; padding:20px 0; text-align:center}
   footer{margin-top:40px; padding-top:20px; border-top:1px solid var(--line); font-family:var(--mono); font-size:12.5px; color:var(--fg-faint)}
@@ -68,6 +81,11 @@
 
   <div class="card">
     <svg id="chart" viewBox="0 0 860 340" role="img" aria-label="Accuracy over time per model"></svg>
+    <div class="controls">
+      <span>Click a model to show/hide it:</span>
+      <button id="show-all" type="button">show all</button>
+      <button id="hide-all" type="button">hide all</button>
+    </div>
     <div class="legend" id="legend"></div>
   </div>
 
@@ -119,6 +137,14 @@ const MODELS = [
 const fmtPct = v => (v*100).toFixed(1) + "%";
 const esc = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 
+// which models the viewer has hidden — persisted so the choice sticks across visits
+const HIDE_KEY = "md-hidden";
+const loadHidden = () => { try { return new Set(JSON.parse(localStorage.getItem(HIDE_KEY) || "[]")); } catch { return new Set(); } };
+const saveHidden = () => { try { localStorage.setItem(HIDE_KEY, JSON.stringify([...hidden])); } catch {} };
+const hidden = loadHidden();
+
+let SERIES = [];  // cached after fetch, so toggling never re-hits the network
+
 async function fetchSeries(m) {
   try {
     const r = await fetch(`${API}/runs?name=${encodeURIComponent(m.id)}&limit=52`);
@@ -130,54 +156,68 @@ async function fetchSeries(m) {
   } catch { return { ...m, runs: [] }; }
 }
 
-function render(series) {
-  const withData = series.filter(s => s.runs.length);
-  const all = withData.flatMap(s => s.runs);
-  document.getElementById("legend").innerHTML = MODELS.map(m =>
-    `<span><span class="swatch" style="background:${m.color}"></span>${esc(m.label)}</span>`).join("");
+function renderLegend() {
+  document.getElementById("legend").innerHTML = MODELS.map(m => {
+    const off = hidden.has(m.id) ? " off" : "";
+    return `<button type="button" class="chip${off}" data-id="${m.id}" aria-pressed="${!hidden.has(m.id)}">`
+         + `<span class="swatch" style="background:${m.color}"></span>${esc(m.label)}</button>`;
+  }).join("");
+}
 
-  if (!all.length) {
-    document.getElementById("updated").textContent =
-      "No runs recorded yet — the first scheduled probe will populate this.";
-    document.getElementById("chart").innerHTML =
-      `<text x="430" y="170" text-anchor="middle" class="tick">waiting for the first run</text>`;
-    document.getElementById("empty").hidden = false;
-    document.getElementById("empty").textContent = "No data yet.";
+function render() {
+  renderLegend();
+  const vis = SERIES.filter(s => !hidden.has(s.id));       // respect the viewer's selection
+  const visWithData = vis.filter(s => s.runs.length);
+  const shown = visWithData.flatMap(s => s.runs);
+  const anyData = SERIES.some(s => s.runs.length);
+  const chart = document.getElementById("chart");
+  const updated = document.getElementById("updated");
+  const empty = document.getElementById("empty");
+
+  // last-updated reflects ALL data (honest freshness), regardless of what's filtered in
+  const allRuns = SERIES.flatMap(s => s.runs);
+  updated.textContent = !anyData
+    ? "No runs recorded yet — the first scheduled probe will populate this."
+    : `Last updated ${new Date(Math.max(...allRuns.map(r => +r.t))).toLocaleString()} · `
+      + `showing ${vis.length} of ${MODELS.length} models`;
+
+  if (!shown.length) {
+    chart.innerHTML = `<text x="430" y="170" text-anchor="middle" class="tick">`
+      + (!anyData ? "waiting for the first run" : "no models selected — click one below") + `</text>`;
+  } else {
+    // ── chart (axes zoom to the visible selection) ──
+    const W=860,H=340, m={l:44,r:14,t:16,b:28};
+    const xs = shown.map(r=>+r.t), x0=Math.min(...xs), x1=Math.max(...xs)||x0+1;
+    const ys = shown.map(r=>r.acc); let y0=Math.min(...ys,0.5), y1=1.0; if(y1-y0<0.1)y0=y1-0.1;
+    const px = t => m.l + (W-m.l-m.r) * ((+t - x0) / (x1 - x0 || 1));
+    const py = v => m.t + (H-m.t-m.b) * (1 - (v - y0) / (y1 - y0 || 1));
+    let svg = "";
+    for (let g=0; g<=4; g++){ const v=y0+(y1-y0)*g/4, y=py(v);
+      svg += `<line class="gl" x1="${m.l}" y1="${y}" x2="${W-m.r}" y2="${y}"/>`;
+      svg += `<text class="tick" x="${m.l-6}" y="${y+3}" text-anchor="end">${(v*100).toFixed(0)}%</text>`; }
+    svg += `<line class="axis" x1="${m.l}" y1="${H-m.b}" x2="${W-m.r}" y2="${H-m.b}"/>`;
+    svg += `<text class="tick" x="${m.l}" y="${H-8}">${new Date(x0).toLocaleDateString()}</text>`;
+    svg += `<text class="tick" x="${W-m.r}" y="${H-8}" text-anchor="end">${new Date(x1).toLocaleDateString()}</text>`;
+    for (const s of visWithData){
+      const pts = s.runs.map(r=>`${px(r.t)},${py(r.acc)}`).join(" ");
+      svg += `<polyline class="series" points="${pts}" stroke="${s.color}"/>`;
+      svg += s.runs.map(r=>`<circle class="dot" cx="${px(r.t)}" cy="${py(r.acc)}" r="3" fill="${s.color}"/>`).join("");
+    }
+    chart.innerHTML = svg;
+  }
+
+  // ── table (visible models only) ──
+  if (!vis.length) {
+    document.getElementById("tbody").innerHTML = "";
+    empty.hidden = false; empty.textContent = "All models hidden — click one above to show it.";
     return;
   }
-
-  const newest = new Map(withData.map(s => [s.id, s.runs.at(-1)]));
-  const lastAt = new Date(Math.max(...all.map(r => r.t)));
-  document.getElementById("updated").textContent =
-    `Last updated ${lastAt.toLocaleString()} · ${withData.length} model(s) tracked · ${all.length} runs`;
-
-  // ── chart ──
-  const W=860,H=340, m={l:44,r:14,t:16,b:28};
-  const xs = all.map(r=>+r.t), x0=Math.min(...xs), x1=Math.max(...xs)||x0+1;
-  const ys = all.map(r=>r.acc); let y0=Math.min(...ys,0.5), y1=1.0; if(y1-y0<0.1)y0=y1-0.1;
-  const px = t => m.l + (W-m.l-m.r) * ((+t - x0) / (x1 - x0 || 1));
-  const py = v => m.t + (H-m.t-m.b) * (1 - (v - y0) / (y1 - y0 || 1));
-  let svg = "";
-  for (let g=0; g<=4; g++){ const v=y0+(y1-y0)*g/4, y=py(v);
-    svg += `<line class="gl" x1="${m.l}" y1="${y}" x2="${W-m.r}" y2="${y}"/>`;
-    svg += `<text class="tick" x="${m.l-6}" y="${y+3}" text-anchor="end">${(v*100).toFixed(0)}%</text>`; }
-  svg += `<line class="axis" x1="${m.l}" y1="${H-m.b}" x2="${W-m.r}" y2="${H-m.b}"/>`;
-  svg += `<text class="tick" x="${m.l}" y="${H-8}">${new Date(x0).toLocaleDateString()}</text>`;
-  svg += `<text class="tick" x="${W-m.r}" y="${H-8}" text-anchor="end">${new Date(x1).toLocaleDateString()}</text>`;
-  for (const s of withData){
-    const pts = s.runs.map(r=>`${px(r.t)},${py(r.acc)}`).join(" ");
-    svg += `<polyline class="series" points="${pts}" stroke="${s.color}"/>`;
-    svg += s.runs.map(r=>`<circle class="dot" cx="${px(r.t)}" cy="${py(r.acc)}" r="3" fill="${s.color}"/>`).join("");
-  }
-  document.getElementById("chart").innerHTML = svg;
-
-  // ── table ──
-  const rows = MODELS.map(m => {
-    const s = series.find(x=>x.id===m.id);
-    if (!s || !s.runs.length)
+  empty.hidden = true;
+  document.getElementById("tbody").innerHTML = vis.map(m => {
+    if (!m.runs.length)
       return `<tr><td><span class="swatch" style="background:${m.color}"></span>${esc(m.label)}</td>
         <td class="num" colspan="4" style="color:var(--fg-faint)">no runs yet</td></tr>`;
-    const latest = s.runs.at(-1), prev = s.runs.length>1 ? s.runs.at(-2) : null;
+    const latest = m.runs.at(-1), prev = m.runs.length>1 ? m.runs.at(-2) : null;
     const d = prev ? latest.acc - prev.acc : null;
     let badge = `<span class="badge b-warn">baseline</span>`;
     if (d !== null) badge = d < -1e-9 ? `<span class="badge b-bad">▼ regressed</span>`
@@ -192,10 +232,21 @@ function render(series) {
       <td class="num" style="color:var(--fg-faint)">${latest.t.toLocaleDateString()}</td>
     </tr>`;
   }).join("");
-  document.getElementById("tbody").innerHTML = rows;
 }
 
-Promise.all(MODELS.map(fetchSeries)).then(render).catch(e => {
+// toggle a model when its chip is clicked (event delegation)
+document.getElementById("legend").addEventListener("click", e => {
+  const btn = e.target.closest("button[data-id]");
+  if (!btn) return;
+  const id = btn.dataset.id;
+  hidden.has(id) ? hidden.delete(id) : hidden.add(id);
+  saveHidden(); render();
+});
+document.getElementById("show-all").addEventListener("click", () => { hidden.clear(); saveHidden(); render(); });
+document.getElementById("hide-all").addEventListener("click", () => { MODELS.forEach(m => hidden.add(m.id)); saveHidden(); render(); });
+
+renderLegend();  // interactive immediately, even before data lands
+Promise.all(MODELS.map(fetchSeries)).then(s => { SERIES = s; render(); }).catch(() => {
   document.getElementById("updated").textContent = "Couldn't reach eval-history (it may be waking up).";
 });
 </script>
