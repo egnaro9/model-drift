@@ -41,11 +41,11 @@ The runner **only probes a model whose API key is present**, so you fund exactly
 | --- | --- |
 | OpenAI — GPT-5 · GPT-5 mini · GPT-4o mini · GPT-5 nano | `OPENAI_API_KEY` |
 | Anthropic — Fable 5 · Opus 4.8 · Sonnet 5 · Haiku 4.5 | `ANTHROPIC_API_KEY` |
-| Google — Gemini 2.5 Pro · Flash · Flash-Lite | `GEMINI_API_KEY` |
-| xAI — Grok 4 Heavy · 4.5 · 4.3 · 4.1 Fast | `XAI_API_KEY` |
+| Google — Gemini 3.1 Pro · 3.5 Flash · 3.1 Flash-Lite | `GEMINI_API_KEY` |
+| xAI — Grok 4.5 · 4.3 · 4 Fast | `XAI_API_KEY` |
 | Meta — Llama 3.3 70B (open-weights; served free via Groq) | `GROQ_API_KEY` |
 
-Plus `EVAL_HISTORY_WRITE_KEY` to record runs. Each provider is tracked across the tiers it actually has — **heavy → flagship → mid → mini → nano** — so you can see whether a cheap tier keeps pace with the top model (tiers are only added where a real model exists; Google has no model above Pro or below Flash-Lite, so it stays at three — no padding). Edit [`models.json`](modeldrift/models.json) to change models; any OpenAI-compatible endpoint works with a `base_url`, and a model that rejects a `temperature` param (Fable 5, Opus 4.8, Sonnet 5, GPT-5 / mini / nano) sets `"temperature": null`. **16 series**, ~22 prompts each, weekly — still **cents per run** (Fable 5 is the priciest at ~$10/$50 per 1M, but the tiny token count keeps it under a cent) on the free GitHub Actions cron.
+Plus `EVAL_HISTORY_WRITE_KEY` to record runs. Each provider is tracked across the tiers it actually has — **heavy → flagship → mid → mini → nano** — so you can see whether a cheap tier keeps pace with the top model (tiers are only added where a real model exists; Google and xAI have no model above their flagship on the API, so they stay at three — no padding). Edit [`models.json`](modeldrift/models.json) to change models; any OpenAI-compatible endpoint works with a `base_url`, and a model that rejects a `temperature` param (Fable 5, Opus 4.8, Sonnet 5, GPT-5 / mini / nano) sets `"temperature": null`. **14 models**, ~22 prompts each, weekly — still **cents per run** (Fable 5 is the priciest at ~$10/$50 per 1M, but the tiny token count keeps it under a cent) on the free GitHub Actions cron.
 
 ```bash
 pip install -e .
@@ -73,7 +73,7 @@ The tracker runs weekly on a free cron and a small spend. The dashboard shows **
 Built on the pieces it needed already: [eval-history](https://github.com/egnaro9/eval-history) stores the runs and computes the run-to-run comparison; the scoring mirrors [rag-eval-lab](https://github.com/egnaro9/rag-eval-lab). stdlib `urllib` only — no SDKs, no dependencies.
 
 ```bash
-pip install -e ".[dev]" && pytest -q     # 18 tests, stdlib only
+pip install -e ".[dev]" && pytest -q     # 22 tests, stdlib only
 ```
 
 ---
