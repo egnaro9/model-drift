@@ -99,6 +99,8 @@
       <button type="button" class="mbtn" data-metric="accuracy">Accuracy</button>
       <button type="button" class="mbtn" data-metric="latency">Speed</button>
       <button type="button" class="mbtn" data-metric="verbosity">Verbosity</button>
+      <button type="button" class="mbtn" data-metric="reliability">Reliability</button>
+      <button type="button" class="mbtn" data-metric="refusals">Refusals</button>
     </div>
     <svg id="chart" viewBox="0 0 860 340" role="img" aria-label="Metric over time per model"></svg>
     <div class="controls">
@@ -177,17 +179,23 @@ const METRICS_URL = "https://raw.githubusercontent.com/egnaro9/model-drift/main/
 
 // The three tracked metrics. Accuracy comes from eval-history; speed + verbosity
 // from metrics.json. betterUp says which direction is "good" (latency: lower).
-const METRICS = {
-  accuracy:  { label:"Accuracy", betterUp:true,
+const METRICS = {   // eps = the delta below which a change counts as "stable" (fractions: tiny; counts: 0.5)
+  accuracy:  { label:"Accuracy", betterUp:true, eps:1e-9, frac:true,
                fmt:v=>(v*100).toFixed(1)+"%", tick:v=>(v*100).toFixed(0)+"%",
                dfmt:d=>`${d>=0?"+":""}${(d*100).toFixed(1)} pts`, verbs:["improved","regressed"] },
-  latency:   { label:"Speed", betterUp:false,
+  latency:   { label:"Speed", betterUp:false, eps:0.5, frac:false,
                fmt:v=>v>=1000?`${(v/1000).toFixed(2)} s`:`${v.toFixed(0)} ms`,
                tick:v=>v>=1000?`${(v/1000).toFixed(1)}s`:`${v.toFixed(0)}ms`,
                dfmt:d=>`${d>=0?"+":""}${d.toFixed(0)} ms`, verbs:["slower","faster"] },
-  verbosity: { label:"Verbosity", betterUp:null,
+  verbosity: { label:"Verbosity", betterUp:null, eps:0.5, frac:false,
                fmt:v=>`${v.toFixed(0)} chars`, tick:v=>v.toFixed(0),
                dfmt:d=>`${d>=0?"+":""}${d.toFixed(0)}`, verbs:["longer","shorter"] },
+  reliability:{ label:"Reliability", betterUp:true, eps:1e-9, frac:true,
+               fmt:v=>(v*100).toFixed(1)+"%", tick:v=>(v*100).toFixed(0)+"%",
+               dfmt:d=>`${d>=0?"+":""}${(d*100).toFixed(1)} pts`, verbs:["steadier","flakier"] },
+  refusals:  { label:"Refusals", betterUp:false, eps:1e-9, frac:true,
+               fmt:v=>(v*100).toFixed(1)+"%", tick:v=>(v*100).toFixed(0)+"%",
+               dfmt:d=>`${d>=0?"+":""}${(d*100).toFixed(1)} pts`, verbs:["more","fewer"] },
 };
 
 // viewer's hidden models + chosen metric — both persisted so the view sticks
@@ -213,11 +221,14 @@ async function fetchAll() {
   let extra = {};
   try { const r = await fetch(METRICS_URL, {cache:"no-store"}); if (r.ok) extra = (await r.json()).series || {}; } catch {}
   return MODELS.map((m,i) => {
-    const ex = (extra[m.id] || []).map(p => ({ t:new Date(p.t), lat:p.latency_ms, ch:p.out_chars })).sort((a,b)=>a.t-b.t);
+    const ex = (extra[m.id] || []).map(p => ({ t:new Date(p.t), lat:p.latency_ms, ch:p.out_chars,
+                                               rel:p.reliability, ref:p.refusal_rate })).sort((a,b)=>a.t-b.t);
     return { ...m,
-      accuracy:  accs[i],
-      latency:   ex.map(p => ({ t:p.t, v:p.lat })),
-      verbosity: ex.map(p => ({ t:p.t, v:p.ch })),
+      accuracy:    accs[i],
+      latency:     ex.map(p => ({ t:p.t, v:p.lat })),
+      verbosity:   ex.map(p => ({ t:p.t, v:p.ch })),
+      reliability: ex.filter(p => p.rel != null).map(p => ({ t:p.t, v:p.rel })),
+      refusals:    ex.filter(p => p.ref != null).map(p => ({ t:p.t, v:p.ref })),
     };
   });
 }
@@ -295,7 +306,7 @@ function render() {
     return;
   }
   empty.hidden = true;
-  const eps = ACTIVE === "accuracy" ? 1e-9 : 0.5;
+  const eps = cfg.eps;
   document.getElementById("tbody").innerHTML = vis.map(m => {
     const pp = pts(m);
     if (!pp.length)

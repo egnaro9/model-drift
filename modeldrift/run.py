@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import statistics
 import time
 import urllib.error
@@ -22,6 +23,19 @@ from typing import Dict, List, Optional
 
 from .providers import Model, ProviderError, call, load_registry
 from .suite import SUITE, SUITE_VERSION, suite_hash
+
+# Every prompt in the suite is benign, so a response that reads like a refusal is
+# an *over*-refusal — the thing that makes a model annoying. Detected by phrase,
+# not by a judge; on these terse prompts (answers are "blue", "144") a refusal
+# phrase in the output is a strong signal, not noise.
+_REFUSAL = re.compile(
+    r"\b(i can'?t|i cannot|i'?m (sorry|unable|not able|not sure i can)|i won'?t|"
+    r"as an ai|unable to (help|assist|comply)|i (don'?t|do not) (feel comfortable|think i can)|"
+    r"i'?m not able to help)\b", re.I)
+
+
+def is_refusal(text: str) -> bool:
+    return bool(_REFUSAL.search(text or ""))
 
 
 def probe(model: Model) -> dict:
@@ -37,13 +51,15 @@ def probe(model: Model) -> dict:
     byproducts of calls already being made, so they cost nothing extra.
     """
     cases, errors, first_error = [], 0, None
-    latencies, out_lens = [], []   # successful calls only
+    latencies, out_lens, refusals = [], [], 0   # over successful calls only
     for t in SUITE:
         try:
             t0 = time.perf_counter()
             out = call(model, t.prompt, task_id=t.id)
             latencies.append((time.perf_counter() - t0) * 1000.0)  # ms
             out_lens.append(len(out))
+            if is_refusal(out):
+                refusals += 1
             passed = bool(t.grade(out))
             note = t.kind
         except ProviderError as e:
@@ -75,6 +91,11 @@ def probe(model: Model) -> dict:
         "_first_error": first_error,  # full text of the first failure, for diagnosis
         "_latency_ms": round(statistics.median(latencies), 1) if latencies else None,
         "_out_chars": round(statistics.mean(out_lens), 1) if out_lens else None,
+        # reliability = fraction of the suite's calls that succeeded (transient
+        # errors / rate limits pull it below 1); refusal_rate = fraction of the
+        # responses that read like an over-refusal.
+        "_reliability": round((len(SUITE) - errors) / len(SUITE), 4),
+        "_refusal_rate": round(refusals / len(latencies), 4) if latencies else None,
     }
 
 
@@ -122,7 +143,8 @@ def update_metrics_file(path: str, results: List[dict], stamp: str, cap: int = 1
             continue
         pts = series.setdefault(r["run"], [])
         pts.append({"t": stamp, "acc": r["metrics"]["faithfulness"],
-                    "latency_ms": r["_latency_ms"], "out_chars": r["_out_chars"]})
+                    "latency_ms": r["_latency_ms"], "out_chars": r["_out_chars"],
+                    "reliability": r["_reliability"], "refusal_rate": r["_refusal_rate"]})
         del pts[:-cap]                    # keep the series bounded
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps({"updated": stamp, "series": series}, indent=1), encoding="utf-8")

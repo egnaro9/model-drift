@@ -71,6 +71,26 @@ def test_probe_measures_latency_and_verbosity():
     assert r["_out_chars"] is not None and r["_out_chars"] > 0
 
 
+def test_refusal_detector():
+    from modeldrift.run import is_refusal
+    assert is_refusal("I'm not sure I can help with that.")
+    assert is_refusal("I can't help with that request.")
+    assert is_refusal("As an AI, I cannot do that.")
+    assert not is_refusal("blue")
+    assert not is_refusal("144")
+    assert not is_refusal("The answer is Tokyo.")
+
+
+def test_probe_reliability_and_refusal_rate():
+    clean = probe(STABLE)
+    assert clean["_reliability"] == 1.0        # mock never errors
+    assert clean["_refusal_rate"] == 0.0       # stable mock never refuses
+    # mock-drifted returns a refusal for exactly two tasks
+    r = probe(DRIFTED)
+    assert r["_reliability"] == 1.0            # still no provider errors
+    assert r["_refusal_rate"] == round(2 / len(SUITE), 4)
+
+
 def test_metrics_file_accumulates_and_skips_total_failures(tmp_path):
     import json
     from modeldrift.run import update_metrics_file
@@ -78,7 +98,8 @@ def test_metrics_file_accumulates_and_skips_total_failures(tmp_path):
     f = tmp_path / "metrics.json"
     update_metrics_file(str(f), [r], "2026-07-18T00:00:00Z")
     d = json.loads(f.read_text())
-    assert set(d["series"]["mock:stable"][0]) == {"t", "acc", "latency_ms", "out_chars"}
+    assert set(d["series"]["mock:stable"][0]) == {"t", "acc", "latency_ms", "out_chars",
+                                                   "reliability", "refusal_rate"}
     update_metrics_file(str(f), [r], "2026-07-25T00:00:00Z")          # appends
     assert len(json.loads(f.read_text())["series"]["mock:stable"]) == 2
     failed = {**r, "run": "x:broken", "_latency_ms": None, "_out_chars": None}
