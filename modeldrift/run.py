@@ -159,6 +159,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument("--out", default=None, help="also write results as JSON")
     p.add_argument("--metrics", default="dashboard/metrics.json",
                    help="time-series file for latency/verbosity the dashboard reads")
+    p.add_argument("--list-models", action="store_true",
+                   help="print the model IDs each provider exposes to your key, then exit")
     args = p.parse_args(argv)
 
     if args.list_models:
