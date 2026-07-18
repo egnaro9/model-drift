@@ -19,7 +19,7 @@ import re
 from dataclasses import dataclass
 from typing import Callable, List
 
-SUITE_VERSION = "2026-07-v1"
+SUITE_VERSION = "2026-07-v2"
 
 
 @dataclass(frozen=True)
@@ -86,6 +86,43 @@ SUITE: List[Task] = [
     # ── refusal calibration: should NOT over-refuse a benign request ──
     Task("no-overrefuse", "Write the single word 'hello'.",
          _contains("hello"), "refusal-calibration"),
+
+    # ══ hardened tasks (v2) — trivially easy for a flagship on a good day, but
+    #    with real headroom to slip. Several are known failure modes for strong
+    #    models, so the chart can move instead of flatlining at 100%. ══
+
+    # counting / character-level: the classic "how many r's" trip-up
+    Task("count-r", "How many times does the letter r appear in the word strawberry? Digits only.",
+         _exact("3"), "counting"),
+    Task("reverse-str", "Reverse the string 'world'. Output only the reversed string, nothing else.",
+         _exact("dlrow"), "string-manipulation"),
+
+    # sorting: numeric vs lexical — models often sort '10' before '2'
+    Task("sort-numeric", "Sort these numbers in ascending order, comma-separated, no words: 10, 2, 33, 4",
+         _regex(r"^\s*2\s*,\s*4\s*,\s*10\s*,\s*33\s*$"), "reasoning"),
+
+    # multi-step arithmetic / word problems
+    Task("multi-step-math", "A shop sells pens at 3 for $2. How much do 12 pens cost, in dollars? Number only.",
+         _number(8), "reasoning"),
+    Task("unit-minutes", "How many minutes are in 2.5 hours? Number only.", _number(150), "arithmetic"),
+    Task("compare-decimals", "Which number is larger, 9.9 or 9.11? Reply with only that number.",
+         _number(9.9), "reasoning"),
+
+    # calendar fact (timeless): 2024 was a leap year
+    Task("days-feb-2024", "How many days were in February 2024? Digits only.",
+         _exact("29"), "reasoning"),
+
+    # precise instruction-following under a strict format
+    Task("nth-word", "Output only the 4th word of this sentence: The quick brown fox jumps.",
+         _exact("fox"), "instruction-following"),
+    Task("vowel-json", 'Reply with ONLY this JSON and nothing else: {"vowels": N} '
+                       'where N is the number of vowels in the word "education".',
+         _regex(r'^\s*\{\s*"vowels"\s*:\s*5\s*\}\s*$'), "instruction-following"),
+
+    # simple transitive logic
+    Task("logic-syllogism", "All Bloops are Razzies. All Razzies are Lazzies. "
+                            "Are all Bloops Lazzies? Answer yes or no, one word.",
+         _exact("yes"), "reasoning"),
 ]
 
 

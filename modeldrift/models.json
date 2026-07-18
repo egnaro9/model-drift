@@ -1,14 +1,25 @@
 [
   {"id": "mock:stable", "label": "Mock (stable)", "provider": "mock", "model": "mock", "key_env": "NONE"},
 
+  {"id": "openai:gpt-5", "label": "GPT-5", "provider": "openai",
+   "model": "gpt-5", "key_env": "OPENAI_API_KEY", "temperature": null},
   {"id": "openai:gpt-4o-mini", "label": "GPT-4o mini", "provider": "openai",
    "model": "gpt-4o-mini", "key_env": "OPENAI_API_KEY"},
 
-  {"id": "anthropic:claude-3-5-haiku", "label": "Claude 3.5 Haiku", "provider": "anthropic",
-   "model": "claude-3-5-haiku-latest", "key_env": "ANTHROPIC_API_KEY"},
+  {"id": "anthropic:claude-opus-4-8", "label": "Claude Opus 4.8", "provider": "anthropic",
+   "model": "claude-opus-4-8", "key_env": "ANTHROPIC_API_KEY", "temperature": null},
+  {"id": "anthropic:claude-haiku-4-5", "label": "Claude Haiku 4.5", "provider": "anthropic",
+   "model": "claude-haiku-4-5", "key_env": "ANTHROPIC_API_KEY"},
 
-  {"id": "google:gemini-2.0-flash", "label": "Gemini 2.0 Flash", "provider": "gemini",
-   "model": "gemini-2.0-flash", "key_env": "GEMINI_API_KEY"},
+  {"id": "google:gemini-2.5-pro", "label": "Gemini 2.5 Pro", "provider": "gemini",
+   "model": "gemini-2.5-pro", "key_env": "GEMINI_API_KEY"},
+  {"id": "google:gemini-2.5-flash", "label": "Gemini 2.5 Flash", "provider": "gemini",
+   "model": "gemini-2.5-flash", "key_env": "GEMINI_API_KEY"},
+
+  {"id": "xai:grok-4.5", "label": "Grok 4.5", "provider": "openai-compatible",
+   "model": "grok-4.5", "key_env": "XAI_API_KEY", "base_url": "https://api.x.ai/v1"},
+  {"id": "xai:grok-4.1-fast", "label": "Grok 4.1 Fast", "provider": "openai-compatible",
+   "model": "grok-4.1-fast", "key_env": "XAI_API_KEY", "base_url": "https://api.x.ai/v1"},
 
   {"id": "groq:llama-3.3-70b", "label": "Llama 3.3 70B (Groq)", "provider": "openai-compatible",
    "model": "llama-3.3-70b-versatile", "key_env": "GROQ_API_KEY",
