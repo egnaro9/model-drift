@@ -90,15 +90,6 @@
     "key_env": "GEMINI_API_KEY"
   },
   {
-    "id": "xai:grok-4-heavy",
-    "label": "Grok 4 Heavy",
-    "provider": "openai-compatible",
-    "model": "grok-4-heavy",
-    "key_env": "XAI_API_KEY",
-    "base_url": "https://api.x.ai/v1",
-    "temperature": null
-  },
-  {
     "id": "xai:grok-4.5",
     "label": "Grok 4.5",
     "provider": "openai-compatible",
@@ -117,10 +108,10 @@
     "temperature": null
   },
   {
-    "id": "xai:grok-4.1-fast",
-    "label": "Grok 4.1 Fast",
+    "id": "xai:grok-4-fast",
+    "label": "Grok 4 Fast",
     "provider": "openai-compatible",
-    "model": "grok-4.1-fast",
+    "model": "grok-4-fast-non-reasoning",
     "key_env": "XAI_API_KEY",
     "base_url": "https://api.x.ai/v1",
     "temperature": null

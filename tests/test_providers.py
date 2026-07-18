@@ -40,7 +40,7 @@ def test_registry_parses_flagships_with_null_temperature():
     # a mini that accepts the param keeps the deterministic default
     assert reg["openai:gpt-4o-mini"].temperature == 0.0
     # tier depth per big-four provider (only where a real model exists — no padding)
-    expected = {"openai:": 4, "anthropic:": 4, "google:": 3, "xai:": 4}
+    expected = {"openai:": 4, "anthropic:": 4, "google:": 3, "xai:": 3}
     for prefix, n in expected.items():
         assert sum(1 for k in reg if k.startswith(prefix)) == n, prefix
     # Grok routes through the OpenAI-compatible path with xAI's base url
