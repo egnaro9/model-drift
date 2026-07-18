@@ -2,13 +2,23 @@
 
 [![ci](https://github.com/egnaro9/model-drift/actions/workflows/ci.yml/badge.svg)](https://github.com/egnaro9/model-drift/actions/workflows/ci.yml)
 [![python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org/)
-[![tests](https://img.shields.io/badge/tests-18-brightgreen)](tests)
+[![tests](https://img.shields.io/badge/tests-22-brightgreen)](tests)
 
-**A public LLM regression tracker. A frozen suite runs against live models on a schedule; every score is kept, so you can watch each model's quality over time — and see when it drops.**
+**A small public LLM observability board. A frozen suite runs against live models on a schedule and keeps every result — so you can watch each model's quality *and* speed, verbosity, reliability, and refusal rate over time, and see when any of them moves.**
 
 ### ▶ [Live tracker](https://egnaro9.github.io/model-drift/)
 
-Model providers ship silent updates. A [peer-reviewed study](https://arxiv.org/abs/2311.11123) found that on a silent model change, **58.8% of prompt+model combinations lost accuracy** — no error, no version bump, no way to know except to keep measuring. This measures.
+Model providers ship silent updates. A [peer-reviewed study](https://arxiv.org/abs/2311.11123) found that on a silent model change, **58.8% of prompt+model combinations lost accuracy** — no error, no version bump, no way to know except to keep measuring. This measures — across five metrics, toggled on the dashboard:
+
+| Metric | What it answers | Source |
+| --- | --- | --- |
+| **Accuracy** | Did answers get worse? | eval-history (with regression alerts) |
+| **Speed** | Median call latency — is it slower? | measured on the same calls |
+| **Verbosity** | Avg answer length — chattier / pricier? | " |
+| **Reliability** | Share of calls that succeeded — flaky? | " |
+| **Refusals** | Share of benign prompts refused — over-refusing? | " |
+
+The last four are byproducts of calls already made (near-zero extra cost) and live in a repo-committed `metrics.json` the dashboard reads from raw GitHub. Accuracy is the one that fires the automatic regression alert.
 
 ```
 frozen suite ──►  live model APIs  ──►  deterministic grader  ──►  eval-history  ──►  chart + "▼ regressed"
