@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import json
 import os
+import statistics
+import time
 import urllib.error
 import urllib.request
 from collections import defaultdict
@@ -28,11 +30,20 @@ def probe(model: Model) -> dict:
     Accuracy (fraction of tasks passed) is the headline number. It's mapped onto
     eval-history's `faithfulness` metric so the existing regression comparison
     works unchanged — for a drift probe "faithfulness" reads as "still correct".
+
+    Two more numbers ride along for free, measured on the same calls: **latency**
+    (median per-call wall-clock — "is it getting slower?") and **verbosity** (mean
+    answer length in characters — "is it getting chattier / pricier?"). Both are
+    byproducts of calls already being made, so they cost nothing extra.
     """
     cases, errors, first_error = [], 0, None
+    latencies, out_lens = [], []   # successful calls only
     for t in SUITE:
         try:
+            t0 = time.perf_counter()
             out = call(model, t.prompt, task_id=t.id)
+            latencies.append((time.perf_counter() - t0) * 1000.0)  # ms
+            out_lens.append(len(out))
             passed = bool(t.grade(out))
             note = t.kind
         except ProviderError as e:
@@ -62,6 +73,8 @@ def probe(model: Model) -> dict:
         "cases": cases,
         "_errors": errors,          # stripped before POST; used for the console summary
         "_first_error": first_error,  # full text of the first failure, for diagnosis
+        "_latency_ms": round(statistics.median(latencies), 1) if latencies else None,
+        "_out_chars": round(statistics.mean(out_lens), 1) if out_lens else None,
     }
 
 
@@ -89,12 +102,41 @@ def _post(api: str, key: str, payload: dict) -> Optional[str]:
         return None
 
 
+def update_metrics_file(path: str, results: List[dict], stamp: str, cap: int = 104) -> None:
+    """Accumulate the extra metrics (latency, verbosity) into a small time-series
+    JSON the dashboard reads directly. Kept in the repo and served same-origin —
+    no database column, no CORS, and adding a future metric is one more key here.
+
+    Only models that actually responded get a point; a totally-failed probe
+    (bad key) adds nothing, same as it isn't recorded in eval-history.
+    """
+    from pathlib import Path
+    p = Path(path)
+    try:
+        data = json.loads(p.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        data = {}
+    series = data.get("series", {})
+    for r in results:
+        if r["_latency_ms"] is None:      # nothing got through — don't record
+            continue
+        pts = series.setdefault(r["run"], [])
+        pts.append({"t": stamp, "acc": r["metrics"]["faithfulness"],
+                    "latency_ms": r["_latency_ms"], "out_chars": r["_out_chars"]})
+        del pts[:-cap]                    # keep the series bounded
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps({"updated": stamp, "series": series}, indent=1), encoding="utf-8")
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     import argparse
+    from datetime import datetime, timezone
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--api", default="https://eval-history.onrender.com")
     p.add_argument("--registry", default=None)
     p.add_argument("--out", default=None, help="also write results as JSON")
+    p.add_argument("--metrics", default="dashboard/metrics.json",
+                   help="time-series file for latency/verbosity the dashboard reads")
     args = p.parse_args(argv)
 
     key = os.environ.get("EVAL_HISTORY_WRITE_KEY", "").strip()
@@ -109,8 +151,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         result = probe(m)
         results.append(result)
         acc = result["metrics"]["faithfulness"]
+        speed = f"{result['_latency_ms']:.0f}ms" if result["_latency_ms"] is not None else "—"
+        chars = f"{result['_out_chars']:.0f}c" if result["_out_chars"] is not None else "—"
         kinds = ", ".join(f"{k} {v:.0%}" for k, v in per_kind(result).items())
-        print(f"  {m.label:26} accuracy {acc:.1%}  ({kinds})")
+        print(f"  {m.label:26} acc {acc:.0%} · {speed:>7} · {chars:>5}  ({kinds})")
         if result["_errors"]:   # surface the real error so a 0% is diagnosable, not mysterious
             print(f"      ↳ {result['_errors']}/{len(SUITE)} failed — first error: {result['_first_error']}")
         # A probe that entirely failed is an infra/key problem, not a 0% score —
@@ -121,6 +165,11 @@ def main(argv: Optional[List[str]] = None) -> int:
             _post(args.api, key, result)
     if not key:
         print("\n  EVAL_HISTORY_WRITE_KEY unset — probed but not recorded (set it to build history).")
+
+    # latency + verbosity go to the repo-local time series the dashboard reads
+    stamp = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    update_metrics_file(args.metrics, results, stamp)
+    print(f"\nwrote latency/verbosity to {args.metrics}")
 
     if args.out:
         with open(args.out, "w", encoding="utf-8") as fh:

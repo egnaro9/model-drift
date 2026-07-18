@@ -47,6 +47,14 @@
   .badge{font-family:var(--mono); font-size:11px; padding:2px 8px; border-radius:3px; border:1px solid currentColor}
   .b-good{color:var(--good)} .b-bad{color:var(--bad)} .b-warn{color:var(--fg-faint)}
 
+  /* metric toggle (Accuracy / Speed / Verbosity) */
+  .metricbar{display:flex; align-items:center; gap:8px; margin-bottom:16px;
+    font-family:var(--mono); font-size:11.5px; color:var(--fg-faint)}
+  .metricbar .mbtn{cursor:pointer; font:inherit; color:var(--fg-dim); background:transparent;
+    border:1px solid var(--line); border-radius:6px; padding:4px 12px}
+  .metricbar .mbtn:hover{border-color:var(--fg-faint); color:var(--fg)}
+  .metricbar .mbtn.on{background:var(--fg); color:var(--ink); border-color:var(--fg)}
+
   /* tier quick-filters + grouped, clickable legend */
   .controls{display:flex; align-items:center; flex-wrap:wrap; gap:6px 12px; margin-top:16px;
     font-family:var(--mono); font-size:11.5px; color:var(--fg-faint)}
@@ -86,7 +94,13 @@
   </header>
 
   <div class="card">
-    <svg id="chart" viewBox="0 0 860 340" role="img" aria-label="Accuracy over time per model"></svg>
+    <div class="metricbar" id="metricbar">
+      <span>Metric:</span>
+      <button type="button" class="mbtn" data-metric="accuracy">Accuracy</button>
+      <button type="button" class="mbtn" data-metric="latency">Speed</button>
+      <button type="button" class="mbtn" data-metric="verbosity">Verbosity</button>
+    </div>
+    <svg id="chart" viewBox="0 0 860 340" role="img" aria-label="Metric over time per model"></svg>
     <div class="controls">
       <span>Show:</span>
       <button type="button" data-tier="all">all</button>
@@ -155,26 +169,54 @@ const MODELS = [
   { id: "xai:grok-4-fast",               label: "Grok 4 Fast",        color: "#f0aecb", group: "xAI",       tier: "mini" },
   { id: "groq:llama-3.3-70b",            label: "Llama 3.3 70B",      color: "#c084fc", group: "Groq",      tier: "open" },
 ];
-const fmtPct = v => (v*100).toFixed(1) + "%";
 const esc = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const METRICS_URL = "./metrics.json";  // written by the weekly runner, served same-origin
 
-// which models the viewer has hidden — persisted so the choice sticks across visits
-const HIDE_KEY = "md-hidden";
+// The three tracked metrics. Accuracy comes from eval-history; speed + verbosity
+// from metrics.json. betterUp says which direction is "good" (latency: lower).
+const METRICS = {
+  accuracy:  { label:"Accuracy", betterUp:true,
+               fmt:v=>(v*100).toFixed(1)+"%", tick:v=>(v*100).toFixed(0)+"%",
+               dfmt:d=>`${d>=0?"+":""}${(d*100).toFixed(1)} pts`, verbs:["improved","regressed"] },
+  latency:   { label:"Speed", betterUp:false,
+               fmt:v=>v>=1000?`${(v/1000).toFixed(2)} s`:`${v.toFixed(0)} ms`,
+               tick:v=>v>=1000?`${(v/1000).toFixed(1)}s`:`${v.toFixed(0)}ms`,
+               dfmt:d=>`${d>=0?"+":""}${d.toFixed(0)} ms`, verbs:["slower","faster"] },
+  verbosity: { label:"Verbosity", betterUp:null,
+               fmt:v=>`${v.toFixed(0)} chars`, tick:v=>v.toFixed(0),
+               dfmt:d=>`${d>=0?"+":""}${d.toFixed(0)}`, verbs:["longer","shorter"] },
+};
+
+// viewer's hidden models + chosen metric — both persisted so the view sticks
+const HIDE_KEY="md-hidden", METRIC_KEY="md-metric";
 const loadHidden = () => { try { return new Set(JSON.parse(localStorage.getItem(HIDE_KEY) || "[]")); } catch { return new Set(); } };
 const saveHidden = () => { try { localStorage.setItem(HIDE_KEY, JSON.stringify([...hidden])); } catch {} };
 const hidden = loadHidden();
+let ACTIVE = (() => { try { const m = localStorage.getItem(METRIC_KEY); return METRICS[m] ? m : "accuracy"; } catch { return "accuracy"; } })();
 
-let SERIES = [];  // cached after fetch, so toggling never re-hits the network
+let SERIES = [];  // cached after fetch; switching metric/model never re-hits the network
+const pts = s => s[ACTIVE] || [];   // the active metric's [{t, v}] for one series
 
-async function fetchSeries(m) {
-  try {
-    const r = await fetch(`${API}/runs?name=${encodeURIComponent(m.id)}&limit=52`);
-    if (!r.ok) return { ...m, runs: [] };
-    const runs = (await r.json())
-      .map(x => ({ t: new Date(x.created_at), acc: x.faithfulness }))
-      .sort((a,b) => a.t - b.t);           // oldest → newest for plotting
-    return { ...m, runs };
-  } catch { return { ...m, runs: [] }; }
+async function fetchAll() {
+  // accuracy: one call per model to eval-history
+  const accs = await Promise.all(MODELS.map(async m => {
+    try {
+      const r = await fetch(`${API}/runs?name=${encodeURIComponent(m.id)}&limit=52`);
+      if (!r.ok) return [];
+      return (await r.json()).map(x => ({ t:new Date(x.created_at), v:x.faithfulness })).sort((a,b)=>a.t-b.t);
+    } catch { return []; }
+  }));
+  // speed + verbosity: one fetch of the repo-local time series
+  let extra = {};
+  try { const r = await fetch(METRICS_URL, {cache:"no-store"}); if (r.ok) extra = (await r.json()).series || {}; } catch {}
+  return MODELS.map((m,i) => {
+    const ex = (extra[m.id] || []).map(p => ({ t:new Date(p.t), lat:p.latency_ms, ch:p.out_chars })).sort((a,b)=>a.t-b.t);
+    return { ...m,
+      accuracy:  accs[i],
+      latency:   ex.map(p => ({ t:p.t, v:p.lat })),
+      verbosity: ex.map(p => ({ t:p.t, v:p.ch })),
+    };
+  });
 }
 
 function renderLegend() {
@@ -195,69 +237,85 @@ function renderLegend() {
 }
 
 function render() {
+  const cfg = METRICS[ACTIVE];
   renderLegend();
+  document.querySelectorAll("#metricbar .mbtn").forEach(b => b.classList.toggle("on", b.dataset.metric === ACTIVE));
+
   const vis = SERIES.filter(s => !hidden.has(s.id));       // respect the viewer's selection
-  const visWithData = vis.filter(s => s.runs.length);
-  const shown = visWithData.flatMap(s => s.runs);
-  const anyData = SERIES.some(s => s.runs.length);
+  const visWithData = vis.filter(s => pts(s).length);
+  const shown = visWithData.flatMap(s => pts(s));
+  const anyData = SERIES.some(s => pts(s).length);
   const chart = document.getElementById("chart");
   const updated = document.getElementById("updated");
   const empty = document.getElementById("empty");
 
-  // last-updated reflects ALL data (honest freshness), regardless of what's filtered in
-  const allRuns = SERIES.flatMap(s => s.runs);
+  const allPts = SERIES.flatMap(s => pts(s));
   updated.textContent = !anyData
-    ? "No runs recorded yet — the first scheduled probe will populate this."
-    : `Last updated ${new Date(Math.max(...allRuns.map(r => +r.t))).toLocaleString()} · `
-      + `showing ${vis.length} of ${MODELS.length} models`;
+    ? (ACTIVE === "accuracy" ? "No runs recorded yet — the first scheduled probe will populate this."
+                             : "No speed/verbosity data yet — it starts filling on the next scheduled run.")
+    : `Last updated ${new Date(Math.max(...allPts.map(r => +r.t))).toLocaleString()} · `
+      + `showing ${vis.length} of ${MODELS.length} models · ${cfg.label}`;
 
   if (!shown.length) {
     chart.innerHTML = `<text x="430" y="170" text-anchor="middle" class="tick">`
-      + (!anyData ? "waiting for the first run" : "no models selected — click one below") + `</text>`;
+      + (!anyData ? "waiting for data" : "no models selected — click one below") + `</text>`;
   } else {
-    // ── chart (axes zoom to the visible selection) ──
-    const W=860,H=340, m={l:44,r:14,t:16,b:28};
+    // ── chart (axes zoom to the visible selection + active metric) ──
+    const W=860,H=340, m={l:54,r:14,t:16,b:28};
     const xs = shown.map(r=>+r.t), x0=Math.min(...xs), x1=Math.max(...xs)||x0+1;
-    const ys = shown.map(r=>r.acc); let y0=Math.min(...ys,0.5), y1=1.0; if(y1-y0<0.1)y0=y1-0.1;
+    const vs = shown.map(r=>r.v);
+    let y0, y1;
+    if (ACTIVE === "accuracy") { y1 = 1.0; y0 = Math.min(0.5, Math.min(...vs)); if (y1-y0 < 0.1) y0 = y1-0.1; }
+    else { const mn=Math.min(...vs), mx=Math.max(...vs), pad=((mx-mn) || mx*0.2 || 1)*0.18; y0=Math.max(0, mn-pad); y1=mx+pad; }
     const px = t => m.l + (W-m.l-m.r) * ((+t - x0) / (x1 - x0 || 1));
     const py = v => m.t + (H-m.t-m.b) * (1 - (v - y0) / (y1 - y0 || 1));
     let svg = "";
     for (let g=0; g<=4; g++){ const v=y0+(y1-y0)*g/4, y=py(v);
       svg += `<line class="gl" x1="${m.l}" y1="${y}" x2="${W-m.r}" y2="${y}"/>`;
-      svg += `<text class="tick" x="${m.l-6}" y="${y+3}" text-anchor="end">${(v*100).toFixed(0)}%</text>`; }
+      svg += `<text class="tick" x="${m.l-6}" y="${y+3}" text-anchor="end">${cfg.tick(v)}</text>`; }
     svg += `<line class="axis" x1="${m.l}" y1="${H-m.b}" x2="${W-m.r}" y2="${H-m.b}"/>`;
     svg += `<text class="tick" x="${m.l}" y="${H-8}">${new Date(x0).toLocaleDateString()}</text>`;
     svg += `<text class="tick" x="${W-m.r}" y="${H-8}" text-anchor="end">${new Date(x1).toLocaleDateString()}</text>`;
     for (const s of visWithData){
-      const pts = s.runs.map(r=>`${px(r.t)},${py(r.acc)}`).join(" ");
-      svg += `<polyline class="series" points="${pts}" stroke="${s.color}"/>`;
-      svg += s.runs.map(r=>`<circle class="dot" cx="${px(r.t)}" cy="${py(r.acc)}" r="3" fill="${s.color}"/>`).join("");
+      const pp = pts(s);
+      svg += `<polyline class="series" points="${pp.map(r=>`${px(r.t)},${py(r.v)}`).join(" ")}" stroke="${s.color}"/>`;
+      svg += pp.map(r=>`<circle class="dot" cx="${px(r.t)}" cy="${py(r.v)}" r="3" fill="${s.color}"/>`).join("");
     }
     chart.innerHTML = svg;
   }
 
-  // ── table (visible models only) ──
+  // ── table (visible models only, active metric) ──
+  document.querySelector("#table thead th:nth-child(2)").textContent = "Latest " + cfg.label.toLowerCase();
   if (!vis.length) {
     document.getElementById("tbody").innerHTML = "";
     empty.hidden = false; empty.textContent = "All models hidden — click one above to show it.";
     return;
   }
   empty.hidden = true;
+  const eps = ACTIVE === "accuracy" ? 1e-9 : 0.5;
   document.getElementById("tbody").innerHTML = vis.map(m => {
-    if (!m.runs.length)
+    const pp = pts(m);
+    if (!pp.length)
       return `<tr><td><span class="swatch" style="background:${m.color}"></span>${esc(m.label)}</td>
-        <td class="num" colspan="4" style="color:var(--fg-faint)">no runs yet</td></tr>`;
-    const latest = m.runs.at(-1), prev = m.runs.length>1 ? m.runs.at(-2) : null;
-    const d = prev ? latest.acc - prev.acc : null;
-    let badge = `<span class="badge b-warn">baseline</span>`;
-    if (d !== null) badge = d < -1e-9 ? `<span class="badge b-bad">▼ regressed</span>`
-                    : d > 1e-9 ? `<span class="badge b-good">▲ improved</span>`
-                    : `<span class="badge b-warn">— stable</span>`;
-    const dtxt = d===null ? "—" : `${d>=0?"+":""}${(d*100).toFixed(1)} pts`;
+        <td class="num" colspan="4" style="color:var(--fg-faint)">no data yet</td></tr>`;
+    const latest = pp.at(-1), prev = pp.length>1 ? pp.at(-2) : null;
+    const d = prev ? latest.v - prev.v : null;
+    let badge = `<span class="badge b-warn">baseline</span>`, dcolor = "var(--fg-dim)", dtxt = "—";
+    if (d !== null) {
+      dtxt = cfg.dfmt(d);
+      const arrow = d>eps ? "▲" : d<-eps ? "▼" : "—";
+      const word = d>eps ? cfg.verbs[0] : d<-eps ? cfg.verbs[1] : "stable";
+      let cls = "b-warn";
+      if (cfg.betterUp !== null && Math.abs(d) > eps) {
+        const good = cfg.betterUp ? d>0 : d<0;
+        cls = good ? "b-good" : "b-bad"; dcolor = good ? "var(--good)" : "var(--bad)";
+      }
+      badge = `<span class="badge ${cls}">${arrow} ${word}</span>`;
+    }
     return `<tr>
       <td><span class="swatch" style="background:${m.color}"></span>${esc(m.label)}</td>
-      <td class="num">${fmtPct(latest.acc)}</td>
-      <td class="num" style="color:${d&&d<0?'var(--bad)':d&&d>0?'var(--good)':'var(--fg-dim)'}">${dtxt}</td>
+      <td class="num">${cfg.fmt(latest.v)}</td>
+      <td class="num" style="color:${dcolor}">${dtxt}</td>
       <td>${badge}</td>
       <td class="num" style="color:var(--fg-faint)">${latest.t.toLocaleDateString()}</td>
     </tr>`;
@@ -282,9 +340,16 @@ document.querySelectorAll(".controls button[data-tier]").forEach(b =>
   b.addEventListener("click", () => showTier(b.dataset.tier)));
 document.getElementById("hide-all").addEventListener("click", () => { MODELS.forEach(m => hidden.add(m.id)); saveHidden(); render(); });
 
-renderLegend();  // interactive immediately, even before data lands
-Promise.all(MODELS.map(fetchSeries)).then(s => { SERIES = s; render(); }).catch(() => {
-  document.getElementById("updated").textContent = "Couldn't reach eval-history (it may be waking up).";
+// metric toggle — accuracy / speed / verbosity
+document.querySelectorAll("#metricbar .mbtn").forEach(b => b.addEventListener("click", () => {
+  ACTIVE = b.dataset.metric;
+  try { localStorage.setItem(METRIC_KEY, ACTIVE); } catch {}
+  render();
+}));
+
+render();  // interactive immediately (empty state), even before data lands
+fetchAll().then(s => { SERIES = s; render(); }).catch(() => {
+  document.getElementById("updated").textContent = "Couldn't reach the data source (it may be waking up).";
 });
 </script>
 </body>

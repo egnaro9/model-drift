@@ -63,3 +63,24 @@ def test_run_shape_is_eval_history_compatible():
     assert set(r["metrics"]) >= {"faithfulness", "precision@k", "recall@k", "citation_rate",
                                  "flagged_cases", "n_cases"}
     assert all({"q", "answer", "scores", "flagged"} <= set(c) for c in r["cases"])
+
+
+def test_probe_measures_latency_and_verbosity():
+    r = probe(STABLE)
+    assert r["_latency_ms"] is not None and r["_latency_ms"] >= 0
+    assert r["_out_chars"] is not None and r["_out_chars"] > 0
+
+
+def test_metrics_file_accumulates_and_skips_total_failures(tmp_path):
+    import json
+    from modeldrift.run import update_metrics_file
+    r = probe(STABLE)
+    f = tmp_path / "metrics.json"
+    update_metrics_file(str(f), [r], "2026-07-18T00:00:00Z")
+    d = json.loads(f.read_text())
+    assert set(d["series"]["mock:stable"][0]) == {"t", "acc", "latency_ms", "out_chars"}
+    update_metrics_file(str(f), [r], "2026-07-25T00:00:00Z")          # appends
+    assert len(json.loads(f.read_text())["series"]["mock:stable"]) == 2
+    failed = {**r, "run": "x:broken", "_latency_ms": None, "_out_chars": None}
+    update_metrics_file(str(f), [failed], "2026-07-26T00:00:00Z")     # skipped
+    assert "x:broken" not in json.loads(f.read_text())["series"]
