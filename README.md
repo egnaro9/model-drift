@@ -27,15 +27,15 @@ frozen suite ──►  live model APIs  ──►  deterministic grader  ──
 
 The runner **only probes a model whose API key is present**, so you fund exactly what you choose. Add the secret in the repo's Settings → Secrets → Actions and it appears on the next run:
 
-| Provider (flagship + mini tracked) | Secret |
+| Provider (three tiers tracked) | Secret |
 | --- | --- |
-| OpenAI — GPT-5 · GPT-4o mini | `OPENAI_API_KEY` |
-| Anthropic — Claude Opus 4.8 · Haiku 4.5 | `ANTHROPIC_API_KEY` |
-| Google — Gemini 2.5 Pro · 2.5 Flash | `GEMINI_API_KEY` |
-| xAI — Grok 4.5 · Grok 4.1 Fast | `XAI_API_KEY` |
+| OpenAI — GPT-5 · GPT-5 mini · GPT-4o mini | `OPENAI_API_KEY` |
+| Anthropic — Claude Opus 4.8 · Sonnet 5 · Haiku 4.5 | `ANTHROPIC_API_KEY` |
+| Google — Gemini 2.5 Pro · Flash · Flash-Lite | `GEMINI_API_KEY` |
+| xAI — Grok 4.5 · 4.3 · 4.1 Fast | `XAI_API_KEY` |
 | Groq — Llama 3.3 70B (free tier) | `GROQ_API_KEY` |
 
-Plus `EVAL_HISTORY_WRITE_KEY` to record runs. Each provider is tracked at a **flagship** (the headline — GPT-5, Opus 4.8) and a **mini** (moves week-to-week, near-free). Edit [`models.json`](modeldrift/models.json) to change models; any OpenAI-compatible endpoint works with a `base_url`, and a model that rejects a `temperature` param (Opus 4.8, GPT-5) sets `"temperature": null`. The suite is ~22 prompts × a handful of models, weekly — **cents per run**, on the free GitHub Actions cron.
+Plus `EVAL_HISTORY_WRITE_KEY` to record runs. Each of the big four is tracked across **three tiers** — flagship (the headline), mid, and mini — so you can see whether a provider's cheap tier keeps pace with its top model. Edit [`models.json`](modeldrift/models.json) to change models; any OpenAI-compatible endpoint works with a `base_url`, and a model that rejects a `temperature` param (Opus 4.8, Sonnet 5, GPT-5, GPT-5 mini) sets `"temperature": null`. The suite is ~22 prompts × a dozen models, weekly — **cents per run**, on the free GitHub Actions cron.
 
 ```bash
 pip install -e .

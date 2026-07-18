@@ -124,15 +124,20 @@
 const API = "https://eval-history.onrender.com";
 // The tracked series, mirroring modeldrift/models.json. Colours are assigned here.
 const MODELS = [
-  { id: "openai:gpt-5",                label: "GPT-5",             color: "#48c1ac" },
-  { id: "openai:gpt-4o-mini",          label: "GPT-4o mini",       color: "#8fe3d4" },
-  { id: "anthropic:claude-opus-4-8",   label: "Claude Opus 4.8",   color: "#f2a53c" },
-  { id: "anthropic:claude-haiku-4-5",  label: "Claude Haiku 4.5",  color: "#f7cd8a" },
-  { id: "google:gemini-2.5-pro",       label: "Gemini 2.5 Pro",    color: "#60a5fa" },
-  { id: "google:gemini-2.5-flash",     label: "Gemini 2.5 Flash",  color: "#a9cdfb" },
-  { id: "xai:grok-4.5",                label: "Grok 4.5",          color: "#e06c9f" },
-  { id: "xai:grok-4.1-fast",           label: "Grok 4.1 Fast",     color: "#f0aecb" },
-  { id: "groq:llama-3.3-70b",          label: "Llama 3.3 70B",     color: "#c084fc" },
+  // colour = company (hue), tier = lightness (flagship darkest → mini lightest)
+  { id: "openai:gpt-5",                  label: "GPT-5",               color: "#2fb8a0" },
+  { id: "openai:gpt-5-mini",             label: "GPT-5 mini",          color: "#48c1ac" },
+  { id: "openai:gpt-4o-mini",            label: "GPT-4o mini",         color: "#8fe3d4" },
+  { id: "anthropic:claude-opus-4-8",     label: "Claude Opus 4.8",     color: "#e8912a" },
+  { id: "anthropic:claude-sonnet-5",     label: "Claude Sonnet 5",     color: "#f2a53c" },
+  { id: "anthropic:claude-haiku-4-5",    label: "Claude Haiku 4.5",    color: "#f7cd8a" },
+  { id: "google:gemini-2.5-pro",         label: "Gemini 2.5 Pro",      color: "#3b82f6" },
+  { id: "google:gemini-2.5-flash",       label: "Gemini 2.5 Flash",    color: "#60a5fa" },
+  { id: "google:gemini-2.5-flash-lite",  label: "Gemini 2.5 Flash-Lite", color: "#a9cdfb" },
+  { id: "xai:grok-4.5",                  label: "Grok 4.5",            color: "#d6488a" },
+  { id: "xai:grok-4.3",                  label: "Grok 4.3",            color: "#e06c9f" },
+  { id: "xai:grok-4.1-fast",             label: "Grok 4.1 Fast",       color: "#f0aecb" },
+  { id: "groq:llama-3.3-70b",            label: "Llama 3.3 70B",       color: "#c084fc" },
 ];
 const fmtPct = v => (v*100).toFixed(1) + "%";
 const esc = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
