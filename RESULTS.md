@@ -11,7 +11,7 @@ _Auto-generated after each scheduled probe. Live chart: [egnaro9.github.io/model
 | GPT-5 nano | 100.0% | +0.0 pts | ⚪ unchanged |
 | Claude Fable 5 | 100.0% | +0.0 pts | ⚪ unchanged |
 | Claude Opus 4.8 | 100.0% | +0.0 pts | ⚪ unchanged |
-| Claude Sonnet 5 | 86.4% | +0.0 pts | ⚪ unchanged |
+| Claude Sonnet 5 | 81.8% | -4.5 pts | 🔴 regressed |
 | Claude Haiku 4.5 | 86.4% | +0.0 pts | ⚪ unchanged |
 | Gemini 2.5 Pro | 0.0% | +0.0 pts | ⚪ unchanged |
 | Gemini 2.5 Flash | 0.0% | +0.0 pts | ⚪ unchanged |

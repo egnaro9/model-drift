@@ -1,4 +1,77 @@
 {
- "updated": null,
- "series": {}
+ "updated": "2026-07-18T09:55:58Z",
+ "series": {
+  "mock:stable": [
+   {
+    "t": "2026-07-18T09:55:58Z",
+    "acc": 1.0,
+    "latency_ms": 0.0,
+    "out_chars": 4.6
+   }
+  ],
+  "openai:gpt-5": [
+   {
+    "t": "2026-07-18T09:55:58Z",
+    "acc": 1.0,
+    "latency_ms": 1617.9,
+    "out_chars": 4.5
+   }
+  ],
+  "openai:gpt-5-mini": [
+   {
+    "t": "2026-07-18T09:55:58Z",
+    "acc": 1.0,
+    "latency_ms": 1523.1,
+    "out_chars": 4.4
+   }
+  ],
+  "openai:gpt-4o-mini": [
+   {
+    "t": "2026-07-18T09:55:58Z",
+    "acc": 0.7727,
+    "latency_ms": 419.3,
+    "out_chars": 6.3
+   }
+  ],
+  "openai:gpt-5-nano": [
+   {
+    "t": "2026-07-18T09:55:58Z",
+    "acc": 1.0,
+    "latency_ms": 1377.9,
+    "out_chars": 4.5
+   }
+  ],
+  "anthropic:claude-fable-5": [
+   {
+    "t": "2026-07-18T09:55:58Z",
+    "acc": 1.0,
+    "latency_ms": 3401.0,
+    "out_chars": 4.6
+   }
+  ],
+  "anthropic:claude-opus-4-8": [
+   {
+    "t": "2026-07-18T09:55:58Z",
+    "acc": 1.0,
+    "latency_ms": 1093.9,
+    "out_chars": 4.6
+   }
+  ],
+  "anthropic:claude-sonnet-5": [
+   {
+    "t": "2026-07-18T09:55:58Z",
+    "acc": 0.8182,
+    "latency_ms": 1182.1,
+    "out_chars": 13.6
+   }
+  ],
+  "anthropic:claude-haiku-4-5": [
+   {
+    "t": "2026-07-18T09:55:58Z",
+    "acc": 0.8636,
+    "latency_ms": 659.0,
+    "out_chars": 5.7
+   }
+  ]
+ }
 }
