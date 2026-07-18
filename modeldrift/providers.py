@@ -78,7 +78,7 @@ def gemini_body(m: Model, prompt: str) -> dict:
 
 def _openai(m: Model, prompt: str) -> str:
     base = (m.base_url or "https://api.openai.com/v1").rstrip("/")
-    key = os.environ[m.key_env]
+    key = os.environ[m.key_env].strip()
     data = _post(f"{base}/chat/completions",
                  {"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
                  openai_body(m, prompt))
@@ -86,7 +86,7 @@ def _openai(m: Model, prompt: str) -> str:
 
 
 def _anthropic(m: Model, prompt: str) -> str:
-    key = os.environ[m.key_env]
+    key = os.environ[m.key_env].strip()
     data = _post("https://api.anthropic.com/v1/messages",
                  {"x-api-key": key, "anthropic-version": "2023-06-01", "Content-Type": "application/json"},
                  anthropic_body(m, prompt))
@@ -94,7 +94,7 @@ def _anthropic(m: Model, prompt: str) -> str:
 
 
 def _gemini(m: Model, prompt: str) -> str:
-    key = os.environ[m.key_env]
+    key = os.environ[m.key_env].strip()
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{m.model}:generateContent?key={key}"
     data = _post(url, {"Content-Type": "application/json"}, gemini_body(m, prompt))
     return "".join(p.get("text", "") for p in data["candidates"][0]["content"]["parts"])
