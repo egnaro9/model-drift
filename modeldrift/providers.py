@@ -51,7 +51,10 @@ def _post(url: str, headers: Dict[str, str], body: dict) -> dict:
         with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
             return json.loads(r.read().decode())
     except urllib.error.HTTPError as e:
-        raise ProviderError(f"{url} -> {e.code}: {e.read().decode()[:200]}")
+        # collapse whitespace: providers pretty-print JSON errors, and the newlines
+        # break the message across log lines exactly when you need to read it
+        body = " ".join(e.read().decode().split())[:300]
+        raise ProviderError(f"{url} -> {e.code}: {body}")
     except urllib.error.URLError as e:
         raise ProviderError(f"{url} unreachable: {e.reason}")
 
