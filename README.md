@@ -2,7 +2,7 @@
 
 [![ci](https://github.com/egnaro9/model-drift/actions/workflows/ci.yml/badge.svg)](https://github.com/egnaro9/model-drift/actions/workflows/ci.yml)
 [![python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org/)
-[![tests](https://img.shields.io/badge/tests-22-brightgreen)](tests)
+[![tests](https://img.shields.io/badge/tests-74-brightgreen)](tests)
 
 **A small public LLM observability board. A frozen suite runs against live models on a schedule and keeps every result — so you can watch each model's quality *and* speed, verbosity, reliability, and refusal rate over time, and see when any of them moves.**
 
@@ -53,6 +53,31 @@ OPENAI_API_KEY=... EVAL_HISTORY_WRITE_KEY=... python -m modeldrift.run
 # or with no keys at all — the deterministic mock proves the pipeline, no spend:
 python -m modeldrift.run
 ```
+
+## The board writes its own prose
+
+My portfolio describes this board in a paragraph, and that paragraph went **false twice** — both times for the same reason. *"Gemini 3.5 Flash is the only 100% that isn't a flagship"* was true the day it was written and false the week two OpenAI models also hit 100%. Nobody was careless; prose about weekly data simply can't move when the data does.
+
+So [`narrative.py`](modeldrift/narrative.py) writes it. Each sentence is a **claim** — a predicate over the current numbers plus a renderer — and a claim whose predicate stops holding is *dropped*, not reworded. The generator can be silent. It can't be wrong.
+
+```bash
+python -m modeldrift.narrative      # -> dashboard/narrative.json
+```
+
+What it refuses to do, because each one is a way this kind of tool lies:
+
+| Refusal | Why |
+| --- | --- |
+| **Break a tie silently** | "The slowest model" is false when two tie. Superlatives return *every* row at the extreme, so the renderer has to say so. |
+| **Print one number beside several models** | It caught this in its own first output — Flash and Flash-Lite are at 100% and 95%, and the template said both were at 100%. Scores are per-model now. |
+| **Round a percentage up** | 99.6% shown as "100%" is a perfect score a model didn't get, in the figure a reader checks hardest. Truncation can only understate. |
+| **Date the prose by a file write** | `metrics.json`'s `updated` is stamped on *every* write, including a mock-only CI run. The date comes from the newest real measurement. |
+| **Let a throttled model win a superlative** | A partial provider failure still records a point, with a depressed score and a latency measured over whatever calls got through. Those rows stay on the chart but out of the comparisons — and the paragraph says how many were left out before it compares anything. |
+| **Generalise past its own predicate** | A cheap tier beating *its own lab's* flagship says nothing about cheap tiers generally — on this board, Meta's and OpenAI's cost plenty. |
+
+The tests are mostly **mutation tests**: change a number, assert the prose changed to match. A test that only checks today's output passes forever while the generator quietly stops tracking reality. Every guard was verified by reintroducing the bug and watching it go red — which is how the first version of the pairing test was caught being decorative: it compared *sets* of percentages rather than which model each was attached to, so it stayed green against the exact bug it was written for.
+
+The portfolio pulls the result in through [a weekly job](https://github.com/egnaro9/egnaro9.github.io/blob/main/.github/workflows/refresh-drift-paragraph.yml) that opens a **pull request** rather than pushing — the page is outward-facing, so publishing stays a human act.
 
 ## Automatic — but signal, not noise
 
