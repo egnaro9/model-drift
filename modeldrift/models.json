@@ -123,5 +123,13 @@
     "model": "llama-3.3-70b-versatile",
     "key_env": "GROQ_API_KEY",
     "base_url": "https://api.groq.com/openai/v1"
+  },
+  {
+    "id": "meta:llama-3.1-8b",
+    "label": "Llama 3.1 8B",
+    "provider": "openai-compatible",
+    "model": "llama-3.1-8b-instant",
+    "key_env": "GROQ_API_KEY",
+    "base_url": "https://api.groq.com/openai/v1"
   }
 ]
