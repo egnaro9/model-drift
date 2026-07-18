@@ -11,12 +11,13 @@ _Auto-generated after each scheduled probe. Live chart: [egnaro9.github.io/model
 | GPT-5 nano | 100.0% | +0.0 pts | ⚪ unchanged |
 | Claude Fable 5 | 100.0% | +0.0 pts | ⚪ unchanged |
 | Claude Opus 4.8 | 100.0% | +0.0 pts | ⚪ unchanged |
-| Claude Sonnet 5 | 81.8% | +0.0 pts | ⚪ unchanged |
+| Claude Sonnet 5 | 86.4% | +4.5 pts | 🟢 improved |
 | Claude Haiku 4.5 | 86.4% | +0.0 pts | ⚪ unchanged |
 | Gemini 3.1 Pro | 95.5% | +0.0 pts | ⚪ unchanged |
 | Gemini 3.5 Flash | 100.0% | +0.0 pts | ⚪ unchanged |
 | Gemini 3.1 Flash-Lite | 95.5% | +0.0 pts | ⚪ unchanged |
 | Grok 4.5 | 100.0% | +0.0 pts | ⚪ unchanged |
-| Grok 4.3 | 77.3% | -4.5 pts | 🔴 regressed |
-| Grok 4 Fast | 86.4% | -9.1 pts | 🔴 regressed |
-| Llama 3.3 70B | — | — | ⚫ no runs yet |
+| Grok 4.3 | 77.3% | +0.0 pts | ⚪ unchanged |
+| Grok 4 Fast | 86.4% | +0.0 pts | ⚪ unchanged |
+| Llama 3.3 70B | 77.3% | — | 🔵 baseline |
+| Llama 3.1 8B | 59.1% | — | 🔵 baseline |

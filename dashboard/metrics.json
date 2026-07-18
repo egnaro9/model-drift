@@ -1,5 +1,5 @@
 {
- "updated": "2026-07-18T19:11:58Z",
+ "updated": "2026-07-18T19:23:15Z",
  "series": {
   "mock:stable": [
    {
@@ -58,6 +58,14 @@
    },
    {
     "t": "2026-07-18T19:11:58Z",
+    "acc": 1.0,
+    "latency_ms": 0.0,
+    "out_chars": 4.6,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T19:23:15Z",
     "acc": 1.0,
     "latency_ms": 0.0,
     "out_chars": 4.6,
@@ -127,6 +135,14 @@
     "out_chars": 4.5,
     "reliability": 1.0,
     "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T19:23:15Z",
+    "acc": 1.0,
+    "latency_ms": 1813.6,
+    "out_chars": 4.5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
    }
   ],
   "openai:gpt-5-mini": [
@@ -188,6 +204,14 @@
     "t": "2026-07-18T19:11:58Z",
     "acc": 1.0,
     "latency_ms": 1582.1,
+    "out_chars": 4.4,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T19:23:15Z",
+    "acc": 1.0,
+    "latency_ms": 1513.8,
     "out_chars": 4.4,
     "reliability": 1.0,
     "refusal_rate": 0.0
@@ -255,6 +279,14 @@
     "out_chars": 6.4,
     "reliability": 1.0,
     "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T19:23:15Z",
+    "acc": 0.7727,
+    "latency_ms": 552.3,
+    "out_chars": 6.3,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
    }
   ],
   "openai:gpt-5-nano": [
@@ -316,6 +348,14 @@
     "t": "2026-07-18T19:11:58Z",
     "acc": 1.0,
     "latency_ms": 1310.4,
+    "out_chars": 4.5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T19:23:15Z",
+    "acc": 1.0,
+    "latency_ms": 1675.6,
     "out_chars": 4.5,
     "reliability": 1.0,
     "refusal_rate": 0.0
@@ -383,6 +423,14 @@
     "out_chars": 4.6,
     "reliability": 1.0,
     "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T19:23:15Z",
+    "acc": 1.0,
+    "latency_ms": 3565.8,
+    "out_chars": 4.6,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
    }
   ],
   "anthropic:claude-opus-4-8": [
@@ -444,6 +492,14 @@
     "t": "2026-07-18T19:11:58Z",
     "acc": 1.0,
     "latency_ms": 1139.2,
+    "out_chars": 4.6,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T19:23:15Z",
+    "acc": 1.0,
+    "latency_ms": 988.1,
     "out_chars": 4.6,
     "reliability": 1.0,
     "refusal_rate": 0.0
@@ -511,6 +567,14 @@
     "out_chars": 14.8,
     "reliability": 1.0,
     "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T19:23:15Z",
+    "acc": 0.8636,
+    "latency_ms": 1271.1,
+    "out_chars": 11.8,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
    }
   ],
   "anthropic:claude-haiku-4-5": [
@@ -575,6 +639,14 @@
     "out_chars": 5.7,
     "reliability": 1.0,
     "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T19:23:15Z",
+    "acc": 0.8636,
+    "latency_ms": 637.2,
+    "out_chars": 5.7,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
    }
   ],
   "xai:grok-4.5": [
@@ -606,6 +678,14 @@
     "t": "2026-07-18T19:11:58Z",
     "acc": 1.0,
     "latency_ms": 1469.7,
+    "out_chars": 4.5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T19:23:15Z",
+    "acc": 1.0,
+    "latency_ms": 1489.3,
     "out_chars": 4.5,
     "reliability": 1.0,
     "refusal_rate": 0.0
@@ -643,6 +723,14 @@
     "out_chars": 93.5,
     "reliability": 1.0,
     "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T19:23:15Z",
+    "acc": 0.7727,
+    "latency_ms": 2221.8,
+    "out_chars": 88.5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
    }
   ],
   "xai:grok-4-fast": [
@@ -677,6 +765,14 @@
     "out_chars": 4.7,
     "reliability": 1.0,
     "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T19:23:15Z",
+    "acc": 0.8636,
+    "latency_ms": 874.5,
+    "out_chars": 4.6,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
    }
   ],
   "google:gemini-3.1-pro": [
@@ -692,6 +788,14 @@
     "t": "2026-07-18T19:11:58Z",
     "acc": 0.9545,
     "latency_ms": 2585.5,
+    "out_chars": 4.5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T19:23:15Z",
+    "acc": 0.9545,
+    "latency_ms": 2186.2,
     "out_chars": 4.5,
     "reliability": 1.0,
     "refusal_rate": 0.0
@@ -713,6 +817,14 @@
     "out_chars": 4.5,
     "reliability": 1.0,
     "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T19:23:15Z",
+    "acc": 1.0,
+    "latency_ms": 1042.8,
+    "out_chars": 4.5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
    }
   ],
   "google:gemini-3.1-flash-lite": [
@@ -729,6 +841,34 @@
     "acc": 0.9545,
     "latency_ms": 489.2,
     "out_chars": 4.5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
+   },
+   {
+    "t": "2026-07-18T19:23:15Z",
+    "acc": 0.9545,
+    "latency_ms": 466.2,
+    "out_chars": 4.5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
+   }
+  ],
+  "meta:llama-3.3-70b": [
+   {
+    "t": "2026-07-18T19:23:15Z",
+    "acc": 0.7727,
+    "latency_ms": 211.7,
+    "out_chars": 4.7,
+    "reliability": 1.0,
+    "refusal_rate": 0.0
+   }
+  ],
+  "meta:llama-3.1-8b": [
+   {
+    "t": "2026-07-18T19:23:15Z",
+    "acc": 0.5909,
+    "latency_ms": 130.9,
+    "out_chars": 12.0,
     "reliability": 1.0,
     "refusal_rate": 0.0
    }
