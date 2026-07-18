@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Is My Model Drifting? A public tracker: a frozen suite runs against live LLM APIs on a schedule, and every score is kept so you can see each model's quality over time — and when it drops.">
+<title>Is My Model Drifting?</title>
+<meta property="og:title" content="Is My Model Drifting?">
+<meta property="og:description" content="A public LLM regression tracker — a frozen suite, run on a schedule against live models, with every score kept and drops flagged.">
+<style>
+  :root{
+    color-scheme: dark light;
+    --ink:#0b0f14; --panel:#131a22; --line:rgba(255,255,255,.10); --line-2:rgba(255,255,255,.05);
+    --fg:#e6edf1; --fg-dim:#93a1ab; --fg-faint:#63727d;
+    --good:#48c1ac; --bad:#f2545b; --warn:#f2a53c;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --ink:#f4f7f8; --panel:#fff; --line:rgba(10,20,28,.12); --line-2:rgba(10,20,28,.06);
+           --fg:#0f1820; --fg-dim:#4a5761; --fg-faint:#78868f;
+           --good:#1c8f7d; --bad:#c73842; --warn:#b7761a; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--ink); color:var(--fg); font-family:var(--sans); line-height:1.6;
+    padding:0 20px 80px; -webkit-font-smoothing:antialiased}
+  .col{max-width:860px; margin:0 auto}
+  a{color:var(--good)}
+  header{padding:56px 0 20px}
+  h1{font-size:clamp(30px,6vw,46px); margin:0; letter-spacing:-.02em}
+  .sub{color:var(--fg-dim); max-width:60ch; margin:14px 0 0}
+  .updated{font-family:var(--mono); font-size:12.5px; color:var(--fg-faint); margin:14px 0 0}
+
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:20px; margin-top:22px}
+  svg{width:100%; height:auto; display:block; overflow:visible}
+  .axis{stroke:var(--line); stroke-width:1}
+  .gl{stroke:var(--line-2); stroke-width:1}
+  .tick{font-family:var(--mono); font-size:10px; fill:var(--fg-faint)}
+  .series{fill:none; stroke-width:2}
+  .dot{stroke:var(--panel); stroke-width:1.5}
+
+  table{width:100%; border-collapse:collapse; margin-top:8px; font-size:14px}
+  th,td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--fg-faint)}
+  .swatch{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:8px; vertical-align:middle}
+  .num{font-family:var(--mono); font-variant-numeric:tabular-nums}
+  .badge{font-family:var(--mono); font-size:11px; padding:2px 8px; border-radius:3px; border:1px solid currentColor}
+  .b-good{color:var(--good)} .b-bad{color:var(--bad)} .b-warn{color:var(--fg-faint)}
+  .legend{display:flex; flex-wrap:wrap; gap:14px; margin-top:12px; font-size:12.5px; color:var(--fg-dim); font-family:var(--mono)}
+  .note{color:var(--fg-dim); font-size:14px; max-width:64ch}
+  .empty{color:var(--fg-faint); font-family:var(--mono); font-size:13px; padding:20px 0; text-align:center}
+  footer{margin-top:40px; padding-top:20px; border-top:1px solid var(--line); font-family:var(--mono); font-size:12.5px; color:var(--fg-faint)}
+  h2{font-size:20px; margin:0 0 4px}
+  code{font-family:var(--mono); font-size:.9em; color:var(--good)}
+</style>
+</head>
+<body>
+<div class="col">
+  <header>
+    <h1>Is my model drifting?</h1>
+    <p class="sub">Model providers ship silent updates. A prompt that worked can quietly get worse
+      with no version bump and no error. This tracks it: a <strong>frozen, deterministically-graded
+      suite</strong> runs against live models on a schedule, every score is kept, and a drop from one
+      run to the next is flagged. No LLM-as-judge — the grader is exact-match, so a score change means
+      the <em>model</em> moved.</p>
+    <p class="updated" id="updated">Loading…</p>
+  </header>
+
+  <div class="card">
+    <svg id="chart" viewBox="0 0 860 340" role="img" aria-label="Accuracy over time per model"></svg>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="card">
+    <h2>Latest</h2>
+    <table id="table"><thead><tr>
+      <th>Model</th><th>Latest accuracy</th><th>Δ vs previous</th><th>Status</th><th>When</th>
+    </tr></thead><tbody id="tbody"></tbody></table>
+    <div class="empty" id="empty" hidden></div>
+  </div>
+
+  <div class="card">
+    <h2>How it works</h2>
+    <p class="note">A fixed suite of <strong>12 unambiguous tasks</strong> (instruction-following,
+      factual recall, arithmetic, formatting, refusal calibration) runs against each model at
+      <code>temperature 0</code>. Each answer is graded by exact match, regex, or a numeric compare —
+      never by another model. Runs are stored in
+      <a href="https://github.com/egnaro9/eval-history" target="_blank" rel="noopener">eval-history</a>,
+      which computes the run-to-run comparison. The suite is versioned and frozen; a chart only means
+      something if the questions never change under it.</p>
+    <p class="note" style="margin-top:10px">Open, auditable, reproducible: the suite, the graders, and
+      the runner are all in
+      <a href="https://github.com/egnaro9/model-drift" target="_blank" rel="noopener">the repo</a>.</p>
+  </div>
+
+  <footer>
+    by <a href="https://egnaro9.github.io">Erik Hill</a> · built on
+    <a href="https://github.com/egnaro9/eval-history">eval-history</a> +
+    <a href="https://github.com/egnaro9/rag-eval-lab">rag-eval-lab</a> · MIT
+  </footer>
+</div>
+
+<script>
+const API = "https://eval-history.onrender.com";
+// The tracked series, mirroring modeldrift/models.json. Colours are assigned here.
+const MODELS = [
+  { id: "openai:gpt-4o-mini",          label: "GPT-4o mini",        color: "#48c1ac" },
+  { id: "anthropic:claude-3-5-haiku",  label: "Claude 3.5 Haiku",   color: "#f2a53c" },
+  { id: "google:gemini-2.0-flash",     label: "Gemini 2.0 Flash",   color: "#60a5fa" },
+  { id: "groq:llama-3.3-70b",          label: "Llama 3.3 70B",      color: "#c084fc" },
+];
+const fmtPct = v => (v*100).toFixed(1) + "%";
+const esc = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+async function fetchSeries(m) {
+  try {
+    const r = await fetch(`${API}/runs?name=${encodeURIComponent(m.id)}&limit=52`);
+    if (!r.ok) return { ...m, runs: [] };
+    const runs = (await r.json())
+      .map(x => ({ t: new Date(x.created_at), acc: x.faithfulness }))
+      .sort((a,b) => a.t - b.t);           // oldest → newest for plotting
+    return { ...m, runs };
+  } catch { return { ...m, runs: [] }; }
+}
+
+function render(series) {
+  const withData = series.filter(s => s.runs.length);
+  const all = withData.flatMap(s => s.runs);
+  document.getElementById("legend").innerHTML = MODELS.map(m =>
+    `<span><span class="swatch" style="background:${m.color}"></span>${esc(m.label)}</span>`).join("");
+
+  if (!all.length) {
+    document.getElementById("updated").textContent =
+      "No runs recorded yet — the first scheduled probe will populate this.";
+    document.getElementById("chart").innerHTML =
+      `<text x="430" y="170" text-anchor="middle" class="tick">waiting for the first run</text>`;
+    document.getElementById("empty").hidden = false;
+    document.getElementById("empty").textContent = "No data yet.";
+    return;
+  }
+
+  const newest = new Map(withData.map(s => [s.id, s.runs.at(-1)]));
+  const lastAt = new Date(Math.max(...all.map(r => r.t)));
+  document.getElementById("updated").textContent =
+    `Last updated ${lastAt.toLocaleString()} · ${withData.length} model(s) tracked · ${all.length} runs`;
+
+  // ── chart ──
+  const W=860,H=340, m={l:44,r:14,t:16,b:28};
+  const xs = all.map(r=>+r.t), x0=Math.min(...xs), x1=Math.max(...xs)||x0+1;
+  const ys = all.map(r=>r.acc); let y0=Math.min(...ys,0.5), y1=1.0; if(y1-y0<0.1)y0=y1-0.1;
+  const px = t => m.l + (W-m.l-m.r) * ((+t - x0) / (x1 - x0 || 1));
+  const py = v => m.t + (H-m.t-m.b) * (1 - (v - y0) / (y1 - y0 || 1));
+  let svg = "";
+  for (let g=0; g<=4; g++){ const v=y0+(y1-y0)*g/4, y=py(v);
+    svg += `<line class="gl" x1="${m.l}" y1="${y}" x2="${W-m.r}" y2="${y}"/>`;
+    svg += `<text class="tick" x="${m.l-6}" y="${y+3}" text-anchor="end">${(v*100).toFixed(0)}%</text>`; }
+  svg += `<line class="axis" x1="${m.l}" y1="${H-m.b}" x2="${W-m.r}" y2="${H-m.b}"/>`;
+  svg += `<text class="tick" x="${m.l}" y="${H-8}">${new Date(x0).toLocaleDateString()}</text>`;
+  svg += `<text class="tick" x="${W-m.r}" y="${H-8}" text-anchor="end">${new Date(x1).toLocaleDateString()}</text>`;
+  for (const s of withData){
+    const pts = s.runs.map(r=>`${px(r.t)},${py(r.acc)}`).join(" ");
+    svg += `<polyline class="series" points="${pts}" stroke="${s.color}"/>`;
+    svg += s.runs.map(r=>`<circle class="dot" cx="${px(r.t)}" cy="${py(r.acc)}" r="3" fill="${s.color}"/>`).join("");
+  }
+  document.getElementById("chart").innerHTML = svg;
+
+  // ── table ──
+  const rows = MODELS.map(m => {
+    const s = series.find(x=>x.id===m.id);
+    if (!s || !s.runs.length)
+      return `<tr><td><span class="swatch" style="background:${m.color}"></span>${esc(m.label)}</td>
+        <td class="num" colspan="4" style="color:var(--fg-faint)">no runs yet</td></tr>`;
+    const latest = s.runs.at(-1), prev = s.runs.length>1 ? s.runs.at(-2) : null;
+    const d = prev ? latest.acc - prev.acc : null;
+    let badge = `<span class="badge b-warn">baseline</span>`;
+    if (d !== null) badge = d < -1e-9 ? `<span class="badge b-bad">▼ regressed</span>`
+                    : d > 1e-9 ? `<span class="badge b-good">▲ improved</span>`
+                    : `<span class="badge b-warn">— stable</span>`;
+    const dtxt = d===null ? "—" : `${d>=0?"+":""}${(d*100).toFixed(1)} pts`;
+    return `<tr>
+      <td><span class="swatch" style="background:${m.color}"></span>${esc(m.label)}</td>
+      <td class="num">${fmtPct(latest.acc)}</td>
+      <td class="num" style="color:${d&&d<0?'var(--bad)':d&&d>0?'var(--good)':'var(--fg-dim)'}">${dtxt}</td>
+      <td>${badge}</td>
+      <td class="num" style="color:var(--fg-faint)">${latest.t.toLocaleDateString()}</td>
+    </tr>`;
+  }).join("");
+  document.getElementById("tbody").innerHTML = rows;
+}
+
+Promise.all(MODELS.map(fetchSeries)).then(render).catch(e => {
+  document.getElementById("updated").textContent = "Couldn't reach eval-history (it may be waking up).";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "model-drift"
+version = "0.1.0"
+description = "Is My Model Drifting? A public LLM regression tracker: probe models on a frozen suite, store runs over time, flag regressions."
+requires-python = ">=3.11"
+dependencies = []
+license = {text = "MIT"}
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.scripts]
+model-drift = "modeldrift.run:main"
+
+[tool.setuptools]
+packages = ["modeldrift"]
+
+[tool.setuptools.package-data]
+modeldrift = ["models.json"]
