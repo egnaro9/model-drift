@@ -47,18 +47,24 @@
   .badge{font-family:var(--mono); font-size:11px; padding:2px 8px; border-radius:3px; border:1px solid currentColor}
   .b-good{color:var(--good)} .b-bad{color:var(--bad)} .b-warn{color:var(--fg-faint)}
 
-  /* interactive legend — click a chip to show/hide that model */
-  .controls{display:flex; align-items:center; gap:14px; margin-top:16px;
+  /* tier quick-filters + grouped, clickable legend */
+  .controls{display:flex; align-items:center; flex-wrap:wrap; gap:6px 12px; margin-top:16px;
     font-family:var(--mono); font-size:11.5px; color:var(--fg-faint)}
   .controls button{cursor:pointer; color:var(--fg-faint); background:transparent; border:0; padding:0;
     font:inherit; border-bottom:1px dashed var(--line)}
   .controls button:hover{color:var(--fg)}
-  .legend{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+  .controls .sep{opacity:.5}
+  .hint{font-family:var(--mono); font-size:11px; color:var(--fg-faint); margin:12px 0 0}
+  .legend{display:flex; flex-direction:column; gap:8px; margin-top:8px}
+  .grp{display:flex; align-items:center; flex-wrap:wrap; gap:7px}
+  .glabel{width:78px; min-width:78px; text-align:right; padding-right:4px;
+    font-family:var(--mono); font-size:11px; color:var(--fg-faint)}
   .legend button{display:inline-flex; align-items:center; gap:7px; cursor:pointer; font-family:var(--mono);
     font-size:12px; color:var(--fg-dim); background:transparent; border:1px solid var(--line);
     border-radius:20px; padding:4px 11px 4px 9px; transition:opacity .12s, border-color .12s, color .12s}
   .legend button:hover{border-color:var(--fg-faint); color:var(--fg)}
   .legend button.off{opacity:.38; text-decoration:line-through}
+  @media (max-width:520px){ .glabel{width:100%; text-align:left; padding:0} }
 
   .note{color:var(--fg-dim); font-size:14px; max-width:64ch}
   .empty{color:var(--fg-faint); font-family:var(--mono); font-size:13px; padding:20px 0; text-align:center}
@@ -82,10 +88,15 @@
   <div class="card">
     <svg id="chart" viewBox="0 0 860 340" role="img" aria-label="Accuracy over time per model"></svg>
     <div class="controls">
-      <span>Click a model to show/hide it:</span>
-      <button id="show-all" type="button">show all</button>
+      <span>Show:</span>
+      <button type="button" data-tier="all">all</button>
+      <button type="button" data-tier="flagship">flagships</button>
+      <button type="button" data-tier="mid">mid</button>
+      <button type="button" data-tier="mini">minis</button>
+      <span class="sep">·</span>
       <button id="hide-all" type="button">hide all</button>
     </div>
+    <p class="hint">…or click any model below to toggle it. Your selection is remembered.</p>
     <div class="legend" id="legend"></div>
   </div>
 
@@ -124,20 +135,21 @@
 const API = "https://eval-history.onrender.com";
 // The tracked series, mirroring modeldrift/models.json. Colours are assigned here.
 const MODELS = [
-  // colour = company (hue), tier = lightness (flagship darkest → mini lightest)
-  { id: "openai:gpt-5",                  label: "GPT-5",               color: "#2fb8a0" },
-  { id: "openai:gpt-5-mini",             label: "GPT-5 mini",          color: "#48c1ac" },
-  { id: "openai:gpt-4o-mini",            label: "GPT-4o mini",         color: "#8fe3d4" },
-  { id: "anthropic:claude-opus-4-8",     label: "Claude Opus 4.8",     color: "#e8912a" },
-  { id: "anthropic:claude-sonnet-5",     label: "Claude Sonnet 5",     color: "#f2a53c" },
-  { id: "anthropic:claude-haiku-4-5",    label: "Claude Haiku 4.5",    color: "#f7cd8a" },
-  { id: "google:gemini-2.5-pro",         label: "Gemini 2.5 Pro",      color: "#3b82f6" },
-  { id: "google:gemini-2.5-flash",       label: "Gemini 2.5 Flash",    color: "#60a5fa" },
-  { id: "google:gemini-2.5-flash-lite",  label: "Gemini 2.5 Flash-Lite", color: "#a9cdfb" },
-  { id: "xai:grok-4.5",                  label: "Grok 4.5",            color: "#d6488a" },
-  { id: "xai:grok-4.3",                  label: "Grok 4.3",            color: "#e06c9f" },
-  { id: "xai:grok-4.1-fast",             label: "Grok 4.1 Fast",       color: "#f0aecb" },
-  { id: "groq:llama-3.3-70b",            label: "Llama 3.3 70B",       color: "#c084fc" },
+  // colour = company (hue), tier = lightness (flagship darkest → mini lightest).
+  // group = the legend row; tier drives the Flagship/Mid/Mini quick-filters.
+  { id: "openai:gpt-5",                  label: "GPT-5",              color: "#2fb8a0", group: "OpenAI",    tier: "flagship" },
+  { id: "openai:gpt-5-mini",             label: "GPT-5 mini",         color: "#48c1ac", group: "OpenAI",    tier: "mid" },
+  { id: "openai:gpt-4o-mini",            label: "GPT-4o mini",        color: "#8fe3d4", group: "OpenAI",    tier: "mini" },
+  { id: "anthropic:claude-opus-4-8",     label: "Opus 4.8",           color: "#e8912a", group: "Anthropic", tier: "flagship" },
+  { id: "anthropic:claude-sonnet-5",     label: "Sonnet 5",           color: "#f2a53c", group: "Anthropic", tier: "mid" },
+  { id: "anthropic:claude-haiku-4-5",    label: "Haiku 4.5",          color: "#f7cd8a", group: "Anthropic", tier: "mini" },
+  { id: "google:gemini-2.5-pro",         label: "2.5 Pro",            color: "#3b82f6", group: "Google",    tier: "flagship" },
+  { id: "google:gemini-2.5-flash",       label: "2.5 Flash",          color: "#60a5fa", group: "Google",    tier: "mid" },
+  { id: "google:gemini-2.5-flash-lite",  label: "2.5 Flash-Lite",     color: "#a9cdfb", group: "Google",    tier: "mini" },
+  { id: "xai:grok-4.5",                  label: "Grok 4.5",           color: "#d6488a", group: "xAI",       tier: "flagship" },
+  { id: "xai:grok-4.3",                  label: "Grok 4.3",           color: "#e06c9f", group: "xAI",       tier: "mid" },
+  { id: "xai:grok-4.1-fast",             label: "Grok 4.1 Fast",      color: "#f0aecb", group: "xAI",       tier: "mini" },
+  { id: "groq:llama-3.3-70b",            label: "Llama 3.3 70B",      color: "#c084fc", group: "Groq",      tier: "open" },
 ];
 const fmtPct = v => (v*100).toFixed(1) + "%";
 const esc = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
@@ -162,10 +174,19 @@ async function fetchSeries(m) {
 }
 
 function renderLegend() {
-  document.getElementById("legend").innerHTML = MODELS.map(m => {
-    const off = hidden.has(m.id) ? " off" : "";
-    return `<button type="button" class="chip${off}" data-id="${m.id}" aria-pressed="${!hidden.has(m.id)}">`
-         + `<span class="swatch" style="background:${m.color}"></span>${esc(m.label)}</button>`;
+  // group models by company into one row each, so 13 chips read as 5 tidy rows
+  const order = [], byGroup = new Map();
+  for (const m of MODELS) {
+    if (!byGroup.has(m.group)) { byGroup.set(m.group, []); order.push(m.group); }
+    byGroup.get(m.group).push(m);
+  }
+  document.getElementById("legend").innerHTML = order.map(g => {
+    const chips = byGroup.get(g).map(m => {
+      const off = hidden.has(m.id) ? " off" : "";
+      return `<button type="button" class="chip${off}" data-id="${m.id}" aria-pressed="${!hidden.has(m.id)}">`
+           + `<span class="swatch" style="background:${m.color}"></span>${esc(m.label)}</button>`;
+    }).join("");
+    return `<div class="grp"><span class="glabel">${esc(g)}</span>${chips}</div>`;
   }).join("");
 }
 
@@ -247,7 +268,14 @@ document.getElementById("legend").addEventListener("click", e => {
   hidden.has(id) ? hidden.delete(id) : hidden.add(id);
   saveHidden(); render();
 });
-document.getElementById("show-all").addEventListener("click", () => { hidden.clear(); saveHidden(); render(); });
+// tier quick-filters: show only one tier across every provider (or 'all')
+function showTier(tier) {
+  hidden.clear();
+  if (tier !== "all") MODELS.forEach(m => { if (m.tier !== tier) hidden.add(m.id); });
+  saveHidden(); render();
+}
+document.querySelectorAll(".controls button[data-tier]").forEach(b =>
+  b.addEventListener("click", () => showTier(b.dataset.tier)));
 document.getElementById("hide-all").addEventListener("click", () => { MODELS.forEach(m => hidden.add(m.id)); saveHidden(); render(); });
 
 renderLegend();  // interactive immediately, even before data lands
