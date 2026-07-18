@@ -29,15 +29,16 @@ def probe(model: Model) -> dict:
     eval-history's `faithfulness` metric so the existing regression comparison
     works unchanged — for a drift probe "faithfulness" reads as "still correct".
     """
-    cases, errors = [], 0
+    cases, errors, first_error = [], 0, None
     for t in SUITE:
         try:
             out = call(model, t.prompt, task_id=t.id)
             passed = bool(t.grade(out))
             note = t.kind
         except ProviderError as e:
-            out, passed, note = "", False, f"{t.kind} · provider error: {str(e)[:80]}"
+            out, passed, note = "", False, f"{t.kind} · provider error: {str(e)[:220]}"
             errors += 1
+            first_error = first_error or str(e)
         cases.append({
             "q": f"[{t.id}] {t.prompt}",
             "answer": out[:500],
@@ -59,7 +60,8 @@ def probe(model: Model) -> dict:
             "flagged_cases": float(sum(1 for c in cases if c["flagged"])), "n_cases": float(n),
         },
         "cases": cases,
-        "_errors": errors,   # stripped before POST; used for the console summary
+        "_errors": errors,          # stripped before POST; used for the console summary
+        "_first_error": first_error,  # full text of the first failure, for diagnosis
     }
 
 
@@ -109,6 +111,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         acc = result["metrics"]["faithfulness"]
         kinds = ", ".join(f"{k} {v:.0%}" for k, v in per_kind(result).items())
         print(f"  {m.label:26} accuracy {acc:.1%}  ({kinds})")
+        if result["_errors"]:   # surface the real error so a 0% is diagnosable, not mysterious
+            print(f"      ↳ {result['_errors']}/{len(SUITE)} failed — first error: {result['_first_error']}")
         if key:
             _post(args.api, key, result)
     if not key:
