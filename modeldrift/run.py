@@ -113,7 +113,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         print(f"  {m.label:26} accuracy {acc:.1%}  ({kinds})")
         if result["_errors"]:   # surface the real error so a 0% is diagnosable, not mysterious
             print(f"      ↳ {result['_errors']}/{len(SUITE)} failed — first error: {result['_first_error']}")
-        if key:
+        # A probe that entirely failed is an infra/key problem, not a 0% score —
+        # don't record it, or the chart shows a fake crash. Partial runs still count.
+        if key and result["_errors"] >= len(SUITE):
+            print("      (every call failed — not recorded; fix the key/quota, not the model)")
+        elif key:
             _post(args.api, key, result)
     if not key:
         print("\n  EVAL_HISTORY_WRITE_KEY unset — probed but not recorded (set it to build history).")
