@@ -75,6 +75,10 @@
   @media (max-width:520px){ .glabel{width:100%; text-align:left; padding:0} }
 
   .note{color:var(--fg-dim); font-size:14px; max-width:64ch}
+  /* second metric row: accuracy broken out by what the task exercises */
+  .mrow.kinds{margin-top:6px; opacity:.92}
+  .krow-label{color:var(--fg-faint); font-family:var(--mono); font-size:11px;
+              letter-spacing:.04em; text-transform:uppercase; margin-right:4px; align-self:center}
   .empty{color:var(--fg-faint); font-family:var(--mono); font-size:13px; padding:20px 0; text-align:center}
   footer{margin-top:40px; padding-top:20px; border-top:1px solid var(--line); font-family:var(--mono); font-size:12.5px; color:var(--fg-faint)}
   h2{font-size:20px; margin:0 0 4px}
@@ -101,6 +105,18 @@
       <button type="button" class="mbtn" data-metric="verbosity">Verbosity</button>
       <button type="button" class="mbtn" data-metric="reliability">Reliability</button>
       <button type="button" class="mbtn" data-metric="refusals">Refusals</button>
+    </div>
+    <div class="mrow kinds" role="group" aria-label="Accuracy by capability">
+      <span class="krow-label">by capability</span>
+      <button type="button" class="mbtn" data-metric="kind:instruction-following">Instructions</button>
+      <button type="button" class="mbtn" data-metric="kind:formatting">Formatting</button>
+      <button type="button" class="mbtn" data-metric="kind:reasoning">Reasoning</button>
+      <button type="button" class="mbtn" data-metric="kind:arithmetic">Arithmetic</button>
+      <button type="button" class="mbtn" data-metric="kind:factual-recall">Recall</button>
+      <button type="button" class="mbtn" data-metric="kind:counting">Counting</button>
+      <button type="button" class="mbtn" data-metric="kind:string-manipulation">Strings</button>
+      <button type="button" class="mbtn" data-metric="kind:extraction">Extraction</button>
+      <button type="button" class="mbtn" data-metric="kind:refusal-calibration">Refusal cal.</button>
     </div>
     <svg id="chart" viewBox="0 0 860 340" role="img" aria-label="Metric over time per model"></svg>
     <div class="controls">
@@ -199,6 +215,22 @@ const METRICS = {   // eps = the delta below which a change counts as "stable" (
                dfmt:d=>`${d>=0?"+":""}${(d*100).toFixed(1)} pts`, verbs:["more","fewer"] },
 };
 
+// Per-capability accuracy. The suite tags every task with what it exercises, and
+// the probe has always computed these — they went to a log and were dropped until
+// the runner started storing them. This is where models actually differ: an
+// aggregate of 77% is usually near-perfect recall sitting next to failing
+// formatting, and the single number hides which half moved.
+const KINDS = ["instruction-following", "formatting", "reasoning", "arithmetic",
+               "factual-recall", "counting", "string-manipulation", "extraction",
+               "refusal-calibration"];
+for (const k of KINDS) {
+  METRICS["kind:" + k] = {
+    label: k.replace(/-/g, " ").replace(/^./, c => c.toUpperCase()),
+    betterUp:true, eps:1e-9, frac:true,
+    fmt:v=>(v*100).toFixed(0)+"%", tick:v=>(v*100).toFixed(0)+"%",
+    dfmt:d=>`${d>=0?"+":""}${(d*100).toFixed(0)} pts`, verbs:["improved","regressed"] };
+}
+
 // viewer's hidden models + chosen metric — both persisted so the view sticks
 const HIDE_KEY="md-hidden", METRIC_KEY="md-metric";
 const loadHidden = () => { try { return new Set(JSON.parse(localStorage.getItem(HIDE_KEY) || "[]")); } catch { return new Set(); } };
@@ -223,13 +255,16 @@ async function fetchAll() {
   try { const r = await fetch(METRICS_URL, {cache:"no-store"}); if (r.ok) extra = (await r.json()).series || {}; } catch {}
   return MODELS.map((m,i) => {
     const ex = (extra[m.id] || []).map(p => ({ t:new Date(p.t), lat:p.latency_ms, ch:p.out_chars,
-                                               rel:p.reliability, ref:p.refusal_rate })).sort((a,b)=>a.t-b.t);
+                                               rel:p.reliability, ref:p.refusal_rate, kinds:p.by_kind })).sort((a,b)=>a.t-b.t);
     return { ...m,
       accuracy:    accs[i],
       latency:     ex.map(p => ({ t:p.t, v:p.lat })),
       verbosity:   ex.map(p => ({ t:p.t, v:p.ch })),
       reliability: ex.filter(p => p.rel != null).map(p => ({ t:p.t, v:p.rel })),
       refusals:    ex.filter(p => p.ref != null).map(p => ({ t:p.t, v:p.ref })),
+      ...Object.fromEntries(KINDS.map(k => ["kind:" + k,
+        ex.filter(p => p.kinds && p.kinds[k] != null)
+          .map(p => ({ t:p.t, v:p.kinds[k] }))])),
     };
   });
 }
