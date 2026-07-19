@@ -196,7 +196,13 @@ const esc = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"
 // read the metrics time series straight from the repo (raw is CORS-open and always
 // current) — the weekly runner commits it with [skip ci], so Pages never rebuilds
 // to re-serve a same-origin copy; raw sidesteps that entirely.
-const METRICS_URL = "https://raw.githubusercontent.com/egnaro9/model-drift/main/dashboard/metrics.json";
+// Same-origin first: this page is served from the same Pages deploy as the file,
+// so the data always matches the page version and there's no cross-origin CDN in
+// the way — raw.githubusercontent caches for minutes, which is long enough to
+// show an emptied board after a wipe. The raw URL stays as a fallback for anyone
+// opening this file outside the deploy.
+const METRICS_URL = "./metrics.json";
+const METRICS_FALLBACK = "https://raw.githubusercontent.com/egnaro9/model-drift/main/dashboard/metrics.json";
 
 // The five tracked metrics. Accuracy comes from eval-history; speed + verbosity
 // from metrics.json. betterUp says which direction is "good" (latency: lower).
@@ -254,7 +260,15 @@ async function fetchAll() {
   // alert compares; it just isn't a second source of truth for this chart. Also
   // one static fetch instead of sixteen calls to a service that sleeps.
   let extra = {};
-  try { const r = await fetch(METRICS_URL, {cache:"no-store"}); if (r.ok) extra = (await r.json()).series || {}; } catch {}
+  for (const url of [METRICS_URL, METRICS_FALLBACK]) {
+    try {
+      const r = await fetch(url, {cache:"no-store"});
+      if (!r.ok) continue;
+      const j = await r.json();
+      if (Object.keys(j.series || {}).length) { extra = j.series; break; }
+      extra = j.series || {};
+    } catch {}
+  }
   return MODELS.map((m) => {
     const ex = (extra[m.id] || []).map(p => ({ t:new Date(p.t), lat:p.latency_ms, ch:p.out_chars,
                                                rel:p.reliability, ref:p.refusal_rate, kinds:p.by_kind, acc:p.acc })).sort((a,b)=>a.t-b.t);
