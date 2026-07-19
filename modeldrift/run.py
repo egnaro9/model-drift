@@ -101,6 +101,53 @@ def probe(model: Model) -> dict:
     }
 
 
+def probe_repeated(model: Model, runs: int = 3) -> dict:
+    """Probe a model `runs` times and return the **median** run.
+
+    A single probe is not a measurement of a model, it is one sample from it.
+    Three runs of this identical frozen suite, half an hour apart, moved Claude
+    Sonnet 5 by 9 points and Fable 5 by 6 — while 11 of 16 models did not move
+    at all. None of the 16 accept `temperature`, so nothing can be pinned to 0
+    and that spread is the floor under any drift signal. Alerting on a single
+    run means alerting on sampling noise.
+
+    So: take the median. It needs two of three runs to agree before a number
+    moves, which is exactly the "is it a fluke?" question.
+
+    The spread is kept, not hidden — `_acc_spread` rides along on the result, so
+    the board can show how noisy a model is instead of implying a precision the
+    sampling doesn't support. An aggregate that conceals its own variance is a
+    worse lie than a noisy chart.
+    """
+    samples = [probe(model) for _ in range(max(1, runs))]
+    # A run where every call failed is an infra problem, not a sample of the
+    # model. Median over the usable ones; fall back to everything if none are.
+    usable = [r for r in samples if r["_errors"] < len(SUITE)] or samples
+
+    def med(field, of=None):
+        vals = [(of(r) if of else r[field]) for r in usable]
+        vals = [v for v in vals if v is not None]
+        return statistics.median(vals) if vals else None
+
+    accs = sorted(r["metrics"]["faithfulness"] for r in usable)
+    median_acc = statistics.median(accs)
+    # Return the sample closest to the median so `cases` stay real answers from
+    # one actual run rather than a stitched-together average of several.
+    rep = min(usable, key=lambda r: abs(r["metrics"]["faithfulness"] - median_acc))
+    out = dict(rep)
+    out["metrics"] = dict(rep["metrics"])
+    for k in ("faithfulness", "precision@k", "recall@k", "citation_rate"):
+        out["metrics"][k] = round(median_acc, 4)
+    out["_latency_ms"] = med("_latency_ms")
+    out["_out_chars"] = med("_out_chars")
+    out["_reliability"] = med("_reliability")
+    out["_refusal_rate"] = med("_refusal_rate")
+    out["_runs"] = len(usable)
+    out["_acc_spread"] = round(max(accs) - min(accs), 4)
+    out["label"] = f"suite {SUITE_VERSION} · median of {len(usable)} runs"
+    return out
+
+
 def per_kind(result: dict) -> Dict[str, float]:
     by = defaultdict(lambda: [0, 0])
     for c in result["cases"]:
@@ -152,7 +199,11 @@ def update_metrics_file(path: str, results: List[dict], stamp: str, cap: int = 1
                     # models actually differ — a model at 77% overall is usually
                     # near-perfect on recall and failing formatting, and the single
                     # aggregate hides exactly that.
-                    "by_kind": per_kind(r)})
+                    "by_kind": per_kind(r),
+                    # how many samples the median came from, and how far apart
+                    # they were - so a reader can see the noise, not just the
+                    # number that survived it
+                    "runs": r.get("_runs", 1), "acc_spread": r.get("_acc_spread", 0.0)})
         del pts[:-cap]                    # keep the series bounded
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps({"updated": stamp, "series": series}, indent=1), encoding="utf-8")
@@ -168,6 +219,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument("--out", default=None, help="also write results as JSON")
     p.add_argument("--metrics", default="dashboard/metrics.json",
                    help="time-series file for latency/verbosity the dashboard reads")
+    p.add_argument("--runs", type=int, default=3,
+                   help="probe each model this many times and record the median "
+                        "(1 = single sample; the noise floor across 3 runs was 9 points)")
     p.add_argument("--narrative", default="dashboard/narrative.json",
                    help="generated prose summary of the board, for the portfolio")
     p.add_argument("--list-models", action="store_true",
@@ -195,17 +249,20 @@ def main(argv: Optional[List[str]] = None) -> int:
     skipped = [m for m in load_registry(args.registry) if not m.available]
 
     print(f"suite {SUITE_VERSION} ({suite_hash()}), {len(SUITE)} tasks")
-    print(f"probing {len(models)} model(s); {len(skipped)} skipped for lack of an API key\n")
+    print(f"probing {len(models)} model(s) x{args.runs} run(s); "
+          f"{len(skipped)} skipped for lack of an API key\n")
 
     results = []
     for m in models:
-        result = probe(m)
+        result = probe_repeated(m, args.runs)
         results.append(result)
         acc = result["metrics"]["faithfulness"]
         speed = f"{result['_latency_ms']:.0f}ms" if result["_latency_ms"] is not None else "—"
         chars = f"{result['_out_chars']:.0f}c" if result["_out_chars"] is not None else "—"
         kinds = ", ".join(f"{k} {v:.0%}" for k, v in per_kind(result).items())
-        print(f"  {m.label:26} acc {acc:.0%} · {speed:>7} · {chars:>5}  ({kinds})")
+        spread = result.get("_acc_spread") or 0.0
+        band = f" ±{spread*100:.0f}" if spread else "    "
+        print(f"  {m.label:26} acc {acc:.0%}{band} · {speed:>7} · {chars:>5}  ({kinds})")
         if result["_errors"]:   # surface the real error so a 0% is diagnosable, not mysterious
             print(f"      ↳ {result['_errors']}/{len(SUITE)} failed — first error: {result['_first_error']}")
         # A probe that entirely failed is an infra/key problem, not a 0% score —

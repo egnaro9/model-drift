@@ -5,6 +5,8 @@ must depend on the model's answer and nothing else. These pin that — the grade
 pass and fail the right things, a clean model scores 1.0, and a model that returns
 wrong answers is caught (not silently averaged away).
 """
+import pytest
+
 from modeldrift.providers import Model
 from modeldrift.run import per_kind, probe
 from modeldrift.suite import SUITE, suite_hash
@@ -100,7 +102,7 @@ def test_metrics_file_accumulates_and_skips_total_failures(tmp_path):
     d = json.loads(f.read_text())
     point = d["series"]["mock:stable"][0]
     assert set(point) == {"t", "acc", "latency_ms", "out_chars", "reliability",
-                          "refusal_rate", "by_kind"}
+                          "refusal_rate", "by_kind", "runs", "acc_spread"}
     # by_kind is the per-capability breakdown — the aggregate hides which kind of
     # thing moved, which is the useful half of a drift signal.
     assert point["by_kind"]["formatting"] == 1.0
@@ -110,3 +112,65 @@ def test_metrics_file_accumulates_and_skips_total_failures(tmp_path):
     failed = {**r, "run": "x:broken", "_latency_ms": None, "_out_chars": None}
     update_metrics_file(str(f), [failed], "2026-07-26T00:00:00Z")     # skipped
     assert "x:broken" not in json.loads(f.read_text())["series"]
+
+
+# ── median-of-N sampling ────────────────────────────────────────────────
+def _fake_runs(monkeypatch, accs):
+    """Make probe() return a canned accuracy per call, in order."""
+    from modeldrift import run as runmod
+    seq = list(accs)
+    def fake(model):
+        a = seq.pop(0)
+        n = len(SUITE)
+        return {"run": model.id, "git_sha": "x", "label": "",
+                "metrics": {"faithfulness": a, "precision@k": a, "recall@k": a,
+                            "citation_rate": a, "flagged_cases": 0.0, "n_cases": float(n)},
+                "cases": [], "_errors": 0, "_first_error": None,
+                "_latency_ms": 100.0, "_out_chars": 5.0,
+                "_reliability": 1.0, "_refusal_rate": 0.0}
+    monkeypatch.setattr(runmod, "probe", fake)
+
+
+def test_one_odd_run_does_not_move_the_recorded_number(monkeypatch):
+    """The point of the median: two of three runs have to agree. A single
+    outlier - the 'is it a fluke?' case - must not move the number."""
+    from modeldrift.run import probe_repeated
+    _fake_runs(monkeypatch, [0.90, 0.90, 0.60])          # one bad sample
+    out = probe_repeated(STABLE, runs=3)
+    assert out["metrics"]["faithfulness"] == 0.90
+
+
+def test_a_real_move_survives_the_median(monkeypatch):
+    """A genuine regression shows up in most runs, so the median follows it."""
+    from modeldrift.run import probe_repeated
+    _fake_runs(monkeypatch, [0.60, 0.60, 0.90])
+    out = probe_repeated(STABLE, runs=3)
+    assert out["metrics"]["faithfulness"] == 0.60
+
+
+def test_the_spread_is_recorded_not_hidden(monkeypatch):
+    """An aggregate that conceals its own variance is worse than a noisy chart."""
+    from modeldrift.run import probe_repeated
+    _fake_runs(monkeypatch, [0.77, 0.83, 0.86])          # the real Sonnet 5 spread
+    out = probe_repeated(STABLE, runs=3)
+    assert out["metrics"]["faithfulness"] == 0.83
+    assert out["_acc_spread"] == pytest.approx(0.09, abs=1e-6)
+    assert out["_runs"] == 3
+
+
+def test_metrics_file_carries_runs_and_spread(monkeypatch, tmp_path):
+    import json
+    from modeldrift.run import probe_repeated, update_metrics_file
+    _fake_runs(monkeypatch, [0.77, 0.83, 0.86])
+    r = probe_repeated(STABLE, runs=3)
+    f = tmp_path / "m.json"
+    update_metrics_file(str(f), [r], "2026-07-19T00:00:00Z")
+    pt = json.loads(f.read_text())["series"]["mock:stable"][0]
+    assert pt["runs"] == 3 and pt["acc_spread"] == pytest.approx(0.09, abs=1e-6)
+
+
+def test_runs_1_is_still_a_single_sample(monkeypatch):
+    from modeldrift.run import probe_repeated
+    _fake_runs(monkeypatch, [0.42])
+    out = probe_repeated(STABLE, runs=1)
+    assert out["metrics"]["faithfulness"] == 0.42 and out["_acc_spread"] == 0.0

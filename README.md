@@ -2,7 +2,7 @@
 
 [![ci](https://github.com/egnaro9/model-drift/actions/workflows/ci.yml/badge.svg)](https://github.com/egnaro9/model-drift/actions/workflows/ci.yml)
 [![python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org/)
-[![tests](https://img.shields.io/badge/tests-91-brightgreen)](tests)
+[![tests](https://img.shields.io/badge/tests-132-brightgreen)](tests)
 
 **A small public LLM observability board. A frozen suite runs against live models on a schedule and keeps every result — so you can watch each model's quality *and* speed, verbosity, reliability, and refusal rate over time, and see when any of them moves.**
 
@@ -53,6 +53,21 @@ OPENAI_API_KEY=... EVAL_HISTORY_WRITE_KEY=... python -m modeldrift.run
 # or with no keys at all — the deterministic mock proves the pipeline, no spend:
 python -m modeldrift.run
 ```
+
+## One run is a sample, not a measurement
+
+Three runs of this identical frozen suite, half an hour apart, moved **Claude Sonnet 5 by 9 points** and **Fable 5 by 6**, while **11 of 16 models did not move at all**. Same questions, same deterministic grader, same day. None of the 16 models accept a `temperature` parameter, so nothing can be pinned to 0 — that spread is the floor under any drift signal, and a board that alerts on a single run alerts on sampling noise.
+
+So each model is probed **three times per night and the median is recorded**. A number only moves when two of three runs agree, which is exactly the "is this a fluke?" question. A real regression shows up in most runs and survives; one odd run doesn't.
+
+The **spread is stored alongside it** (`runs`, `acc_spread` on every point) rather than smoothed away. An aggregate that hides its own variance is a worse lie than a noisy chart — if a model is erratic, that *is* the finding.
+
+```
+Claude Sonnet 5    77 → 83 → 86     recorded: 83, spread 9
+GPT-5             100 → 100 → 100   recorded: 100, spread 0
+```
+
+Cost: 35 tasks × 16 models × 3 runs is ~1,700 calls a night, still cents.
 
 ## Why the suite is hard on purpose
 
@@ -120,7 +135,7 @@ The tracker runs daily on a free cron and a small spend. The dashboard shows **"
 Built on the pieces it needed already: [eval-history](https://github.com/egnaro9/eval-history) stores the runs and computes the run-to-run comparison; the scoring mirrors [rag-eval-lab](https://github.com/egnaro9/rag-eval-lab). stdlib `urllib` only — no SDKs, no dependencies.
 
 ```bash
-pip install -e ".[dev]" && pytest -q     # 22 tests, stdlib only
+pip install -e ".[dev]" && pytest -q     # 132 tests, stdlib only
 ```
 
 ---
