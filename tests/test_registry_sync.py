@@ -63,8 +63,16 @@ def test_the_dashboard_shows_nothing_that_is_not_probed():
     assert not extra, f"on the board but not probed: {extra}"
 
 
-@pytest.mark.parametrize("field", ["group", "tier", "color"])
+@pytest.mark.parametrize("field", ["label", "group", "tier", "color"])
 def test_dashboard_metadata_matches_the_registry(field):
+    """`label` is pinned here too, and that is a change from the original rule.
+
+    The chart used to carry its own shorter labels, which drifted into naming
+    models inconsistently: OpenAI, xAI and Meta got full names, Anthropic's
+    dropped "Claude", and Google's dropped "Gemini" and led with a bare version
+    number, so the legend read "3.1 Pro" while the prose beneath it said
+    "Gemini 3.1 Pro". One name per model, from one place.
+    """
     reg = {e["id"]: e for e in registry()}
     for model_id, entry in dashboard().items():
         assert entry[field] == reg[model_id].get(field), (
