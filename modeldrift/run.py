@@ -126,7 +126,7 @@ def _post(api: str, key: str, payload: dict) -> Optional[str]:
 
 
 def update_metrics_file(path: str, results: List[dict], stamp: str, cap: int = 104) -> None:
-    """Accumulate the extra metrics (latency, verbosity) into a small time-series
+    """Accumulate the extra metrics (latency, verbosity, per-capability) into a small time-series
     JSON the dashboard reads directly. Kept in the repo and read from raw.githubusercontent —
     no database column, no CORS, and adding a future metric is one more key here.
 
@@ -146,7 +146,13 @@ def update_metrics_file(path: str, results: List[dict], stamp: str, cap: int = 1
         pts = series.setdefault(r["run"], [])
         pts.append({"t": stamp, "acc": r["metrics"]["faithfulness"],
                     "latency_ms": r["_latency_ms"], "out_chars": r["_out_chars"],
-                    "reliability": r["_reliability"], "refusal_rate": r["_refusal_rate"]})
+                    "reliability": r["_reliability"], "refusal_rate": r["_refusal_rate"],
+                    # Per-capability scores were already being computed every run
+                    # and printed to the console, then thrown away. They are where
+                    # models actually differ — a model at 77% overall is usually
+                    # near-perfect on recall and failing formatting, and the single
+                    # aggregate hides exactly that.
+                    "by_kind": per_kind(r)})
         del pts[:-cap]                    # keep the series bounded
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps({"updated": stamp, "series": series}, indent=1), encoding="utf-8")

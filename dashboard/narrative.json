@@ -1,13 +1,9 @@
 {
- "sentences": [
-  "<strong>Google's cheaper tiers match or beat its own flagship</strong> \u2014 Gemini 3.5 Flash at 100% and Gemini 3.1 Flash-Lite at 95%, against Gemini 3.1 Pro at 95% \u2014 so within that lab, on this suite, paying more buys no accuracy.",
-  "<strong>Grok 4.3 answers with 20.1x the characters of the tersest model</strong>, at 77%.",
-  "<strong>Llama 3.1 8B answers fastest and scores lowest</strong> (131 ms at 59%) \u2014 a speed/quality tradeoff you can see rather than argue about."
- ],
- "html": "A frozen, deterministically-graded suite against <strong>16 models across 5 labs</strong>. <strong>Google's cheaper tiers match or beat its own flagship</strong> \u2014 Gemini 3.5 Flash at 100% and Gemini 3.1 Flash-Lite at 95%, against Gemini 3.1 Pro at 95% \u2014 so within that lab, on this suite, paying more buys no accuracy. <strong>Grok 4.3 answers with 20.1x the characters of the tersest model</strong>, at 77%. <strong>Llama 3.1 8B answers fastest and scores lowest</strong> (131 ms at 59%) \u2014 a speed/quality tradeoff you can see rather than argue about. <em>Generated from the run of 18 Jul 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.</em>",
- "text": "A frozen, deterministically-graded suite against 16 models across 5 labs. Google's cheaper tiers match or beat its own flagship \u2014 Gemini 3.5 Flash at 100% and Gemini 3.1 Flash-Lite at 95%, against Gemini 3.1 Pro at 95% \u2014 so within that lab, on this suite, paying more buys no accuracy. Grok 4.3 answers with 20.1x the characters of the tersest model, at 77%. Llama 3.1 8B answers fastest and scores lowest (131 ms at 59%) \u2014 a speed/quality tradeoff you can see rather than argue about. Generated from the run of 18 Jul 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.",
- "models": 16,
- "clean": 16,
- "updated": "2026-07-18T19:23:15Z",
- "claims_fired": 3
+ "sentences": [],
+ "html": "The board has 0 clean runs to compare so far \u2014 not enough to rank models against each other yet.",
+ "text": "The board has 0 clean runs to compare so far \u2014 not enough to rank models against each other yet.",
+ "models": 0,
+ "clean": 0,
+ "updated": "",
+ "claims_fired": 0
 }

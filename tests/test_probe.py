@@ -98,8 +98,13 @@ def test_metrics_file_accumulates_and_skips_total_failures(tmp_path):
     f = tmp_path / "metrics.json"
     update_metrics_file(str(f), [r], "2026-07-18T00:00:00Z")
     d = json.loads(f.read_text())
-    assert set(d["series"]["mock:stable"][0]) == {"t", "acc", "latency_ms", "out_chars",
-                                                   "reliability", "refusal_rate"}
+    point = d["series"]["mock:stable"][0]
+    assert set(point) == {"t", "acc", "latency_ms", "out_chars", "reliability",
+                          "refusal_rate", "by_kind"}
+    # by_kind is the per-capability breakdown — the aggregate hides which kind of
+    # thing moved, which is the useful half of a drift signal.
+    assert point["by_kind"]["formatting"] == 1.0
+    assert set(point["by_kind"]) == {t.kind for t in SUITE}
     update_metrics_file(str(f), [r], "2026-07-25T00:00:00Z")          # appends
     assert len(json.loads(f.read_text())["series"]["mock:stable"]) == 2
     failed = {**r, "run": "x:broken", "_latency_ms": None, "_out_chars": None}

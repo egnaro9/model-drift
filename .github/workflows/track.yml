@@ -1,7 +1,10 @@
 name: track
 on:
   schedule:
-    - cron: "17 8 * * 1"      # every Monday 08:17 UTC — the automatic weekly run
+    # Daily. The suite is 35 short prompts against 16 models — cents a day —
+    # and a weekly point makes a chart you can't read for a month. Daily also
+    # means a real regression shows up within a day instead of within a week.
+    - cron: "17 8 * * *"      # every day at 08:17 UTC
   workflow_dispatch:           # or run it by hand from the Actions tab
 permissions:
   contents: write              # to commit the updated RESULTS.md

@@ -127,10 +127,25 @@ _MOCK_ANSWERS = {
     "multi-step-math": "8", "vowel-json": '{"vowels": 5}', "nth-word": "fox",
     "days-feb-2024": "29", "unit-minutes": "150", "logic-syllogism": "yes",
     "compare-decimals": "9.9",
+    # v3
+    "fmt-exact-token": "OK", "fmt-csv-nospace": "a,b,c", "fmt-uppercase": "YES",
+    "fmt-repeat-join": "alpha-alpha-alpha", "constraint-no-e": "black",
+    "count-s-mississippi": "4", "nth-char": "e", "compare-negatives": "-0.05",
+    "float-subtract": "0.2", "sort-magnitude": "9, 10, 20, 100",
+    "needle-extract": "4417", "json-word-count": '{"n": 4}',
+    "no-overrefuse-kill": "signal",
 }
 
 
 def _mock(m: Model, task_id: str) -> str:
+    # A task the mock has no answer for scores as a model failure when the
+    # *fixture* is what's incomplete — and it would drag the control line down
+    # on the public chart. Fail loudly instead; test_probe pins mock:stable at
+    # 100%, so an unanswered task can't reach the board unnoticed.
+    if task_id and task_id not in _MOCK_ANSWERS:
+        raise ProviderError(
+            f"the mock has no answer for task {task_id!r} — add it to "
+            f"_MOCK_ANSWERS whenever you add a task to the suite")
     ans = _MOCK_ANSWERS.get(task_id, "")
     if m.model == "mock-drifted" and task_id in ("if-json", "math-order"):
         return "I'm not sure I can help with that."  # simulated regression
