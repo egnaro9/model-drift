@@ -26,7 +26,7 @@ frozen suite ──►  live model APIs  ──►  deterministic grader  ──
 
 ## Why it's trustworthy
 
-- **The grader is not a model.** Every one of the 22 tasks is graded mechanically — exact match, substring, regex, or a numeric compare. If the judge were an LLM you couldn't tell a real regression from the judge having a bad day; here a score change means the *model* moved. ([`suite.py`](modeldrift/suite.py))
+- **The grader is not a model.** Every one of the 35 tasks is graded mechanically — exact match, substring, regex, or a numeric compare. If the judge were an LLM you couldn't tell a real regression from the judge having a bad day; here a score change means the *model* moved. ([`suite.py`](modeldrift/suite.py))
 - **Hard enough that flagships have headroom.** Some tasks are deliberate failure modes for strong models — counting letters in "strawberry", numeric-vs-lexical sorting, 9.9 vs 9.11 — so a top model's line can actually move instead of flatlining at 100%.
 - **The suite is frozen and versioned.** A drift chart only means something if the questions never change under it. `SUITE_VERSION` is stamped on every run, and [`suite_hash()`](modeldrift/suite.py) fingerprints the exact questions so a silent edit is detectable.
 - **Deterministic where the model allows it.** Every task has a single indisputable answer, so a drop is a real drop, not grader noise. Temperature is pinned to `0` on models that accept it; flagships that reject the param (Opus 4.8, GPT-5) run at their default — set per-model in [`models.json`](modeldrift/models.json).
@@ -45,7 +45,7 @@ The runner **only probes a model whose API key is present**, so you fund exactly
 | xAI — Grok 4.5 · 4.3 · 4 Fast | `XAI_API_KEY` |
 | Meta — Llama 3.3 70B · Llama 3.1 8B (open-weights; served free via Groq) | `GROQ_API_KEY` |
 
-Plus `EVAL_HISTORY_WRITE_KEY` to record runs. Each provider is tracked across the tiers it actually has — **heavy → flagship → mid → mini → nano** — so you can see whether a cheap tier keeps pace with the top model (tiers are only added where a real model exists; Google and xAI have no model above their flagship on the API, so they stay at three — no padding). Edit [`models.json`](modeldrift/models.json) to change models; any OpenAI-compatible endpoint works with a `base_url`, and a model that rejects a `temperature` param (Fable 5, Opus 4.8, Sonnet 5, GPT-5 / mini / nano, Grok 4.5 / 4.3 / 4 Fast) sets `"temperature": null`. **16 models**, ~22 prompts each, weekly — still **cents per run** (Fable 5 is the priciest at ~$10/$50 per 1M, but the tiny token count keeps it under a cent) on the free GitHub Actions cron.
+Plus `EVAL_HISTORY_WRITE_KEY` to record runs. Each provider is tracked across the tiers it actually has — **heavy → flagship → mid → mini → nano** — so you can see whether a cheap tier keeps pace with the top model (tiers are only added where a real model exists; Google and xAI have no model above their flagship on the API, so they stay at three — no padding). Edit [`models.json`](modeldrift/models.json) to change models; any OpenAI-compatible endpoint works with a `base_url`, and a model that rejects a `temperature` param (Fable 5, Opus 4.8, Sonnet 5, GPT-5 / mini / nano, Grok 4.5 / 4.3 / 4 Fast) sets `"temperature": null`. **16 models**, 35 prompts each, daily — still **cents per run** (Fable 5 is the priciest at ~$10/$50 per 1M, but the tiny token count keeps it under a cent) on the free GitHub Actions cron.
 
 ```bash
 pip install -e .
@@ -53,6 +53,28 @@ OPENAI_API_KEY=... EVAL_HISTORY_WRITE_KEY=... python -m modeldrift.run
 # or with no keys at all — the deterministic mock proves the pipeline, no spend:
 python -m modeldrift.run
 ```
+
+## Why the suite is hard on purpose
+
+A drift chart needs a test that can *move*. The first version was deliberately dull — unambiguous questions a capable model should always get right — and it worked until it didn't: **seven of sixteen models sat at 100%**, five distinct scores across the whole board. A suite everyone passes measures nothing, and a flat line is indistinguishable from a broken probe.
+
+So **v3** adds tasks aimed at where capable models still slip:
+
+| Probe | Why it separates |
+| --- | --- |
+| **Strict output form** — *"output exactly OK, no punctuation"* | The failure mode is helpfulness. A `Sure!` in front of the answer breaks a machine consumer, so it scores as a miss. |
+| **A negative constraint** — *"name a colour with no letter e"* | Following a prohibition is harder than following an instruction, and it can't be satisfied by pattern-matching a common answer. |
+| **Character-level work** — counting `s` in *Mississippi* | Tokenisation actively works against the model here. |
+| **Float and sign comparison** — `-0.5` vs `-0.05` | Two reliably bad days for otherwise strong models. |
+| **A needle to extract** | Retrieval from filler, for a few hundred tokens rather than a long-context bill. |
+
+Difficulty is the point; ambiguity never is. **An arguable task makes the grader wrong rather than the model** — which is not hypothetical here: the first draft of the no-letter-e task accepted *"grey"*, which would have scored a wrong answer right. [`tests/test_suite.py`](tests/test_suite.py) now asserts that every accepted answer actually satisfies the constraint its prompt states, that no grader takes an empty reply, and that strict-format tasks reject a preamble.
+
+## Which *kind* of thing moved
+
+Every task is tagged with the capability it exercises, and each run scores them separately — instruction-following, formatting, reasoning, arithmetic, recall, counting, string manipulation, extraction, refusal calibration. The dashboard charts any of them.
+
+That breakdown is the useful half of a drift signal. A model at 77% overall is usually near-perfect on recall and *failing formatting*, and the aggregate tells you neither. Two of the five headline metrics — **reliability** and **refusal rate** — are flat whenever nothing breaks and nothing over-refuses, which is most days. That's a working safety net, not a boring chart; they exist to move on the day something goes wrong.
 
 ## The board writes its own prose
 
@@ -81,7 +103,7 @@ The portfolio pulls the result in through [a weekly job](https://github.com/egna
 
 ## Automatic — but signal, not noise
 
-The [weekly workflow](.github/workflows/track.yml) runs on its own (Monday cron), and after each probe it:
+The [daily workflow](.github/workflows/track.yml) runs on its own (08:17 UTC), and after each probe it:
 
 - **updates [`RESULTS.md`](RESULTS.md)** — the current standings, committed to the repo, every run;
 - **opens a GitHub issue *only when a model regressed*** week-over-week — the automatic "go look" trigger;
@@ -91,7 +113,7 @@ That last part is deliberate. A drift post is worth making when a model *actuall
 
 ## Honest about being free
 
-The tracker runs weekly on a free cron and a small spend. The dashboard shows **"last updated"** plainly, so if a run is skipped you see it — a drift tracker that hides its own staleness would be the very thing it warns about.
+The tracker runs daily on a free cron and a small spend. The dashboard shows **"last updated"** plainly, so if a run is skipped you see it — a drift tracker that hides its own staleness would be the very thing it warns about.
 
 ## What it reuses
 
