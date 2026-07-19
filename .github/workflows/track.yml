@@ -6,6 +6,15 @@ on:
     # means a real regression shows up within a day instead of within a week.
     - cron: "17 8 * * *"      # every day at 08:17 UTC
   workflow_dispatch:           # or run it by hand from the Actions tab
+# Two probes must never run at once. Not for correctness - the commit step
+# rebases and retries, so nothing is lost - but because each run is ~1,700 real
+# API calls, and an overlap spends that twice to record two points hours apart
+# on a chart whose x-axis is days. Queue instead of cancelling: a run already
+# in flight has already spent the money.
+concurrency:
+  group: probe
+  cancel-in-progress: false
+
 permissions:
   contents: write              # to commit the updated RESULTS.md
   issues: write                # to open a regression alert issue
