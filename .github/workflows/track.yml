@@ -44,8 +44,19 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add RESULTS.md dashboard/metrics.json dashboard/narrative.json
-          git diff --cached --quiet || git commit -m "chore: update drift standings [skip ci]"
-          git push || true
+          git diff --cached --quiet && { echo "nothing changed"; exit 0; }
+          git commit -m "chore: update drift standings [skip ci]"
+          # A push landing on main while the probe was running used to lose the
+          # entire run: this push was rejected as non-fast-forward and `|| true`
+          # swallowed it, so a job that had just spent 560 API calls reported
+          # success and saved nothing. Rebase onto whatever arrived, then retry.
+          for attempt in 1 2 3; do
+            if git push; then echo "pushed on attempt $attempt"; exit 0; fi
+            echo "push rejected - rebasing onto origin/main and retrying"
+            git pull --rebase origin main || exit 1
+          done
+          echo "::error::could not push this run's results after 3 attempts"
+          exit 1
 
       # ── news, not schedule: the next two only fire on a real regression ──
       - name: Open a regression alert issue
