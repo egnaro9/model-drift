@@ -92,6 +92,17 @@ def _extremes(rows: Sequence[Row], field: str, want_max: bool) -> List[Row]:
     return [r for r in have if getattr(r, field) == best]
 
 
+def _shared(rows: Sequence[Row], field: str):
+    """The value of `field` if every row has the same one, else None.
+
+    Guards the tie bug that kept recurring: a renderer names three models and
+    then prints `rows[0].acc`, which reads as all three having scored it. A
+    value may only be printed alongside a group when the whole group shares it.
+    """
+    values = {getattr(r, field) for r in rows}
+    return values.pop() if len(values) == 1 else None
+
+
 def _names(rows: Sequence[Row]) -> str:
     labels = [r.label for r in rows]
     if len(labels) == 1:
@@ -107,7 +118,11 @@ def _pct(value: float) -> str:
     perfect score it did not get, in the one place a reader checks hardest."""
     if value >= 1.0:
         return "100%"
-    return f"{math.floor(value * 100)}%"
+    # The epsilon is not decoration: 0.58 * 100 is 57.99999999999999 in binary
+    # floating point, so a bare floor prints a measured 58% as "57%". Nudging by
+    # a millionth of a point fixes that without ever reaching the next integer
+    # from a value genuinely below it.
+    return f"{math.floor(value * 100 + 1e-9)}%"
 
 
 def _ms(value: float) -> str:
@@ -124,71 +139,84 @@ def _ratio(high: float, low: float) -> str:
 # priority: the renderer takes the first `limit` that fire.
 
 def claim_cheap_matches_flagship(rows: Sequence[Row]) -> Optional[str]:
-    """A lab's cheaper tier scoring at or above that same lab's top tier.
+    """A lab's cheaper tier scoring at or above that lab's own flagship.
 
-    Joined *within a lab*: "the cheap one matches the flagship" is only a
-    finding about a lab that has both, and comparing one lab's mini against
-    another lab's flagship is how the original false claim got made.
+    Joined *within a lab*: comparing one lab's mini against another lab's
+    flagship is how the original false claim got made.
+
+    "Flagship" means `tier == "flagship"` and nothing else. `heavy` sits above
+    it (Fable 5 over Opus 4.8), so folding the two into one "top tier" and
+    taking the max printed a heavy model's score under the words "the
+    flagship's". A lab with no flagship in the cohort — because it has none, or
+    because its flagship got throttled out — is skipped rather than described
+    against whatever model happens to be left.
     """
     rows = _ok(rows)
     best = None
     for group in sorted({r.group for r in rows if r.group}):
         mine = [r for r in rows if r.group == group and r.has("acc")]
-        top = [r for r in mine if r.tier in _TOP_TIERS]
+        flagships = [r for r in mine if r.tier == "flagship"]
         cheap = [r for r in mine if r.tier in _CHEAP_TIERS]
-        if not top or not cheap:
+        # Exactly one flagship, or "the flagship's N%" is ambiguous about which.
+        if len(flagships) != 1 or not cheap:
             continue
-        top_acc = max(r.acc for r in top)
-        winners = [r for r in cheap if r.acc >= top_acc]
+        flagship = flagships[0]
+        winners = [r for r in cheap if r.acc >= flagship.acc]
         if winners and (best is None or len(winners) > len(best[1])):
-            best = (group, winners, top_acc)
+            best = (group, winners, flagship)
     if not best:
         return None
-    group, winners, top_acc = best
-    # Each winner is printed with *its own* score. Naming several models and then
-    # one number reads as "all of them scored that", which is false the moment
-    # they differ — a cheap tier that merely ties the flagship gets folded into
-    # one that beat it. The scores are per-model or the sentence is a lie.
-    if all(r.acc > top_acc for r in winners):
+    group, winners, flagship = best
+    # Each winner prints its *own* score. Naming several models and then one
+    # number reads as all of them having scored it, which is false the moment
+    # they differ — a cheap tier that merely ties gets folded in with one that beat.
+    if all(r.acc > flagship.acc for r in winners):
         verb = "beat"
-    elif all(r.acc == top_acc for r in winners):
+    elif all(r.acc == flagship.acc for r in winners):
         verb = "match"
     else:
         verb = "match or beat"
-    scores = " and ".join(f"{r.label} at {_pct(r.acc)}" for r in
-                          sorted(winners, key=lambda r: -r.acc))
+    parts = [f"{r.label} at {_pct(r.acc)}" for r in sorted(winners, key=lambda r: -r.acc)]
+    scores = (parts[0] if len(parts) == 1 else
+              " and ".join(parts) if len(parts) == 2 else
+              ", ".join(parts[:-1]) + f", and {parts[-1]}")
     plural = "" if len(winners) == 1 else "s"
     # Scoped to the lab it was computed over. "the cheap seat costs nothing"
     # reads as a claim about cheap models generally, and on this same board
-    # Meta's and OpenAI's cheaper tiers cost a great deal — the sentence would
-    # be a generalisation the predicate never checked.
+    # Meta's and OpenAI's cheaper tiers cost a great deal.
     return (f"<strong>{group}'s cheaper tier{plural} {verb} its own flagship</strong> — "
-            f"{scores}, against the flagship's {_pct(top_acc)} — so within that lab, "
-            f"on this suite, paying more buys no accuracy.")
+            f"{scores}, against {flagship.label} at {_pct(flagship.acc)} — so within "
+            f"that lab, on this suite, paying more buys no accuracy.")
 
 
 def claim_perfect_scores(rows: Sequence[Row]) -> Optional[str]:
-    """How many models answered the whole suite correctly."""
+    """How many models answered the whole suite correctly.
+
+    Scoped to the models that reported cleanly, never to "the board" — the
+    chart above shows every model including the throttled ones, so "every model
+    on the board is at 100%" can sit directly above a chart showing 59%.
+    """
     scored = _ok(rows)
     if not scored:
         return None
+    n = len(scored)
     perfect = [r for r in scored if r.acc >= 1.0]
     if not perfect:
         leaders = _extremes(scored, "acc", want_max=True)
-        return (f"<strong>Nothing is at 100%</strong> — {_names(leaders)} "
+        return (f"<strong>Nothing reached 100%</strong> — {_names(leaders)} "
                 f"lead{'s' if len(leaders) == 1 else ''} at {_pct(leaders[0].acc)}.")
-    if len(perfect) == len(scored):
-        return (f"<strong>Every model on the board is at 100%</strong> — "
+    if len(perfect) == n:
+        return (f"<strong>All {n} models that reported cleanly are at 100%</strong> — "
                 f"the suite has stopped separating them, which is its own signal.")
-    return (f"<strong>{len(perfect)} of {len(scored)} models answer the whole suite "
-            f"correctly</strong> ({_names(perfect)}).")
+    return (f"<strong>{len(perfect)} of the {n} models that reported cleanly answer "
+            f"the whole suite correctly</strong> ({_names(perfect)}).")
 
 
 def claim_verbosity(rows: Sequence[Row]) -> Optional[str]:
     """The spread between the wordiest and tersest answers.
 
-    Needs a ratio of at least 2x to be worth a sentence — below that it's noise,
-    and a generator that narrates noise is how you get prose nobody trusts.
+    Needs a 2x ratio to be worth a sentence — a generator that narrates noise
+    produces prose nobody trusts.
     """
     rows = _ok(rows)
     chattiest = _extremes(rows, "chars", want_max=True)
@@ -202,32 +230,49 @@ def claim_verbosity(rows: Sequence[Row]) -> Optional[str]:
     if ratio < 2:
         return None
     times = _ratio(chattiest[0].chars, lo)
-    return (f"<strong>{_names(chattiest)} answer{'s' if len(chattiest) == 1 else ''} with "
-            f"{times} the characters of the tersest model</strong> — it explains "
-            f"instead of answering, and lands at {_pct(chattiest[0].acc)}."
-            if chattiest[0].has("acc") else
-            f"<strong>{_names(chattiest)} answer{'s' if len(chattiest) == 1 else ''} with "
-            f"{times} the characters of the tersest model</strong>.")
+    verb = "answers" if len(chattiest) == 1 else "answer"
+    head = (f"<strong>{_names(chattiest)} {verb} with {times} the characters of the "
+            f"tersest model</strong>")
+    # Accuracy only rides along when the whole named group shares it — otherwise
+    # three models get named and one model's score gets printed for all of them.
+    acc = _shared(chattiest, "acc")
+    if acc is None:
+        return head + "."
+    # No editorial about *why*. "It explains instead of answering" is a story
+    # about a model that may be sitting at 100%, and length is not a defect.
+    return f"{head}, at {_pct(acc)}."
 
 
 def claim_speed_accuracy(rows: Sequence[Row]) -> Optional[str]:
     """The speed/quality tradeoff, stated only in the shape the data supports."""
     rows = _ok(rows)
     fastest = _extremes(rows, "latency", want_max=False)
-    if not fastest or not fastest[0].has("acc"):
+    if not fastest:
         return None
     scored = [r for r in rows if r.has("acc")]
     if len(scored) < 2:
         return None
     worst = _extremes(scored, "acc", want_max=False)
-    fast_ids = {r.id for r in fastest}
-    if any(r.id in fast_ids for r in worst):
-        return (f"<strong>{_names(fastest)} answer{'s' if len(fastest) == 1 else ''} fastest "
-                f"and score{'s' if len(fastest) == 1 else ''} lowest</strong> "
-                f"({_ms(fastest[0].latency)} at {_pct(fastest[0].acc)}) — a speed/quality "
-                f"tradeoff you can see rather than argue about.")
-    return (f"<strong>{_names(fastest)} lead{'s' if len(fastest) == 1 else ''} on speed</strong> "
-            f"at {_ms(fastest[0].latency)} and {_pct(fastest[0].acc)} accuracy.")
+    best = _extremes(scored, "acc", want_max=True)
+    lead_verb = "leads" if len(fastest) == 1 else "lead"
+    fast_acc = _shared(fastest, "acc")
+    speed_only = (f"<strong>{_names(fastest)} {lead_verb} on speed</strong> at "
+                  f"{_ms(fastest[0].latency)}"
+                  + (f" and {_pct(fast_acc)} accuracy." if fast_acc is not None else "."))
+    if len(worst) == len(scored) and len(best) == len(scored):
+        # Zero accuracy variation: the minimum *is* the maximum, so "scores
+        # lowest" is vacuous and there is no tradeoff to trade against. A frozen
+        # suite against improving models saturates by design.
+        return speed_only
+    # The tradeoff sentence needs the *same* model to be fastest and lowest —
+    # and unambiguously so. If either extreme is a tie, naming the group and
+    # printing one member's number is the collapsed-score bug again.
+    if len(fastest) == 1 and len(worst) == 1 and fastest[0].id == worst[0].id:
+        r = fastest[0]
+        return (f"<strong>{r.label} answers fastest and scores lowest</strong> "
+                f"({_ms(r.latency)} at {_pct(r.acc)}) — a speed/quality tradeoff you "
+                f"can see rather than argue about.")
+    return speed_only
 
 
 def claim_slowest(rows: Sequence[Row]) -> Optional[str]:
@@ -236,6 +281,7 @@ def claim_slowest(rows: Sequence[Row]) -> Optional[str]:
     fastest = _extremes(rows, "latency", want_max=False)
     if not slowest or not fastest or slowest[0].latency == fastest[0].latency:
         return None
+    # Latency is the field they tied on, so it is shared and safe to print.
     return (f"The slowest {'is' if len(slowest) == 1 else 'are'} {_names(slowest)} at "
             f"{_ms(slowest[0].latency)}.")
 
@@ -281,8 +327,21 @@ def run_date(rows: Sequence[Row]) -> str:
 
 
 def _ok(rows: Sequence[Row]) -> List[Row]:
-    """The cohort every claim quantifies over: models that reported cleanly."""
-    return [r for r in rows if r.clean]
+    """The cohort every claim quantifies over: models that reported cleanly *in
+    the most recent run*.
+
+    The run filter matters as much as the clean one. A model dropped from the
+    registry, or one whose provider was down all of last month, keeps its final
+    point at the top of its series forever — and without this it would be
+    compared against this week's numbers as though it had just been measured.
+    "The fastest model" would then mean "the fastest of these, one of which was
+    timed in February".
+    """
+    clean = [r for r in rows if r.clean]
+    if not clean:
+        return []
+    latest = max(r.stamp for r in clean)
+    return [r for r in clean if r.stamp == latest]
 
 
 def narrate(metrics: dict, registry: Sequence[dict], limit: int = 3) -> dict:

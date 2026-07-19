@@ -79,6 +79,9 @@ def test_paragraph_carries_the_run_date_not_todays_date():
 @pytest.mark.parametrize("value,shown", [
     (1.0, "100%"), (0.9999, "99%"), (0.996, "99%"), (0.9545, "95%"),
     (0.7727, "77%"), (0.5, "50%"), (0.0, "0%"),
+    # Exact two-decimal values: 0.58 * 100 is 57.99999999999999 in binary
+    # floating point, so a bare floor() prints a measured 58% as "57%".
+    (0.58, "58%"), (0.29, "29%"), (0.77, "77%"), (0.91, "91%"), (0.07, "7%"),
 ])
 def test_percentages_truncate_so_only_a_real_100_prints_as_100(value, shown):
     """Rounding would print a model on 99.6% as "100%" — a perfect score it did
@@ -192,7 +195,7 @@ def test_mutate_all_perfect__says_so_instead_of_naming_a_winner():
     perfect = {k: [_pt(1.0, 500 + i * 100, 20)] for i, k in enumerate(
         ("lab-a:big", "lab-a:small", "lab-a:tiny", "lab-b:big", "lab-b:small"))}
     out = claim_perfect_scores(build_rows(metrics(**perfect), REGISTRY))
-    assert "Every model" in out
+    assert "All 5 models that reported cleanly are at 100%" in out
 
 
 def test_only_a_model_at_exactly_100_is_called_correct():
@@ -204,7 +207,7 @@ def test_only_a_model_at_exactly_100_is_called_correct():
     alone doesn't catch it, so this checks *which models* get named.
     """
     out = claim_perfect_scores(rows())
-    assert "2 of 5" in out
+    assert "2 of the 5 models that reported cleanly" in out
     assert "A Small" in out and "B Big" in out
     assert "A Big" not in out and "A Tiny" not in out
 
@@ -233,7 +236,32 @@ def test_mutate_none_perfect__reports_the_leader_not_a_fake_100():
            ("lab-a:small", "lab-a:tiny", "lab-b:big", "lab-b:small")}
     low["lab-a:big"] = [_pt(0.75, 500, 20)]
     out = claim_perfect_scores(build_rows(metrics(**low), REGISTRY))
-    assert "Nothing is at 100%" in out and "A Big" in out and "75%" in out
+    assert "Nothing reached 100%" in out and "A Big" in out and "75%" in out
+
+
+@pytest.mark.parametrize("acc", [1.0, 0.7727, 0.5])
+def test_no_tradeoff_is_invented_when_every_model_ties_on_accuracy(acc):
+    """A tie makes "scores lowest" vacuously true and the tradeoff a lie.
+
+    With zero accuracy variance the argmin returns *every* row, so a naive
+    `fastest in worst` check is trivially satisfied and the generator called a
+    joint-100% model the lowest scorer. A frozen suite against improving models
+    saturates by design — 7 of 16 live models are already at 100% — so this is
+    where the board is heading, not a contrived state.
+    """
+    tied = {k: [_pt(acc, 500 + i * 100, 20)] for i, k in enumerate(
+        ("lab-a:big", "lab-a:small", "lab-a:tiny", "lab-b:big", "lab-b:small"))}
+    out = claim_speed_accuracy(build_rows(metrics(**tied), REGISTRY))
+    assert out is not None
+    assert "scores lowest" not in out and "tradeoff" not in out
+
+
+@pytest.mark.parametrize("acc", [1.0, 0.7727])
+def test_property_the_paragraph_never_claims_a_tradeoff_without_a_spread(acc):
+    tied = {k: [_pt(acc, 500 + i * 100, 20 + i * 40)] for i, k in enumerate(
+        ("lab-a:big", "lab-a:small", "lab-a:tiny", "lab-b:big", "lab-b:small"))}
+    text = narrate(metrics(**tied), REGISTRY)["text"]
+    assert "tradeoff" not in text and "scores lowest" not in text
 
 
 def test_fastest_is_not_called_a_tradeoff_when_it_is_also_accurate():
@@ -348,3 +376,73 @@ def test_property_each_model_is_printed_beside_its_own_score(mutation):
         assert f"{actual[label] * 100:.0f}" == printed, (
             f"prose says {label} at {printed}%, data says "
             f"{actual[label] * 100:.0f}% — in: {out['text']}")
+
+
+def test_a_stale_point_is_not_narrated_as_part_of_this_run():
+    """A model whose provider was down for a month keeps its last point at the
+    top of its series. Comparing it against this week's numbers would narrate a
+    months-old measurement as current."""
+    m = metrics()
+    old = _pt(0.01, 3, 999)
+    old["t"] = "2026-01-01T00:00:00Z"          # months behind the others
+    m["series"]["lab-b:small"] = [old]
+    out = narrate(m, REGISTRY)
+    assert "B Small" not in out["text"]
+    assert "18 Jul 2026" in out["html"]
+
+
+def test_ties_never_print_one_members_number_for_the_group():
+    """Two models tied on latency but on different scores: naming both and
+    printing one accuracy reads as both having scored it."""
+    tied = rows(**{"lab-a:small": [_pt(1.00, 100, 8)],
+                   "lab-b:small": [_pt(0.50, 100, 5)]})
+    out = claim_speed_accuracy(tied) or ""
+    if "A Small" in out and "B Small" in out:
+        assert "100%" not in out and "50%" not in out
+
+
+def test_a_lab_without_a_flagship_gets_no_flagship_sentence():
+    reg = [e for e in REGISTRY if e["id"] != "lab-a:big"]
+    m = metrics()
+    m["series"].pop("lab-a:big")
+    out = claim_cheap_matches_flagship(build_rows(m, reg)) or ""
+    assert "LabA" not in out
+
+
+def test_a_heavy_tier_score_is_never_printed_as_the_flagships():
+    """`heavy` sits above `flagship` (Fable 5 over Opus 4.8). Folding them into
+    one "top tier" printed the heavy model's number under "the flagship's"."""
+    reg = REGISTRY + [{"id": "lab-a:heavy", "label": "A Heavy",
+                       "group": "LabA", "tier": "heavy"}]
+    m = metrics()
+    m["series"]["lab-a:heavy"] = [_pt(1.00, 4000, 30)]
+    out = claim_cheap_matches_flagship(build_rows(m, reg)) or ""
+    assert "A Heavy" not in out
+
+
+def test_two_flagships_in_one_lab_produce_no_flagship_sentence():
+    """"against the flagship's N%" is ambiguous when a lab has two — it hides
+    which one the cheap model actually beat, so the lab is skipped."""
+    reg = REGISTRY + [{"id": "lab-a:big2", "label": "A Big Two",
+                       "group": "LabA", "tier": "flagship"}]
+    m = metrics()
+    m["series"]["lab-a:big2"] = [_pt(1.00, 900, 10)]
+    out = claim_cheap_matches_flagship(build_rows(m, reg)) or ""
+    assert "LabA" not in out
+
+
+def test_a_tie_for_fastest_never_produces_the_tradeoff_sentence():
+    """The tradeoff needs one model unambiguously fastest *and* lowest. With a
+    tie at either extreme, naming the group and printing one member's numbers
+    is the collapsed-score bug wearing a different hat."""
+    tied = rows(**{"lab-a:tiny": [_pt(0.95, 100, 8)],
+                   "lab-b:small": [_pt(0.50, 100, 5)]})
+    out = claim_speed_accuracy(tied) or ""
+    assert "scores lowest" not in out and "tradeoff" not in out
+
+
+def test_a_tie_for_lowest_accuracy_never_produces_the_tradeoff_sentence():
+    tied = rows(**{"lab-b:small": [_pt(0.50, 100, 5)],
+                   "lab-a:tiny": [_pt(0.50, 800, 8)]})
+    out = claim_speed_accuracy(tied) or ""
+    assert "scores lowest" not in out and "tradeoff" not in out
