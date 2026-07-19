@@ -8,30 +8,52 @@
 <meta property="og:title" content="Is My Model Drifting?">
 <meta property="og:description" content="A public LLM regression tracker — a frozen suite, run on a schedule against live models, with every score kept and drops flagged.">
 <style>
-  :root{
+    :root{
+    /* Lifted verbatim from egnaro9.github.io so the board reads as part of the
+       portfolio rather than a separate tool: same surfaces, same ink, same amber
+       and teal accents, same 2px corners, same 880px measure. */
     color-scheme: dark light;
-    --ink:#0b0f14; --panel:#131a22; --line:rgba(255,255,255,.10); --line-2:rgba(255,255,255,.05);
-    --fg:#e6edf1; --fg-dim:#93a1ab; --fg-faint:#63727d;
+    --ink:#0e1316; --panel:#141c21; --raised:#1b252b;
+    --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.05);
+    --fg:#dae2e4; --fg-dim:#8a989e; --fg-faint:#5e6c72;
+    --amber:#f2a53c; --amber-ink:#f2a53c; --amber-soft:rgba(242,165,60,.13); --amber-line:rgba(242,165,60,.34);
+    --teal:#48c1ac; --teal-soft:rgba(72,193,172,.12);
     --good:#48c1ac; --bad:#f2545b; --warn:#f2a53c;
-    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;
     --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --maxw:880px;
   }
   @media (prefers-color-scheme: light){
-    :root{ --ink:#f4f7f8; --panel:#fff; --line:rgba(10,20,28,.12); --line-2:rgba(10,20,28,.06);
-           --fg:#0f1820; --fg-dim:#4a5761; --fg-faint:#78868f;
-           --good:#1c8f7d; --bad:#c73842; --warn:#b7761a; }
+    :root{
+      --ink:#e9edee; --panel:#f4f6f6; --raised:#ffffff;
+      --line:rgba(12,26,32,.12); --line-2:rgba(12,26,32,.07);
+      --fg:#131c20; --fg-dim:#4d5a60; --fg-faint:#7c888d;
+      --amber:#b7761a; --amber-ink:#b7761a; --amber-soft:rgba(200,128,26,.12); --amber-line:rgba(200,128,26,.4);
+      --teal:#1c8f7d; --teal-soft:rgba(28,143,125,.1);
+      --good:#1c8f7d; --bad:#c73842; --warn:#b7761a;
+    }
   }
   *{box-sizing:border-box}
-  body{margin:0; background:var(--ink); color:var(--fg); font-family:var(--sans); line-height:1.6;
-    padding:0 20px 80px; -webkit-font-smoothing:antialiased}
+  body{
+    margin:0; background:var(--ink); color:var(--fg); font-family:var(--sans);
+    font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+    /* the portfolio's grid-paper surface, same 34px rhythm */
+    background-image:
+      linear-gradient(var(--line-2) 1px,transparent 1px),
+      linear-gradient(90deg,var(--line-2) 1px,transparent 1px);
+    background-size:34px 34px; background-position:center top;
+    padding:0 20px 72px;
+  }
+  /* the portfolio centres everything in one 880px column */
+  .col{max-width:var(--maxw); margin:0 auto}
   .col{max-width:860px; margin:0 auto}
   a{color:var(--good)}
   header{padding:56px 0 20px}
-  h1{font-size:clamp(30px,6vw,46px); margin:0; letter-spacing:-.02em}
+  h1{font-family:var(--mono); font-weight:600; font-size:clamp(34px,7vw,56px); line-height:.98; letter-spacing:-.02em; margin:18px 0 0; color:var(--fg)}
   .sub{color:var(--fg-dim); max-width:60ch; margin:14px 0 0}
   .updated{font-family:var(--mono); font-size:12.5px; color:var(--fg-faint); margin:14px 0 0}
 
-  .card{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:20px; margin-top:22px}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:2px; padding:22px; margin-top:22px}
   svg{width:100%; height:auto; display:block; overflow:visible}
   .axis{stroke:var(--line); stroke-width:1}
   .gl{stroke:var(--line-2); stroke-width:1}
@@ -42,7 +64,7 @@
   table{width:100%; border-collapse:collapse; margin-top:8px; font-size:14px}
   th,td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--line)}
   th{font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--fg-faint)}
-  .swatch{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:8px; vertical-align:middle}
+  .swatch{display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:7px; flex:0 0 auto}
   .num{font-family:var(--mono); font-variant-numeric:tabular-nums}
   .badge{font-family:var(--mono); font-size:11px; padding:2px 8px; border-radius:3px; border:1px solid currentColor}
   .b-good{color:var(--good)} .b-bad{color:var(--bad)} .b-warn{color:var(--fg-faint)}
@@ -50,28 +72,34 @@
   /* metric toggle (Accuracy / Speed / Verbosity) */
   .metricbar{display:flex; align-items:center; gap:8px; margin-bottom:16px;
     font-family:var(--mono); font-size:11.5px; color:var(--fg-faint)}
-  .metricbar .mbtn{cursor:pointer; font:inherit; color:var(--fg-dim); background:transparent;
-    border:1px solid var(--line); border-radius:6px; padding:4px 12px}
-  .metricbar .mbtn:hover{border-color:var(--fg-faint); color:var(--fg)}
-  .metricbar .mbtn.on{background:var(--fg); color:var(--ink); border-color:var(--fg)}
+  .metricbar .mbtn{cursor:pointer; font-family:var(--mono); font-size:12.5px; color:var(--fg-dim); background:transparent; border:1px solid var(--line); border-radius:2px; padding:6px 12px; transition:border-color .12s, color .12s, background .12s}
+  .metricbar .mbtn:hover{border-color:var(--amber-line); color:var(--amber-ink)}
+  .metricbar .mbtn.on{background:var(--amber-ink); color:var(--ink); border-color:var(--amber-ink); font-weight:600}
 
   /* tier quick-filters + grouped, clickable legend */
   .controls{display:flex; align-items:center; flex-wrap:wrap; gap:6px 12px; margin-top:16px;
     font-family:var(--mono); font-size:11.5px; color:var(--fg-faint)}
-  .controls button{cursor:pointer; color:var(--fg-faint); background:transparent; border:0; padding:0;
-    font:inherit; border-bottom:1px dashed var(--line)}
-  .controls button:hover{color:var(--fg)}
+  .controls button{cursor:pointer; font-family:var(--mono); font-size:11.5px; line-height:1;
+    color:var(--fg-faint); background:transparent; border:1px solid var(--line-2);
+    border-radius:2px; padding:4px 8px; transition:border-color .12s, color .12s}
+  .controls button:hover{color:var(--fg); border-color:var(--amber-line)}
+  .controls button:focus-visible{outline:2px solid var(--amber-ink); outline-offset:1px}
   .controls .sep{opacity:.5}
   .hint{font-family:var(--mono); font-size:11px; color:var(--fg-faint); margin:12px 0 0}
   .legend{display:flex; flex-direction:column; gap:8px; margin-top:8px}
   .grp{display:flex; align-items:center; flex-wrap:wrap; gap:7px}
   .glabel{width:78px; min-width:78px; text-align:right; padding-right:4px;
     font-family:var(--mono); font-size:11px; color:var(--fg-faint)}
-  .legend button{display:inline-flex; align-items:center; gap:7px; cursor:pointer; font-family:var(--mono);
-    font-size:12px; color:var(--fg-dim); background:transparent; border:1px solid var(--line);
-    border-radius:20px; padding:4px 11px 4px 9px; transition:opacity .12s, border-color .12s, color .12s}
-  .legend button:hover{border-color:var(--fg-faint); color:var(--fg)}
-  .legend button.off{opacity:.38; text-decoration:line-through}
+  .legend button{display:inline-flex; align-items:center; gap:0; cursor:pointer;
+    font-family:var(--mono); font-size:12px; line-height:1; color:var(--fg-dim);
+    background:var(--raised); border:1px solid var(--line); border-radius:2px;
+    padding:6px 10px 6px 8px;
+    transition:border-color .12s, color .12s, opacity .12s}
+  .legend button:hover{border-color:var(--amber-line); color:var(--fg)}
+  .legend button.off{opacity:.55; color:var(--fg-faint); background:transparent;
+    border-style:dashed; text-decoration:line-through; text-decoration-thickness:1px}
+  .legend button.off .swatch{background:transparent !important; box-shadow:inset 0 0 0 1px currentColor}
+  .legend button:focus-visible{outline:2px solid var(--amber-ink); outline-offset:1px}
   @media (max-width:520px){ .glabel{width:100%; text-align:left; padding:0} }
 
   .note{color:var(--fg-dim); font-size:14px; max-width:64ch}
@@ -83,6 +111,14 @@
               gap:8px; margin-top:2px; opacity:.92}
   .krow-label{color:var(--fg-faint); font-family:var(--mono); font-size:11px;
               letter-spacing:.04em; text-transform:uppercase; margin-right:4px; align-self:center}
+  .mbar-sep{width:1px; height:18px; background:var(--line); margin:0 4px}
+  .kpick{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono);
+         font-size:11.5px; color:var(--fg-faint); letter-spacing:.02em}
+  .kpick select{font-family:var(--mono); font-size:12.5px; color:var(--fg-dim);
+    background:var(--raised); border:1px solid var(--line); border-radius:2px;
+    padding:6px 10px; cursor:pointer}
+  .kpick select:hover{border-color:var(--amber-line); color:var(--amber-ink)}
+  .kpick select.on{background:var(--amber-ink); color:var(--ink); border-color:var(--amber-ink); font-weight:600}
   .empty{color:var(--fg-faint); font-family:var(--mono); font-size:13px; padding:20px 0; text-align:center}
   footer{margin-top:40px; padding-top:20px; border-top:1px solid var(--line); font-family:var(--mono); font-size:12.5px; color:var(--fg-faint)}
   h2{font-size:20px; margin:0 0 4px}
@@ -109,18 +145,21 @@
       <button type="button" class="mbtn" data-metric="verbosity">Verbosity</button>
       <button type="button" class="mbtn" data-metric="reliability">Reliability</button>
       <button type="button" class="mbtn" data-metric="refusals">Refusals</button>
-      <div class="mrow kinds" role="group" aria-label="Accuracy by capability">
-      <span class="krow-label">by capability</span>
-      <button type="button" class="mbtn" data-metric="kind:instruction-following">Instructions</button>
-      <button type="button" class="mbtn" data-metric="kind:formatting">Formatting</button>
-      <button type="button" class="mbtn" data-metric="kind:reasoning">Reasoning</button>
-      <button type="button" class="mbtn" data-metric="kind:arithmetic">Arithmetic</button>
-      <button type="button" class="mbtn" data-metric="kind:factual-recall">Recall</button>
-      <button type="button" class="mbtn" data-metric="kind:counting">Counting</button>
-      <button type="button" class="mbtn" data-metric="kind:string-manipulation">Strings</button>
-      <button type="button" class="mbtn" data-metric="kind:extraction">Extraction</button>
-      <button type="button" class="mbtn" data-metric="kind:refusal-calibration">Refusal cal.</button>
-    </div>
+      <span class="mbar-sep"></span>
+        <label class="kpick">by capability
+          <select id="kindpick" aria-label="Accuracy by capability">
+            <option value="">— pick one —</option>
+            <option value="kind:instruction-following">Instruction following</option>
+            <option value="kind:formatting">Formatting</option>
+            <option value="kind:reasoning">Reasoning</option>
+            <option value="kind:arithmetic">Arithmetic</option>
+            <option value="kind:factual-recall">Factual recall</option>
+            <option value="kind:counting">Counting</option>
+            <option value="kind:string-manipulation">String manipulation</option>
+            <option value="kind:extraction">Extraction</option>
+            <option value="kind:refusal-calibration">Refusal calibration</option>
+          </select>
+        </label>
       </div>
     <svg id="chart" viewBox="0 0 860 340" role="img" aria-label="Metric over time per model"></svg>
     <div class="controls">
@@ -175,22 +214,22 @@ const API = "https://eval-history.onrender.com";
 const MODELS = [
   // colour = company (hue), tier = lightness (flagship darkest → mini lightest).
   // group = the legend row; tier drives the Flagship/Mid/Mini quick-filters.
-  { id: "openai:gpt-5",                  label: "GPT-5",              color: "#2fb8a0", group: "OpenAI",    tier: "flagship" },
-  { id: "openai:gpt-5-mini",             label: "GPT-5 mini",         color: "#48c1ac", group: "OpenAI",    tier: "mid" },
-  { id: "openai:gpt-4o-mini",            label: "GPT-4o mini",        color: "#7bd7c6", group: "OpenAI",    tier: "mini" },
-  { id: "openai:gpt-5-nano",             label: "GPT-5 nano",         color: "#a6e7db", group: "OpenAI",    tier: "nano" },
-  { id: "anthropic:claude-fable-5",      label: "Claude Fable 5",            color: "#d97e12", group: "Anthropic", tier: "heavy" },
-  { id: "anthropic:claude-opus-4-8",     label: "Claude Opus 4.8",           color: "#e8912a", group: "Anthropic", tier: "flagship" },
-  { id: "anthropic:claude-sonnet-5",     label: "Claude Sonnet 5",           color: "#f2a53c", group: "Anthropic", tier: "mid" },
-  { id: "anthropic:claude-haiku-4-5",    label: "Claude Haiku 4.5",          color: "#f7cd8a", group: "Anthropic", tier: "mini" },
-  { id: "google:gemini-3.1-pro",         label: "Gemini 3.1 Pro",            color: "#3b82f6", group: "Google",    tier: "flagship" },
-  { id: "google:gemini-3.5-flash",       label: "Gemini 3.5 Flash",          color: "#60a5fa", group: "Google",    tier: "mid" },
-  { id: "google:gemini-3.1-flash-lite",  label: "Gemini 3.1 Flash-Lite",     color: "#a9cdfb", group: "Google",    tier: "mini" },
-  { id: "xai:grok-4.5",                  label: "Grok 4.5",           color: "#d6488a", group: "xAI",       tier: "flagship" },
-  { id: "xai:grok-4.3",                  label: "Grok 4.3",           color: "#e06c9f", group: "xAI",       tier: "mid" },
-  { id: "xai:grok-4-fast",               label: "Grok 4 Fast",        color: "#f0aecb", group: "xAI",       tier: "mini" },
-  { id: "meta:llama-3.3-70b",            label: "Llama 3.3 70B",      color: "#c084fc", group: "Meta",      tier: "flagship" },
-  { id: "meta:llama-3.1-8b",             label: "Llama 3.1 8B",       color: "#d8b4fe", group: "Meta",      tier: "mini" },
+  { id: "openai:gpt-5",                  label: "GPT-5",              color: "#00907a", group: "OpenAI",    tier: "flagship" },
+  { id: "openai:gpt-5-mini",             label: "GPT-5 mini",         color: "#00a28a", group: "OpenAI",    tier: "mid" },
+  { id: "openai:gpt-4o-mini",            label: "GPT-4o mini",        color: "#27b39b", group: "OpenAI",    tier: "mini" },
+  { id: "openai:gpt-5-nano",             label: "GPT-5 nano",         color: "#41c5ac", group: "OpenAI",    tier: "nano" },
+  { id: "anthropic:claude-fable-5",      label: "Claude Fable 5",            color: "#a44e00", group: "Anthropic", tier: "heavy" },
+  { id: "anthropic:claude-opus-4-8",     label: "Claude Opus 4.8",           color: "#b86000", group: "Anthropic", tier: "flagship" },
+  { id: "anthropic:claude-sonnet-5",     label: "Claude Sonnet 5",           color: "#ca7100", group: "Anthropic", tier: "mid" },
+  { id: "anthropic:claude-haiku-4-5",    label: "Claude Haiku 4.5",          color: "#dd821a", group: "Anthropic", tier: "mini" },
+  { id: "google:gemini-3.1-pro",         label: "Gemini 3.1 Pro",            color: "#2d74e7", group: "Google",    tier: "flagship" },
+  { id: "google:gemini-3.5-flash",       label: "Gemini 3.5 Flash",          color: "#3f86fa", group: "Google",    tier: "mid" },
+  { id: "google:gemini-3.1-flash-lite",  label: "Gemini 3.1 Flash-Lite",     color: "#5098ff", group: "Google",    tier: "mini" },
+  { id: "xai:grok-4.5",                  label: "Grok 4.5",           color: "#c93b7f", group: "xAI",       tier: "flagship" },
+  { id: "xai:grok-4.3",                  label: "Grok 4.3",           color: "#dc4e8f", group: "xAI",       tier: "mid" },
+  { id: "xai:grok-4-fast",               label: "Grok 4 Fast",        color: "#f060a0", group: "xAI",       tier: "mini" },
+  { id: "meta:llama-3.3-70b",            label: "Llama 3.3 70B",      color: "#9458cc", group: "Meta",      tier: "flagship" },
+  { id: "meta:llama-3.1-8b",             label: "Llama 3.1 8B",       color: "#b67af1", group: "Meta",      tier: "mini" },
 ];
 const esc = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 // read the metrics time series straight from the repo (raw is CORS-open and always
@@ -306,6 +345,8 @@ function render() {
   const cfg = METRICS[ACTIVE];
   renderLegend();
   document.querySelectorAll("#metricbar .mbtn").forEach(b => b.classList.toggle("on", b.dataset.metric === ACTIVE));
+  const kp = document.getElementById("kindpick");
+  if (kp) { kp.classList.toggle("on", ACTIVE.startsWith("kind:")); if (!ACTIVE.startsWith("kind:")) kp.value = ""; }
 
   const vis = SERIES.filter(s => !hidden.has(s.id));       // respect the viewer's selection
   const visWithData = vis.filter(s => pts(s).length);
@@ -411,11 +452,19 @@ document.querySelectorAll(".controls button[data-tier]").forEach(b =>
 document.getElementById("hide-all").addEventListener("click", () => { MODELS.forEach(m => hidden.add(m.id)); saveHidden(); render(); });
 
 // metric toggle — accuracy / speed / verbosity
-document.querySelectorAll("#metricbar .mbtn").forEach(b => b.addEventListener("click", () => {
-  ACTIVE = b.dataset.metric;
+const kindpick = document.getElementById("kindpick");
+function setMetric(key) {
+  ACTIVE = key;
   try { localStorage.setItem(METRIC_KEY, ACTIVE); } catch {}
   render();
-}));
+}
+document.querySelectorAll("#metricbar .mbtn").forEach(b =>
+  b.addEventListener("click", () => { kindpick.value = ""; setMetric(b.dataset.metric); }));
+// Nine capability buttons wrapped onto three rows and buried the five headline
+// metrics. A select keeps the whole control strip on one line and still reaches
+// every series.
+kindpick.addEventListener("change", () => { if (kindpick.value) setMetric(kindpick.value); });
+if (ACTIVE.startsWith("kind:")) kindpick.value = ACTIVE;
 
 render();  // interactive immediately (empty state), even before data lands
 fetchAll().then(s => { SERIES = s; render(); }).catch(() => {

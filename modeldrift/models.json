@@ -18,7 +18,7 @@
   "temperature": null,
   "group": "OpenAI",
   "tier": "flagship",
-  "color": "#2fb8a0"
+  "color": "#00907a"
  },
  {
   "id": "openai:gpt-5-mini",
@@ -29,7 +29,7 @@
   "temperature": null,
   "group": "OpenAI",
   "tier": "mid",
-  "color": "#48c1ac"
+  "color": "#00a28a"
  },
  {
   "id": "openai:gpt-4o-mini",
@@ -39,7 +39,7 @@
   "key_env": "OPENAI_API_KEY",
   "group": "OpenAI",
   "tier": "mini",
-  "color": "#7bd7c6"
+  "color": "#27b39b"
  },
  {
   "id": "openai:gpt-5-nano",
@@ -50,7 +50,7 @@
   "temperature": null,
   "group": "OpenAI",
   "tier": "nano",
-  "color": "#a6e7db"
+  "color": "#41c5ac"
  },
  {
   "id": "anthropic:claude-fable-5",
@@ -61,7 +61,7 @@
   "temperature": null,
   "group": "Anthropic",
   "tier": "heavy",
-  "color": "#d97e12"
+  "color": "#a44e00"
  },
  {
   "id": "anthropic:claude-opus-4-8",
@@ -72,7 +72,7 @@
   "temperature": null,
   "group": "Anthropic",
   "tier": "flagship",
-  "color": "#e8912a"
+  "color": "#b86000"
  },
  {
   "id": "anthropic:claude-sonnet-5",
@@ -83,7 +83,7 @@
   "temperature": null,
   "group": "Anthropic",
   "tier": "mid",
-  "color": "#f2a53c"
+  "color": "#ca7100"
  },
  {
   "id": "anthropic:claude-haiku-4-5",
@@ -93,7 +93,7 @@
   "key_env": "ANTHROPIC_API_KEY",
   "group": "Anthropic",
   "tier": "mini",
-  "color": "#f7cd8a"
+  "color": "#dd821a"
  },
  {
   "id": "google:gemini-3.1-pro",
@@ -103,7 +103,7 @@
   "key_env": "GEMINI_API_KEY",
   "group": "Google",
   "tier": "flagship",
-  "color": "#3b82f6"
+  "color": "#2d74e7"
  },
  {
   "id": "google:gemini-3.5-flash",
@@ -113,7 +113,7 @@
   "key_env": "GEMINI_API_KEY",
   "group": "Google",
   "tier": "mid",
-  "color": "#60a5fa"
+  "color": "#3f86fa"
  },
  {
   "id": "google:gemini-3.1-flash-lite",
@@ -123,7 +123,7 @@
   "key_env": "GEMINI_API_KEY",
   "group": "Google",
   "tier": "mini",
-  "color": "#a9cdfb"
+  "color": "#5098ff"
  },
  {
   "id": "xai:grok-4.5",
@@ -135,7 +135,7 @@
   "temperature": null,
   "group": "xAI",
   "tier": "flagship",
-  "color": "#d6488a"
+  "color": "#c93b7f"
  },
  {
   "id": "xai:grok-4.3",
@@ -147,7 +147,7 @@
   "temperature": null,
   "group": "xAI",
   "tier": "mid",
-  "color": "#e06c9f"
+  "color": "#dc4e8f"
  },
  {
   "id": "xai:grok-4-fast",
@@ -159,7 +159,7 @@
   "temperature": null,
   "group": "xAI",
   "tier": "mini",
-  "color": "#f0aecb"
+  "color": "#f060a0"
  },
  {
   "id": "meta:llama-3.3-70b",
@@ -170,7 +170,7 @@
   "base_url": "https://api.groq.com/openai/v1",
   "group": "Meta",
   "tier": "flagship",
-  "color": "#c084fc"
+  "color": "#9458cc"
  },
  {
   "id": "meta:llama-3.1-8b",
@@ -181,6 +181,6 @@
   "base_url": "https://api.groq.com/openai/v1",
   "group": "Meta",
   "tier": "mini",
-  "color": "#d8b4fe"
+  "color": "#b67af1"
  }
 ]
