@@ -69,6 +69,14 @@ def _post(url: str, headers: Dict[str, str], body: dict) -> dict:
         raise ProviderError(f"{url} -> {e.code}: {body}")
     except urllib.error.URLError as e:
         raise ProviderError(f"{url} unreachable: {e.reason}")
+    except (TimeoutError, json.JSONDecodeError) as e:
+        # A socket read timeout raises a bare TimeoutError, which is NOT a
+        # URLError - so it escaped every handler here, sailed past probe()'s
+        # `except ProviderError`, and killed the whole run. One slow response
+        # from one provider discarded eleven models that had already been
+        # measured. Everything that can go wrong on the wire has to arrive as a
+        # ProviderError, or a run is only as reliable as its flakiest endpoint.
+        raise ProviderError(f"{url}: {type(e).__name__}: {e}")
 
 
 # ── pure request-body builders (tested directly, no network) ──

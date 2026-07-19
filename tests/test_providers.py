@@ -1,3 +1,4 @@
+import pytest
 """Request-body construction — the part that must be right or a flagship 400s.
 
 Claude Opus 4.8 and GPT-5 reject a `temperature` parameter. If the probe sent one
@@ -52,3 +53,33 @@ def test_every_real_model_is_key_gated():
     for m in load_registry():
         if m.provider != "mock":
             assert m.key_env and m.key_env != "NONE"
+
+
+def test_a_socket_timeout_becomes_a_provider_error(monkeypatch):
+    """A bare TimeoutError is not a URLError. It used to escape every handler,
+    sail past probe()'s `except ProviderError`, and kill the run - losing every
+    model already measured because one endpoint was slow."""
+    import urllib.request
+    from modeldrift import providers
+
+    def slow(*a, **k):
+        raise TimeoutError("The read operation timed out")
+
+    monkeypatch.setattr(urllib.request, "urlopen", slow)
+    with pytest.raises(providers.ProviderError) as e:
+        providers._post("https://example.test/v1", {}, {"x": 1})
+    assert "TimeoutError" in str(e.value)
+
+
+def test_a_malformed_json_body_becomes_a_provider_error(monkeypatch):
+    import io, urllib.request
+    from modeldrift import providers
+
+    class R:
+        def read(self): return b"<html>gateway timeout</html>"
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+
+    monkeypatch.setattr(urllib.request, "urlopen", lambda *a, **k: R())
+    with pytest.raises(providers.ProviderError):
+        providers._post("https://example.test/v1", {}, {"x": 1})
