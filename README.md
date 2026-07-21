@@ -135,8 +135,12 @@ The tracker runs daily on a free cron and a small spend. The dashboard shows **"
 Built on the pieces it needed already: [eval-history](https://github.com/egnaro9/eval-history) stores the runs and computes the run-to-run comparison; the scoring mirrors [rag-eval-lab](https://github.com/egnaro9/rag-eval-lab). stdlib `urllib` only — no SDKs, no dependencies.
 
 ```bash
-pip install -e ".[dev]" && pytest -q     # 132 tests, stdlib only
+pip install -e ".[dev]" && pytest -q     # 135 tests, stdlib only
 ```
+
+## Field notes
+
+- [The drift that was a rate limit](docs/a-rate-limit-not-a-regression.md) — a Llama model "dropped" 66 points overnight. It was Groq's 30 RPM cap, not the model. How I caught it and hardened the probe so a rate limit can't read as a regression.
 
 ---
 MIT · by [Erik Hill](https://egnaro9.github.io)
