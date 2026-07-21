@@ -1,5 +1,5 @@
 {
- "updated": "2026-07-20T12:33:14Z",
+ "updated": "2026-07-21T11:38:55Z",
  "series": {
   "mock:stable": [
    {
@@ -103,6 +103,27 @@
    },
    {
     "t": "2026-07-20T12:33:14Z",
+    "acc": 1.0,
+    "latency_ms": 0.0,
+    "out_chars": 5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0
+   },
+   {
+    "t": "2026-07-21T11:38:55Z",
     "acc": 1.0,
     "latency_ms": 0.0,
     "out_chars": 5,
@@ -243,6 +264,27 @@
     },
     "runs": 3,
     "acc_spread": 0.0
+   },
+   {
+    "t": "2026-07-21T11:38:55Z",
+    "acc": 1.0,
+    "latency_ms": 2046.9,
+    "out_chars": 4.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0
    }
   ],
   "openai:gpt-5-mini": [
@@ -365,6 +407,27 @@
     },
     "runs": 3,
     "acc_spread": 0.0
+   },
+   {
+    "t": "2026-07-21T11:38:55Z",
+    "acc": 1.0,
+    "latency_ms": 1397.2,
+    "out_chars": 4.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0
    }
   ],
   "openai:gpt-4o-mini": [
@@ -471,6 +534,27 @@
     "t": "2026-07-20T12:33:14Z",
     "acc": 0.8,
     "latency_ms": 503.6,
+    "out_chars": 9.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.714,
+     "factual-recall": 0.333,
+     "arithmetic": 0.75,
+     "reasoning": 0.75,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0
+   },
+   {
+    "t": "2026-07-21T11:38:55Z",
+    "acc": 0.8,
+    "latency_ms": 469.4,
     "out_chars": 9.9,
     "reliability": 1.0,
     "refusal_rate": 0.0,
@@ -609,6 +693,27 @@
     },
     "runs": 3,
     "acc_spread": 0.0
+   },
+   {
+    "t": "2026-07-21T11:38:55Z",
+    "acc": 1.0,
+    "latency_ms": 1608.4,
+    "out_chars": 4.8,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0286
    }
   ],
   "anthropic:claude-fable-5": [
@@ -716,6 +821,27 @@
     "acc": 0.9143,
     "latency_ms": 3676.0,
     "out_chars": 15.2,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 0.5,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0286
+   },
+   {
+    "t": "2026-07-21T11:38:55Z",
+    "acc": 0.9143,
+    "latency_ms": 3665.1,
+    "out_chars": 10.9,
     "reliability": 1.0,
     "refusal_rate": 0.0,
     "by_kind": {
@@ -853,6 +979,27 @@
     },
     "runs": 3,
     "acc_spread": 0.0286
+   },
+   {
+    "t": "2026-07-21T11:38:55Z",
+    "acc": 0.9429,
+    "latency_ms": 1246.5,
+    "out_chars": 6.4,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0286
    }
   ],
   "anthropic:claude-sonnet-5": [
@@ -975,6 +1122,27 @@
     },
     "runs": 3,
     "acc_spread": 0.0285
+   },
+   {
+    "t": "2026-07-21T11:38:55Z",
+    "acc": 0.8286,
+    "latency_ms": 1433.4,
+    "out_chars": 13.6,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 0.333,
+     "arithmetic": 0.75,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 0.5,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0286
    }
   ],
   "anthropic:claude-haiku-4-5": [
@@ -1081,6 +1249,27 @@
     "t": "2026-07-20T12:33:14Z",
     "acc": 0.8571,
     "latency_ms": 889.4,
+    "out_chars": 6.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.571,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0
+   },
+   {
+    "t": "2026-07-21T11:38:55Z",
+    "acc": 0.8571,
+    "latency_ms": 706.2,
     "out_chars": 6.9,
     "reliability": 1.0,
     "refusal_rate": 0.0,
@@ -1219,6 +1408,27 @@
     },
     "runs": 3,
     "acc_spread": 0.0571
+   },
+   {
+    "t": "2026-07-21T11:38:55Z",
+    "acc": 0.8857,
+    "latency_ms": 3227.9,
+    "out_chars": 4.5,
+    "reliability": 0.9143,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.714,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 0.5,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0
    }
   ],
   "google:gemini-3.5-flash": [
@@ -1341,6 +1551,27 @@
     },
     "runs": 3,
     "acc_spread": 0.2
+   },
+   {
+    "t": "2026-07-21T11:38:55Z",
+    "acc": 0.9714,
+    "latency_ms": 1144.1,
+    "out_chars": 5.5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0
    }
   ],
   "google:gemini-3.1-flash-lite": [
@@ -1447,6 +1678,27 @@
     "t": "2026-07-20T12:33:14Z",
     "acc": 0.9429,
     "latency_ms": 413.6,
+    "out_chars": 5.5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0
+   },
+   {
+    "t": "2026-07-21T11:38:55Z",
+    "acc": 0.9429,
+    "latency_ms": 418.7,
     "out_chars": 5.5,
     "reliability": 1.0,
     "refusal_rate": 0.0,
@@ -1585,6 +1837,27 @@
     },
     "runs": 3,
     "acc_spread": 0.0
+   },
+   {
+    "t": "2026-07-21T11:38:55Z",
+    "acc": 1.0,
+    "latency_ms": 1504.8,
+    "out_chars": 4.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0
    }
   ],
   "xai:grok-4.3": [
@@ -1707,6 +1980,27 @@
     },
     "runs": 3,
     "acc_spread": 0.0286
+   },
+   {
+    "t": "2026-07-21T11:38:55Z",
+    "acc": 0.7429,
+    "latency_ms": 3376.7,
+    "out_chars": 103.0,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.857,
+     "factual-recall": 0.667,
+     "arithmetic": 1.0,
+     "reasoning": 0.75,
+     "formatting": 0.8,
+     "extraction": 0.5,
+     "refusal-calibration": 1.0,
+     "counting": 0.0,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0571
    }
   ],
   "xai:grok-4-fast": [
@@ -1829,6 +2123,27 @@
     },
     "runs": 3,
     "acc_spread": 0.1715
+   },
+   {
+    "t": "2026-07-21T11:38:55Z",
+    "acc": 0.9429,
+    "latency_ms": 985.8,
+    "out_chars": 4.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0571
    }
   ],
   "meta:llama-3.3-70b": [
@@ -1951,6 +2266,27 @@
     },
     "runs": 3,
     "acc_spread": 0.6857
+   },
+   {
+    "t": "2026-07-21T11:38:55Z",
+    "acc": 0.8,
+    "latency_ms": 2023.6,
+    "out_chars": 5.6,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.714,
+     "factual-recall": 0.667,
+     "arithmetic": 0.75,
+     "reasoning": 0.75,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 0.5,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0286
    }
   ],
   "meta:llama-3.1-8b": [
@@ -2073,6 +2409,27 @@
     },
     "runs": 3,
     "acc_spread": 0.4857
+   },
+   {
+    "t": "2026-07-21T11:38:55Z",
+    "acc": 0.5714,
+    "latency_ms": 1997.4,
+    "out_chars": 21.4,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.429,
+     "factual-recall": 0.333,
+     "arithmetic": 0.5,
+     "reasoning": 0.375,
+     "formatting": 0.8,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0
    }
   ]
  }

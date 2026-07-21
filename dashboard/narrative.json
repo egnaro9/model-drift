@@ -1,13 +1,13 @@
 {
  "sentences": [
   "<strong>OpenAI's cheaper tiers match its own flagship</strong> \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy.",
-  "<strong>Grok 4.3 answers with 15.3x the characters of the tersest model</strong>, at 80%.",
-  "<strong>Gemini 3.1 Flash-Lite leads on speed</strong> at 414 ms and 94% accuracy."
+  "<strong>Grok 4.3 answers with 21.4x the characters of the tersest model</strong>, at 74%.",
+  "<strong>Gemini 3.1 Flash-Lite leads on speed</strong> at 419 ms and 94% accuracy."
  ],
- "html": "A frozen, deterministically-graded suite against <strong>11 models across 4 labs</strong>. 5 of the 16 tracked models did not return a clean run and are left out of the comparisons below. <strong>OpenAI's cheaper tiers match its own flagship</strong> \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy. <strong>Grok 4.3 answers with 15.3x the characters of the tersest model</strong>, at 80%. <strong>Gemini 3.1 Flash-Lite leads on speed</strong> at 414 ms and 94% accuracy. <em>Generated from the run of 20 Jul 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.</em>",
- "text": "A frozen, deterministically-graded suite against 11 models across 4 labs. 5 of the 16 tracked models did not return a clean run and are left out of the comparisons below. OpenAI's cheaper tiers match its own flagship \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy. Grok 4.3 answers with 15.3x the characters of the tersest model, at 80%. Gemini 3.1 Flash-Lite leads on speed at 414 ms and 94% accuracy. Generated from the run of 20 Jul 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.",
+ "html": "A frozen, deterministically-graded suite against <strong>15 models across 5 labs</strong>. 1 of the 16 tracked models did not return a clean run and are left out of the comparisons below. <strong>OpenAI's cheaper tiers match its own flagship</strong> \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy. <strong>Grok 4.3 answers with 21.4x the characters of the tersest model</strong>, at 74%. <strong>Gemini 3.1 Flash-Lite leads on speed</strong> at 419 ms and 94% accuracy. <em>Generated from the run of 21 Jul 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.</em>",
+ "text": "A frozen, deterministically-graded suite against 15 models across 5 labs. 1 of the 16 tracked models did not return a clean run and are left out of the comparisons below. OpenAI's cheaper tiers match its own flagship \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy. Grok 4.3 answers with 21.4x the characters of the tersest model, at 74%. Gemini 3.1 Flash-Lite leads on speed at 419 ms and 94% accuracy. Generated from the run of 21 Jul 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.",
  "models": 16,
- "clean": 11,
- "updated": "2026-07-20T12:33:14Z",
+ "clean": 15,
+ "updated": "2026-07-21T11:38:55Z",
  "claims_fired": 3
 }

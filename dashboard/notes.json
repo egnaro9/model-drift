@@ -1,18 +1,51 @@
 [
   {
+    "date": "2026-07-21",
+    "title": "Regression: Grok 4.3 -5.7 pts",
+    "metric": "accuracy",
+    "models": [
+      "anthropic:claude-sonnet-5",
+      "xai:grok-4.3"
+    ],
+    "summary": "2 model(s) regressed week-over-week; worst was Grok 4.3 at -5.7 pts. Auto-logged — confirm it's real before writing it up.",
+    "body": [
+      {
+        "p": "Auto-logged when the scheduled probe flagged a week-over-week regression. Before this becomes a post, check the run log and the Reliability metric — a rate limit or provider outage can look exactly like a regression. If it holds up, the written explanation goes here."
+      }
+    ],
+    "stub": true
+  },
+  {
     "date": "2026-07-20",
     "title": "The drift that was a rate limit",
     "metric": "reliability",
-    "models": ["meta:llama-3.3-70b", "meta:llama-3.1-8b"],
+    "models": [
+      "meta:llama-3.3-70b",
+      "meta:llama-3.1-8b"
+    ],
     "summary": "Llama 3.3 70B \"dropped\" 66 points overnight. It was Groq's 30 RPM cap, not the model — and a rate limit scoring as 0% looks exactly like the thing this board exists to catch.",
     "body": [
-      {"p": "On 2026-07-20 the board showed Llama 3.3 70B fall from 69% to 3%, and Llama 3.1 8B to 0% — overnight, on a frozen suite. That is a regression post. It wasn't drift."},
-      {"p": "The run log told the real story:"},
-      {"code": "api.groq.com -> 429: Rate limit reached for model `llama-3.3-70b-versatile`\nservice tier `on_demand` ... requests per minute (RPM): Limit 30, Used 30"},
-      {"p": "34 of 35 calls, both Llama models, were rate-limited. They run on Groq's free tier — 30 RPM shared across the org — and probing two models back-to-back spent the budget. Every 429'd call scored as a wrong answer, so accuracy cratered toward zero. Google threw a few 503s and xAI a 429 too, same category."},
-      {"p": "The model didn't get dumber; a rate limit scored as a 0%. And a rate limit scoring as a 0% is the single most misleading thing a drift tracker can do — it looks exactly like the thing it exists to catch. Switch to the Reliability metric (button below) and you can see it: the share of calls that succeeded fell off a cliff for those two models, which is the honest signal that the probe, not the model, failed."},
-      {"p": "The board already tracked reliability separately and left the failed probes out of the auto-written summary, so it never claimed a regression. But the accuracy chart still dove toward 0, and there was no retry. So the probe was hardened: retry 429/5xx honoring Retry-After, throttle each provider to its rate cap, and drop points below a reliability floor from the accuracy line. Reliability keeps the dip — that's the true signal."},
-      {"p": "The hard part of an eval board isn't detecting drift. It's not manufacturing it. The most valuable thing the board did that week was stop a post from going out."}
+      {
+        "p": "On 2026-07-20 the board showed Llama 3.3 70B fall from 69% to 3%, and Llama 3.1 8B to 0% — overnight, on a frozen suite. That is a regression post. It wasn't drift."
+      },
+      {
+        "p": "The run log told the real story:"
+      },
+      {
+        "code": "api.groq.com -> 429: Rate limit reached for model `llama-3.3-70b-versatile`\nservice tier `on_demand` ... requests per minute (RPM): Limit 30, Used 30"
+      },
+      {
+        "p": "34 of 35 calls, both Llama models, were rate-limited. They run on Groq's free tier — 30 RPM shared across the org — and probing two models back-to-back spent the budget. Every 429'd call scored as a wrong answer, so accuracy cratered toward zero. Google threw a few 503s and xAI a 429 too, same category."
+      },
+      {
+        "p": "The model didn't get dumber; a rate limit scored as a 0%. And a rate limit scoring as a 0% is the single most misleading thing a drift tracker can do — it looks exactly like the thing it exists to catch. Switch to the Reliability metric (button below) and you can see it: the share of calls that succeeded fell off a cliff for those two models, which is the honest signal that the probe, not the model, failed."
+      },
+      {
+        "p": "The board already tracked reliability separately and left the failed probes out of the auto-written summary, so it never claimed a regression. But the accuracy chart still dove toward 0, and there was no retry. So the probe was hardened: retry 429/5xx honoring Retry-After, throttle each provider to its rate cap, and drop points below a reliability floor from the accuracy line. Reliability keeps the dip — that's the true signal."
+      },
+      {
+        "p": "The hard part of an eval board isn't detecting drift. It's not manufacturing it. The most valuable thing the board did that week was stop a post from going out."
+      }
     ],
     "pr": "https://github.com/egnaro9/model-drift/pull/2"
   }
