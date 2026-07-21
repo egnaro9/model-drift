@@ -308,17 +308,24 @@ async function fetchAll() {
       extra = j.series || {};
     } catch {}
   }
+  // A probe where most calls were rate-limited or errored (low reliability) can't
+  // measure accuracy honestly — the failed calls score as wrong, so the line dives
+  // toward 0 and reads as a regression when it was really a rate limit. Drop those
+  // points from the accuracy and per-capability lines; the Reliability metric keeps
+  // them, because reliability genuinely did drop and that's the true signal.
+  const REL_FLOOR = 0.5;
+  const trusted = (p) => p.rel == null || p.rel >= REL_FLOOR;
   return MODELS.map((m) => {
     const ex = (extra[m.id] || []).map(p => ({ t:new Date(p.t), lat:p.latency_ms, ch:p.out_chars,
                                                rel:p.reliability, ref:p.refusal_rate, kinds:p.by_kind, acc:p.acc })).sort((a,b)=>a.t-b.t);
     return { ...m,
-      accuracy:    ex.filter(p => p.acc != null).map(p => ({ t:p.t, v:p.acc })),
+      accuracy:    ex.filter(p => p.acc != null && trusted(p)).map(p => ({ t:p.t, v:p.acc })),
       latency:     ex.map(p => ({ t:p.t, v:p.lat })),
       verbosity:   ex.map(p => ({ t:p.t, v:p.ch })),
       reliability: ex.filter(p => p.rel != null).map(p => ({ t:p.t, v:p.rel })),
       refusals:    ex.filter(p => p.ref != null).map(p => ({ t:p.t, v:p.ref })),
       ...Object.fromEntries(KINDS.map(k => ["kind:" + k,
-        ex.filter(p => p.kinds && p.kinds[k] != null)
+        ex.filter(p => p.kinds && p.kinds[k] != null && trusted(p))
           .map(p => ({ t:p.t, v:p.kinds[k] }))])),
     };
   });

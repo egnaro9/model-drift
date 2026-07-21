@@ -18,10 +18,12 @@ from __future__ import annotations
 
 import json
 import os
+import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional
+from urllib.parse import urlsplit
 
 TIMEOUT = 60
 # Some providers sit behind Cloudflare and reject urllib's default
@@ -56,27 +58,72 @@ class ProviderError(RuntimeError):
     pass
 
 
-def _post(url: str, headers: Dict[str, str], body: dict) -> dict:
-    req = urllib.request.Request(url, data=json.dumps(body).encode(),
-                                 headers={"User-Agent": USER_AGENT, **headers}, method="POST")
-    try:
-        with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
-            return json.loads(r.read().decode())
-    except urllib.error.HTTPError as e:
-        # collapse whitespace: providers pretty-print JSON errors, and the newlines
-        # break the message across log lines exactly when you need to read it
-        body = " ".join(e.read().decode().split())[:300]
-        raise ProviderError(f"{url} -> {e.code}: {body}")
-    except urllib.error.URLError as e:
-        raise ProviderError(f"{url} unreachable: {e.reason}")
-    except (TimeoutError, json.JSONDecodeError) as e:
-        # A socket read timeout raises a bare TimeoutError, which is NOT a
-        # URLError - so it escaped every handler here, sailed past probe()'s
-        # `except ProviderError`, and killed the whole run. One slow response
-        # from one provider discarded eleven models that had already been
-        # measured. Everything that can go wrong on the wire has to arrive as a
-        # ProviderError, or a run is only as reliable as its flakiest endpoint.
-        raise ProviderError(f"{url}: {type(e).__name__}: {e}")
+MAX_RETRIES = 4
+# Retry these: 429 (rate limit) and 5xx (provider capacity/outage) are transient
+# by definition. A 400/401/403/404 is deterministic — retrying just wastes the run.
+_RETRYABLE = frozenset({429, 500, 502, 503, 504})
+# Per-host request-rate caps (requests/min). Groq's free tier is 30 RPM shared
+# across the whole org, so probing two Llama models back-to-back spent the budget
+# and 34/35 calls 429'd — a rate limit that read on the board as a 0% "regression".
+# Pacing turns that into a handful of retries instead of a wall of failures.
+_HOST_RPM = {"api.groq.com": 30}
+_last_call: Dict[str, float] = {}
+
+
+def _throttle(url: str) -> None:
+    """Space calls to a rate-capped host so we don't 429 ourselves. State is
+    per-host and module-level, so two models on the same provider share the cap."""
+    host = urlsplit(url).hostname or ""
+    rpm = _HOST_RPM.get(host)
+    if not rpm:
+        return
+    min_gap = 60.0 / rpm
+    wait = min_gap - (time.monotonic() - _last_call.get(host, 0.0))
+    if wait > 0:
+        time.sleep(wait)
+    _last_call[host] = time.monotonic()
+
+
+def _retry_after(err: urllib.error.HTTPError, attempt: int) -> float:
+    """How long to wait before a retry: honor the provider's Retry-After header if
+    it sent one (Groq's 429 does), else exponential backoff, both capped."""
+    ra = err.headers.get("Retry-After") if err.headers else None
+    if ra:
+        try:
+            return min(float(ra), 30.0)
+        except ValueError:
+            pass
+    return min(2.0 ** attempt, 20.0)
+
+
+def _post(url: str, headers: Dict[str, str], body: dict, *, retries: int = MAX_RETRIES) -> dict:
+    payload = json.dumps(body).encode()
+    hdrs = {"User-Agent": USER_AGENT, **headers}
+    for attempt in range(retries + 1):
+        _throttle(url)
+        req = urllib.request.Request(url, data=payload, headers=hdrs, method="POST")
+        try:
+            with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
+                return json.loads(r.read().decode())
+        except urllib.error.HTTPError as e:
+            # collapse whitespace: providers pretty-print JSON errors, and the newlines
+            # break the message across log lines exactly when you need to read it
+            text = " ".join(e.read().decode().split())[:300]
+            if e.code in _RETRYABLE and attempt < retries:
+                time.sleep(_retry_after(e, attempt))
+                continue
+            raise ProviderError(f"{url} -> {e.code}: {text}")
+        except urllib.error.URLError as e:
+            raise ProviderError(f"{url} unreachable: {e.reason}")
+        except (TimeoutError, json.JSONDecodeError) as e:
+            # A socket read timeout raises a bare TimeoutError, which is NOT a
+            # URLError - so it escaped every handler here, sailed past probe()'s
+            # `except ProviderError`, and killed the whole run. One slow response
+            # from one provider discarded eleven models that had already been
+            # measured. Everything that can go wrong on the wire has to arrive as a
+            # ProviderError, or a run is only as reliable as its flakiest endpoint.
+            raise ProviderError(f"{url}: {type(e).__name__}: {e}")
+    raise ProviderError(f"{url}: exhausted {retries} retries")  # unreachable; for type-checkers
 
 
 # ── pure request-body builders (tested directly, no network) ──

@@ -83,3 +83,70 @@ def test_a_malformed_json_body_becomes_a_provider_error(monkeypatch):
     monkeypatch.setattr(urllib.request, "urlopen", lambda *a, **k: R())
     with pytest.raises(providers.ProviderError):
         providers._post("https://example.test/v1", {}, {"x": 1})
+
+
+def _http_error(code, body=b"{}", retry_after=None):
+    import email.message, io, urllib.error
+    hdrs = email.message.Message()
+    if retry_after is not None:
+        hdrs["Retry-After"] = str(retry_after)
+    return urllib.error.HTTPError("https://x.test/v1", code, "err", hdrs, io.BytesIO(body))
+
+
+class _OK:
+    def read(self): return b'{"ok": true}'
+    def __enter__(self): return self
+    def __exit__(self, *a): return False
+
+
+def test_post_retries_a_429_then_succeeds(monkeypatch):
+    """A rate limit (429) is transient — Groq's free tier throws it constantly.
+    The probe must retry, not record a 0% 'regression'."""
+    import urllib.request
+    from modeldrift import providers
+    calls = {"n": 0}
+
+    def flaky(req, timeout=None):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise _http_error(429, b'{"error":"rate limit"}', retry_after=0)
+        return _OK()
+
+    monkeypatch.setattr(urllib.request, "urlopen", flaky)
+    monkeypatch.setattr(providers.time, "sleep", lambda s: None)
+    assert providers._post("https://x.test/v1", {}, {"a": 1}) == {"ok": True}
+    assert calls["n"] == 2   # errored once, retried, succeeded
+
+
+def test_post_does_not_retry_a_deterministic_400(monkeypatch):
+    """A 400 (e.g. a flagship rejecting `temperature`) is deterministic — retrying
+    just burns the run. Only 429/5xx are retried."""
+    import urllib.request
+    from modeldrift import providers
+    calls = {"n": 0}
+
+    def bad(req, timeout=None):
+        calls["n"] += 1
+        raise _http_error(400, b'{"error":"temperature unsupported"}')
+
+    monkeypatch.setattr(urllib.request, "urlopen", bad)
+    monkeypatch.setattr(providers.time, "sleep", lambda s: None)
+    with pytest.raises(providers.ProviderError):
+        providers._post("https://x.test/v1", {}, {"a": 1})
+    assert calls["n"] == 1   # not retried
+
+
+def test_a_rate_capped_host_is_throttled(monkeypatch):
+    """Two back-to-back calls to a capped host (Groq) must space themselves;
+    an uncapped host never waits."""
+    from modeldrift import providers
+    slept = []
+    monkeypatch.setattr(providers.time, "sleep", lambda s: slept.append(s))
+    providers._last_call.clear()
+    groq = "https://api.groq.com/openai/v1/chat/completions"
+    providers._throttle(groq)
+    providers._throttle(groq)          # immediately again → must wait
+    assert slept and slept[-1] > 0
+    slept.clear()
+    providers._throttle("https://api.openai.com/v1/chat/completions")
+    assert slept == []                 # uncapped host never sleeps

@@ -75,7 +75,13 @@ jobs:
         run: |
           title=$(head -1 "$RUNNER_TEMP/alert.md")
           body=$(tail -n +3 "$RUNNER_TEMP/alert.md")
-          gh issue create --title "$title" --body "$body" --label drift || true
+          # Ensure the label exists first. A missing 'drift' label made
+          # `gh issue create --label drift` fail, and the trailing `|| true`
+          # swallowed it — so a real regression opened no issue at all. Create
+          # it (idempotent), then let a genuine failure surface instead of hiding.
+          gh label create drift --color b7761a \
+            --description "Automated model-drift regression alert" --force >/dev/null 2>&1 || true
+          gh issue create --title "$title" --body "$body" --label drift
 
       - name: Upload the ready-to-post draft (post it by hand, if it's worth saying)
         if: steps.report.outputs.regressed == 'true'
