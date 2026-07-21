@@ -117,6 +117,40 @@ def social_draft(regs: List[ModelStatus], all_statuses: List[ModelStatus]) -> st
     return "\n".join(lines)
 
 
+def append_stub_note(path: str, regs: List[ModelStatus], today: str) -> bool:
+    """Log a stub Field Note when a regression fires, so the moment is captured
+    automatically — a human writes the prose later. Automate the capture, not the
+    story. Returns True if a new note was written (False if today's already logged)."""
+    from pathlib import Path
+    worst = min(regs, key=lambda s: s.delta if s.delta is not None else 0.0)
+    stub = {
+        "date": today,
+        "title": f"Regression: {worst.label} {worst.delta * 100:+.1f} pts",
+        "metric": "accuracy",
+        "models": [s.id for s in regs],
+        "summary": (f"{len(regs)} model(s) regressed week-over-week; worst was "
+                    f"{worst.label} at {worst.delta * 100:+.1f} pts. Auto-logged — "
+                    "confirm it's real before writing it up."),
+        "body": [{"p": "Auto-logged when the scheduled probe flagged a week-over-week "
+                       "regression. Before this becomes a post, check the run log and the "
+                       "Reliability metric — a rate limit or provider outage can look exactly "
+                       "like a regression. If it holds up, the written explanation goes here."}],
+        "stub": True,
+    }
+    p = Path(path)
+    try:
+        notes = json.loads(p.read_text(encoding="utf-8"))
+        if not isinstance(notes, list):
+            notes = []
+    except (FileNotFoundError, json.JSONDecodeError):
+        notes = []
+    if notes and notes[0].get("stub") and notes[0].get("date") == today:
+        return False   # newest-first; don't double-log the same day
+    notes.insert(0, stub)
+    p.write_text(json.dumps(notes, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return True
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     import argparse
     import os
@@ -125,6 +159,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument("--results", default="RESULTS.md")
     p.add_argument("--alert", default=None, help="write issue title+body here if any regression")
     p.add_argument("--draft", default=None, help="write a social draft here if any regression")
+    p.add_argument("--notes", default=None, help="append a stub Field Note here on a regression")
     args = p.parse_args(argv)
 
     statuses = gather(args.api)
@@ -148,6 +183,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         if args.draft:
             with open(args.draft, "w", encoding="utf-8") as fh:
                 fh.write(social_draft(regs, statuses))
+        if args.notes:
+            from datetime import datetime, timezone
+            today = datetime.now(timezone.utc).date().isoformat()
+            if append_stub_note(args.notes, regs, today):
+                print(f"logged a stub Field Note to {args.notes}")
     else:
         print("no regressions — standings updated, no alert (news, not schedule)")
     return 0
