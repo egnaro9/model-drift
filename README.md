@@ -33,10 +33,7 @@ frozen suite ──►  live model APIs  ──►  deterministic grader  ──
 - **Per-capability breakdown.** Not just "it dropped" but *which kind* dropped — instruction-following, factual recall, arithmetic, reasoning, counting, string manipulation, formatting, extraction, refusal calibration — because that's the useful part.
 - **It's all here.** The suite, the graders, and the runner are open and auditable; the numbers are reproducible.
 
-> *"An eval harness must distinguish **wrong** from **absent** — any harness that can't will report infrastructure as intelligence."*
-> — Bartłomiej Nawara
-
-That is the **Reliability** metric's whole job. A call that never returned an answer — a rate limit, a timeout, an outage — is *absent*, not *wrong*; scoring it `0` reports the provider's bad morning as the model getting dumber (see [the field note](docs/a-rate-limit-not-a-regression.md)). So the dashboard **drops a run's accuracy point when its reliability falls below 50%** while the Reliability line keeps it. That exclusion is keyed on *aggregate reliability*, never on "a call failed" — a [deliberate design rule](docs/a-rate-limit-not-a-regression.md#design-note-not-a-blanket-drop-on-failure), because a blanket drop-on-failure would inflate accuracy on exactly the hardest tasks.
+**Wrong is not the same as absent.** A call that never returned an answer — a rate limit, a timeout, an outage — is *absent*, not *wrong*; scoring it `0` reports the provider's bad morning as the model getting dumber (see [the field note](docs/a-rate-limit-not-a-regression.md)). Telling the two apart is the **Reliability** metric's whole job. So the dashboard **drops a run's accuracy point when its reliability falls below 50%** while the Reliability line keeps it. That exclusion is keyed on *aggregate reliability*, never on "a call failed" — a [deliberate design rule](docs/a-rate-limit-not-a-regression.md#design-note-not-a-blanket-drop-on-failure), because a blanket drop-on-failure would inflate accuracy on exactly the hardest tasks.
 
 ## Add a model — no code, just a secret
 
