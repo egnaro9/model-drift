@@ -123,6 +123,23 @@
   footer{margin-top:40px; padding-top:20px; border-top:1px solid var(--line); font-family:var(--mono); font-size:12.5px; color:var(--fg-faint)}
   h2{font-size:20px; margin:0 0 4px}
   code{font-family:var(--mono); font-size:.9em; color:var(--good)}
+  /* ---- field notes ---- */
+  #fieldnotes .note-item{border:1px solid var(--line); border-radius:2px; background:var(--raised); margin-top:12px; padding:0 16px}
+  #fieldnotes summary{cursor:pointer; list-style:none; display:flex; flex-wrap:wrap; align-items:baseline; gap:10px; padding:14px 0; font-family:var(--mono)}
+  #fieldnotes summary::-webkit-details-marker{display:none}
+  #fieldnotes summary::before{content:"▸"; color:var(--amber-ink); font-size:12px; align-self:center}
+  #fieldnotes details[open] summary::before{content:"▾"}
+  #fieldnotes .note-date{font-family:var(--mono); font-size:12.5px; color:var(--fg-faint)}
+  #fieldnotes .note-title{font-weight:600; color:var(--fg); font-size:15px}
+  #fieldnotes .note-stub{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--amber-ink); border:1px solid var(--amber-line); border-radius:2px; padding:2px 6px}
+  #fieldnotes .note-summary{color:var(--fg-dim); margin:0 0 12px; font-size:14.5px}
+  #fieldnotes details p{color:var(--fg-dim); font-size:14.5px; line-height:1.55; margin:0 0 10px; max-width:70ch}
+  #fieldnotes details pre{background:var(--ink); border:1px solid var(--line); border-radius:2px; padding:10px 12px; overflow-x:auto; font-size:12.5px; margin:0 0 12px}
+  #fieldnotes details code{font-family:var(--mono); color:var(--fg)}
+  #fieldnotes .note-actions{display:flex; flex-wrap:wrap; gap:14px; align-items:center; padding:2px 0 14px}
+  #fieldnotes .note-see{cursor:pointer; font-family:var(--mono); font-size:12.5px; color:var(--ink); background:var(--amber-ink); border:1px solid var(--amber-ink); border-radius:2px; padding:6px 12px; font-weight:600}
+  #fieldnotes .note-see:hover{filter:brightness(1.08)}
+  #fieldnotes .note-src{font-family:var(--mono); font-size:12.5px; color:var(--amber-ink)}
 </style>
 </head>
 <body>
@@ -183,6 +200,12 @@
       <th>Model</th><th>Latest accuracy</th><th>Δ vs previous</th><th>Status</th><th>When</th>
     </tr></thead><tbody id="tbody"></tbody></table>
     <div class="empty" id="empty" hidden></div>
+  </div>
+
+  <div class="card" id="fieldnotes">
+    <h2>Field notes</h2>
+    <p class="note">The moments behind the chart — what happened, when, and how to see it in the data. Newest first.</p>
+    <div id="notes"></div>
   </div>
 
   <div class="card">
@@ -472,6 +495,51 @@ document.querySelectorAll("#metricbar .mbtn").forEach(b =>
 // every series.
 kindpick.addEventListener("change", () => { if (kindpick.value) setMetric(kindpick.value); });
 if (ACTIVE.startsWith("kind:")) kindpick.value = ACTIVE;
+
+// ---- field notes: the moments behind the chart ----
+async function fetchNotes() {
+  for (const url of ["./notes.json",
+      "https://raw.githubusercontent.com/egnaro9/model-drift/main/dashboard/notes.json"]) {
+    try { const r = await fetch(url); if (r.ok) return await r.json(); } catch {}
+  }
+  return [];
+}
+function noteEl(n) {
+  const d = document.createElement("details"); d.className = "note-item";
+  const sum = document.createElement("summary");
+  const date = document.createElement("span"); date.className = "note-date"; date.textContent = n.date || "";
+  const title = document.createElement("span"); title.className = "note-title"; title.textContent = n.title || "";
+  sum.append(date, title);
+  if (n.stub) { const b = document.createElement("span"); b.className = "note-stub"; b.textContent = "auto-logged"; sum.append(b); }
+  d.append(sum);
+  if (n.summary) { const s = document.createElement("p"); s.className = "note-summary"; s.textContent = n.summary; d.append(s); }
+  for (const block of (n.body || [])) {
+    if (block.code != null) { const pre = document.createElement("pre"); const c = document.createElement("code"); c.textContent = block.code; pre.append(c); d.append(pre); }
+    else if (block.p != null) { const p = document.createElement("p"); p.textContent = block.p; d.append(p); }
+  }
+  const actions = document.createElement("div"); actions.className = "note-actions";
+  if (n.metric) {
+    const btn = document.createElement("button"); btn.type = "button"; btn.className = "note-see";
+    btn.textContent = "See the data →";
+    btn.addEventListener("click", () => {
+      const mb = document.querySelector('.mbtn[data-metric="' + n.metric + '"]');
+      if (mb) mb.click();
+      document.querySelector(".metricbar")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    actions.append(btn);
+  }
+  if (n.pr) { const a = document.createElement("a"); a.href = n.pr; a.target = "_blank"; a.rel = "noopener"; a.className = "note-src"; a.textContent = "source →"; actions.append(a); }
+  if (actions.childNodes.length) d.append(actions);
+  return d;
+}
+async function renderNotes() {
+  const box = document.getElementById("notes"), card = document.getElementById("fieldnotes");
+  if (!box) return;
+  const notes = await fetchNotes();
+  if (!Array.isArray(notes) || !notes.length) { if (card) card.hidden = true; return; }
+  box.replaceChildren(...notes.map(noteEl));
+}
+renderNotes();
 
 render();  // interactive immediately (empty state), even before data lands
 fetchAll().then(s => { SERIES = s; render(); }).catch(() => {
