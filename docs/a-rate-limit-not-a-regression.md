@@ -25,3 +25,13 @@ The board got the important half right: it already tracks **reliability** (the s
 - Fixed a silent failure: a missing `drift` label under `|| true` meant a real regression opened no alert issue at all.
 
 The hard part of an eval board isn't detecting drift. It's not manufacturing it. The most valuable thing the board did that week was stop a post from going out.
+
+## Design note: not a blanket drop-on-failure
+
+The floor drops a point by **aggregate reliability** — fewer than half of a run's 35 calls returned an answer — never by "a call failed." That distinction is load-bearing, and it's tempting to over-correct it into a general *drop any run with a failure* rule. That would be a subtle bug.
+
+Failures are not missing-at-random. A rate limit (429) is orthogonal to the prompt — the provider's meter doesn't care what you asked — so dropping it is safe. But **timeouts and `max_tokens` truncation correlate with prompt hardness**: the long, difficult prompts are the ones that blow the token budget or run out the clock. Excluding those would quietly nudge accuracy *up* on exactly the tasks that separate a strong model from a weak one — a cleaner-looking score bought by throwing away the hard questions (missing-not-at-random, MNAR).
+
+So if this exclusion is ever narrowed to individual points, or extended below the current reliability floor, it must **split by failure class**: drop only provably content-independent classes (rate limits, 5xx, quota) and keep content-correlated ones (timeouts, truncation, refusals) scored — or in a separate bucket — so hard tasks still count. Today that already holds for the response-level cases: a refusal or a truncated answer returns *text*, scores as a wrong answer, and never touches the reliability floor. Only calls that error out — no answer came back at all — move reliability, and the floor only fires when most of a run is gone.
+
+*(This rule is due to Bartłomiej Nawara's missing-not-at-random critique of the original 429 fix — the reason the fix stops at a reliability floor rather than a general drop-on-failure.)*
