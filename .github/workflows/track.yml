@@ -28,6 +28,21 @@ jobs:
           python-version: "3.12"
       - run: pip install -e .
 
+      # Before spending ~1,700 calls scoring the models, check the providers are
+      # actually serving the models we asked for. A silently-swapped backend
+      # (alias, routing downgrade, wrong deploy) would otherwise be recorded as
+      # the model drifting. Non-blocking: a mismatch is news to surface (the step
+      # goes red), not a reason to discard the day's data — the probe still runs.
+      - name: Verify each provider serves the model it was asked for
+        continue-on-error: true
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: python -m modeldrift.identity
+
       - name: Probe the models that have a key set
         env:
           # Each is optional — the runner skips any model whose key is absent,

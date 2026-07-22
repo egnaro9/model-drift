@@ -20,3 +20,5 @@ jobs:
       - run: pytest -q
       - name: The probe runs end to end on the mock (no keys, no spend)
         run: python -m modeldrift.run | tee /dev/stderr | grep -q "acc 100%"
+      - name: The identity check runs end to end on the mock (no keys, no spend)
+        run: python -m modeldrift.identity | tee /dev/stderr | grep -q "0 mismatch"

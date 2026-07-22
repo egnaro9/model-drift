@@ -146,27 +146,41 @@ def gemini_body(m: Model, prompt: str) -> dict:
     return {"contents": [{"parts": [{"text": prompt}]}], "generationConfig": cfg}
 
 
-def _openai(m: Model, prompt: str) -> str:
+# Each provider is split raw/text: `_x_raw` returns the provider's full JSON
+# response, `_x` extracts just the answer. The split costs nothing on the text
+# path (call() is unchanged) and lets identity.py read response metadata — the
+# served model id — off the same call shape without re-deriving URLs/headers.
+def _openai_raw(m: Model, prompt: str) -> dict:
     base = (m.base_url or "https://api.openai.com/v1").rstrip("/")
     key = os.environ[m.key_env].strip()
-    data = _post(f"{base}/chat/completions",
+    return _post(f"{base}/chat/completions",
                  {"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
                  openai_body(m, prompt))
-    return data["choices"][0]["message"]["content"]
+
+
+def _openai(m: Model, prompt: str) -> str:
+    return _openai_raw(m, prompt)["choices"][0]["message"]["content"]
+
+
+def _anthropic_raw(m: Model, prompt: str) -> dict:
+    key = os.environ[m.key_env].strip()
+    return _post("https://api.anthropic.com/v1/messages",
+                 {"x-api-key": key, "anthropic-version": "2023-06-01", "Content-Type": "application/json"},
+                 anthropic_body(m, prompt))
 
 
 def _anthropic(m: Model, prompt: str) -> str:
+    return "".join(b.get("text", "") for b in _anthropic_raw(m, prompt).get("content", []))
+
+
+def _gemini_raw(m: Model, prompt: str) -> dict:
     key = os.environ[m.key_env].strip()
-    data = _post("https://api.anthropic.com/v1/messages",
-                 {"x-api-key": key, "anthropic-version": "2023-06-01", "Content-Type": "application/json"},
-                 anthropic_body(m, prompt))
-    return "".join(b.get("text", "") for b in data.get("content", []))
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{m.model}:generateContent?key={key}"
+    return _post(url, {"Content-Type": "application/json"}, gemini_body(m, prompt))
 
 
 def _gemini(m: Model, prompt: str) -> str:
-    key = os.environ[m.key_env].strip()
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{m.model}:generateContent?key={key}"
-    data = _post(url, {"Content-Type": "application/json"}, gemini_body(m, prompt))
+    data = _gemini_raw(m, prompt)
     return "".join(p.get("text", "") for p in data["candidates"][0]["content"]["parts"])
 
 
@@ -212,12 +226,31 @@ _PROVIDERS: Dict[str, Callable[[Model, str], str]] = {
     "anthropic": _anthropic, "gemini": _gemini,
 }
 
+_PROVIDERS_RAW: Dict[str, Callable[[Model, str], dict]] = {
+    "openai": _openai_raw, "openai-compatible": _openai_raw,
+    "anthropic": _anthropic_raw, "gemini": _gemini_raw,
+}
+
 
 def call(model: Model, prompt: str, task_id: str = "") -> str:
     """Send one prompt to a model, return its text. Raises ProviderError on failure."""
     if model.provider == "mock":
         return _mock(model, task_id)
     fn = _PROVIDERS.get(model.provider)
+    if fn is None:
+        raise ProviderError(f"unknown provider {model.provider!r}")
+    return fn(model, prompt)
+
+
+def call_raw(model: Model, prompt: str) -> dict:
+    """Like `call`, but returns the provider's full JSON response instead of just
+    the answer text — so a caller can read response metadata such as the served
+    model id. `identity.py` uses this to catch a silently-swapped backend. The
+    mock returns a synthetic response echoing its own id, so the identity check is
+    testable without keys or network, same as the rest of the pipeline."""
+    if model.provider == "mock":
+        return {"model": model.model}
+    fn = _PROVIDERS_RAW.get(model.provider)
     if fn is None:
         raise ProviderError(f"unknown provider {model.provider!r}")
     return fn(model, prompt)
