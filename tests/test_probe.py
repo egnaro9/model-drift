@@ -127,7 +127,7 @@ def _fake_runs(monkeypatch, accs):
                             "citation_rate": a, "flagged_cases": 0.0, "n_cases": float(n)},
                 "cases": [], "_errors": 0, "_first_error": None,
                 "_latency_ms": 100.0, "_out_chars": 5.0,
-                "_reliability": 1.0, "_refusal_rate": 0.0}
+                "_reliability": 1.0, "_truncations": 0, "_refusal_rate": 0.0}
     monkeypatch.setattr(runmod, "probe", fake)
 
 
@@ -174,3 +174,39 @@ def test_runs_1_is_still_a_single_sample(monkeypatch):
     _fake_runs(monkeypatch, [0.42])
     out = probe_repeated(STABLE, runs=1)
     assert out["metrics"]["faithfulness"] == 0.42 and out["_acc_spread"] == 0.0
+
+
+# ── truncation lands on reliability, not accuracy (B. Nawara, th00masml) ──
+
+def test_is_truncation_recognizes_each_providers_cap():
+    from modeldrift.providers import is_truncation
+    assert is_truncation("length")        # OpenAI
+    assert is_truncation("max_tokens")    # Anthropic
+    assert is_truncation("MAX_TOKENS")    # Gemini (upper-case)
+    assert not is_truncation("stop")
+    assert not is_truncation("end_turn")
+    assert not is_truncation(None)
+
+
+def test_truncation_rides_on_reliability_not_accuracy(monkeypatch):
+    """One task comes back truncated: reliability drops by exactly that call, and
+    accuracy is untouched because the cut-off answer is off the accuracy line."""
+    from modeldrift import run as runmod
+    from modeldrift import providers
+
+    victim = "fact-capital"
+
+    def fake_call_meta(model, prompt, task_id=""):
+        if task_id == victim:
+            return "Tok", "length"                       # a cut-off answer
+        return providers.call_meta(model, prompt, task_id=task_id)
+
+    monkeypatch.setattr(runmod, "call_meta", fake_call_meta)
+    r = probe(STABLE)
+    n = int(r["metrics"]["n_cases"])
+
+    assert r["_truncations"] == 1
+    assert r["_reliability"] == round((n - 1) / n, 4)     # truncation pulls reliability
+    assert r["metrics"]["faithfulness"] == 1.0            # accuracy unaffected
+    truncated = [c for c in r["cases"] if "truncated" in c["note"]]
+    assert len(truncated) == 1 and truncated[0]["flagged"] is False

@@ -21,7 +21,9 @@ import urllib.request
 from collections import defaultdict
 from typing import Dict, List, Optional
 
-from .providers import Model, ProviderError, call, list_models, load_registry
+from .providers import (
+    Model, ProviderError, call_meta, is_truncation, list_models, load_registry,
+)
 from .suite import SUITE, SUITE_VERSION, suite_hash
 
 # Every prompt in the suite is benign, so a response that reads like a refusal is
@@ -52,33 +54,49 @@ def probe(model: Model) -> dict:
     benign prompts declined). All four are byproducts of calls already being
     made, so they cost nothing extra.
     """
-    cases, errors, first_error = [], 0, None
+    cases, errors, first_error, truncations = [], 0, None, 0
     latencies, out_lens, refusals = [], [], 0   # over successful calls only
+    graded_pass, graded_total = 0, 0            # accuracy is over non-truncated calls
     for t in SUITE:
+        truncated = False
         try:
             t0 = time.perf_counter()
-            out = call(model, t.prompt, task_id=t.id)
+            out, finish = call_meta(model, t.prompt, task_id=t.id)
             latencies.append((time.perf_counter() - t0) * 1000.0)  # ms
             out_lens.append(len(out))
             if is_refusal(out):
                 refusals += 1
-            passed = bool(t.grade(out))
-            note = t.kind
+            truncated = is_truncation(finish)
+            if truncated:
+                # A cut-off answer is a delivery failure, not a wrong one, so it
+                # rides on reliability, not accuracy — off the accuracy line
+                # entirely, not scored as a miss. The read that finish_reason
+                # belongs on the reliability line is Bartłomiej Nawara's (th00masml).
+                truncations += 1
+                passed, note = None, f"{t.kind} · truncated (finish_reason={finish})"
+            else:
+                passed = bool(t.grade(out))
+                note = t.kind
         except ProviderError as e:
             out, passed, note = "", False, f"{t.kind} · provider error: {str(e)[:220]}"
             errors += 1
             first_error = first_error or str(e)
+        if not truncated:
+            graded_total += 1
+            graded_pass += 1 if passed else 0
         cases.append({
             "q": f"[{t.id}] {t.prompt}",
             "answer": out[:500],
             "scores": {"faithfulness": 1.0 if passed else 0.0,
                        "precision@k": 1.0 if passed else 0.0,
                        "recall@k": 1.0 if passed else 0.0, "citation": 1.0 if passed else 0.0},
-            "flagged": not passed,
+            "flagged": passed is False,   # a truncated call (None) is not an accuracy fail
             "note": note,
         })
     n = len(cases)
-    acc = sum(1 for c in cases if not c["flagged"]) / n if n else 0.0
+    # accuracy is measured over graded (non-truncated) calls only; truncation
+    # pulls on reliability instead.
+    acc = graded_pass / graded_total if graded_total else 0.0
     return {
         "run": model.id,                       # the series name in eval-history
         "git_sha": suite_hash(),               # which frozen suite produced this
@@ -93,10 +111,12 @@ def probe(model: Model) -> dict:
         "_first_error": first_error,  # full text of the first failure, for diagnosis
         "_latency_ms": round(statistics.median(latencies), 1) if latencies else None,
         "_out_chars": round(statistics.mean(out_lens), 1) if out_lens else None,
-        # reliability = fraction of the suite's calls that succeeded (transient
-        # errors / rate limits pull it below 1); refusal_rate = fraction of the
+        # reliability = fraction of the suite's calls that both succeeded and
+        # finished cleanly; transient errors / rate limits AND truncations
+        # (finish_reason=length) pull it below 1. refusal_rate = fraction of the
         # responses that read like an over-refusal.
-        "_reliability": round((len(SUITE) - errors) / len(SUITE), 4),
+        "_reliability": round((len(SUITE) - errors - truncations) / len(SUITE), 4),
+        "_truncations": truncations,
         "_refusal_rate": round(refusals / len(latencies), 4) if latencies else None,
     }
 
@@ -141,6 +161,7 @@ def probe_repeated(model: Model, runs: int = 3) -> dict:
     out["_latency_ms"] = med("_latency_ms")
     out["_out_chars"] = med("_out_chars")
     out["_reliability"] = med("_reliability")
+    out["_truncations"] = med("_truncations")
     out["_refusal_rate"] = med("_refusal_rate")
     out["_runs"] = len(usable)
     out["_acc_spread"] = round(max(accs) - min(accs), 4)

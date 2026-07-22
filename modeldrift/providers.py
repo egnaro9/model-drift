@@ -256,6 +256,53 @@ def call_raw(model: Model, prompt: str) -> dict:
     return fn(model, prompt)
 
 
+# A response that stopped because it hit the token cap, rather than finishing the
+# thought: OpenAI "length", Anthropic "max_tokens", Gemini "MAX_TOKENS". A cut-off
+# answer is a delivery failure, so it belongs on reliability, not accuracy.
+_TRUNCATION_REASONS = {"length", "max_tokens", "max_output_tokens"}
+
+
+def is_truncation(finish_reason: Optional[str]) -> bool:
+    return bool(finish_reason) and finish_reason.strip().lower() in _TRUNCATION_REASONS
+
+
+def _text_from_raw(provider: str, raw: dict) -> str:
+    if provider in ("openai", "openai-compatible"):
+        return raw["choices"][0]["message"]["content"]
+    if provider == "anthropic":
+        return "".join(b.get("text", "") for b in raw.get("content", []))
+    if provider == "gemini":
+        return "".join(p.get("text", "") for p in raw["candidates"][0]["content"]["parts"])
+    raise ProviderError(f"unknown provider {provider!r}")
+
+
+def _finish_from_raw(provider: str, raw: dict) -> Optional[str]:
+    if provider in ("openai", "openai-compatible"):
+        return (raw.get("choices") or [{}])[0].get("finish_reason")
+    if provider == "anthropic":
+        return raw.get("stop_reason")
+    if provider == "gemini":
+        return (raw.get("candidates") or [{}])[0].get("finishReason")
+    return None
+
+
+def call_meta(model: Model, prompt: str, task_id: str = "") -> "tuple[str, Optional[str]]":
+    """Like `call`, but also returns the provider's finish_reason — so the runner
+    can fold a truncated answer into reliability instead of scoring a cut-off
+    reply as wrong. The mock never truncates, so it returns None.
+
+    Fetches the raw response once and extracts both text and finish_reason from
+    it; `call()` (the text-only path) is left untouched.
+    """
+    if model.provider == "mock":
+        return _mock(model, task_id), None
+    raw_fn = _PROVIDERS_RAW.get(model.provider)
+    if raw_fn is None:
+        raise ProviderError(f"unknown provider {model.provider!r}")
+    raw = raw_fn(model, prompt)
+    return _text_from_raw(model.provider, raw), _finish_from_raw(model.provider, raw)
+
+
 def _get(url: str, headers: Dict[str, str]) -> dict:
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, **headers}, method="GET")
     try:
