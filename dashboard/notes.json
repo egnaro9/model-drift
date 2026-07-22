@@ -1,5 +1,21 @@
 [
   {
+    "date": "2026-07-22",
+    "title": "Regression: Llama 3.3 70B -2.9 pts",
+    "metric": "accuracy",
+    "models": [
+      "anthropic:claude-sonnet-5",
+      "meta:llama-3.3-70b"
+    ],
+    "summary": "2 model(s) regressed week-over-week; worst was Llama 3.3 70B at -2.9 pts. Auto-logged — confirm it's real before writing it up.",
+    "body": [
+      {
+        "p": "Auto-logged when the scheduled probe flagged a week-over-week regression. Before this becomes a post, check the run log and the Reliability metric — a rate limit or provider outage can look exactly like a regression. If it holds up, the written explanation goes here."
+      }
+    ],
+    "stub": true
+  },
+  {
     "date": "2026-07-21",
     "title": "Regression: Grok 4.3 -5.7 pts",
     "metric": "accuracy",
