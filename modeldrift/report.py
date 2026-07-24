@@ -4,8 +4,13 @@ when something actually moved.
 The discipline here is the same one the tracker is about: signal, not noise. Every
 run updates `RESULTS.md` (the standings, committed to the repo). But an alert — a
 GitHub issue, a ready-to-post writeup — is produced *only when a model regressed
-week-over-week*. A weekly "nothing changed" post is spam; the post worth making is
-"Claude dropped 8 points this week", and this writes exactly that, only then.
+against its previous run*. A daily "nothing changed" post is spam; the post worth
+making is "Claude dropped 8 points", and this writes exactly that, only then.
+
+Note the resolution limit this implies: the suite is 35 tasks, so one task is
+2.86 points and nothing smaller than that is measurable. A "-2.9 pt regression"
+is one question changing answer — which is why every stub says to confirm before
+writing it up.
 
 Reads eval-history (no key needed). The per-model verdict is eval-history's own
 `latest-comparison` — this doesn't recompute regressions, it asks the store that
@@ -86,7 +91,7 @@ def alert_issue(regs: List[ModelStatus]) -> tuple[str, str]:
     """(title, body) for a GitHub issue — the automatic 'go look' trigger."""
     worst = min(regs, key=lambda s: s.delta)
     title = f"Drift: {len(regs)} model(s) regressed — {worst.label} {worst.delta*100:+.1f} pts"
-    body = ["A scheduled probe found a week-over-week regression:\n"]
+    body = ["A scheduled probe found a regression against the previous run:\n"]
     for s in regs:
         body.append(f"- **{s.label}**: {s.delta*100:+.1f} pts → now {s.latest*100:.1f}%")
     body.append("\nChart: https://egnaro9.github.io/model-drift/ · A draft writeup is attached to the "
@@ -128,10 +133,10 @@ def append_stub_note(path: str, regs: List[ModelStatus], today: str) -> bool:
         "title": f"Regression: {worst.label} {worst.delta * 100:+.1f} pts",
         "metric": "accuracy",
         "models": [s.id for s in regs],
-        "summary": (f"{len(regs)} model(s) regressed week-over-week; worst was "
+        "summary": (f"{len(regs)} model(s) regressed against the previous run; worst was "
                     f"{worst.label} at {worst.delta * 100:+.1f} pts. Auto-logged — "
                     "confirm it's real before writing it up."),
-        "body": [{"p": "Auto-logged when the scheduled probe flagged a week-over-week "
+        "body": [{"p": "Auto-logged when the scheduled probe flagged a run-over-run "
                        "regression. Before this becomes a post, check the run log and the "
                        "Reliability metric — a rate limit or provider outage can look exactly "
                        "like a regression. If it holds up, the written explanation goes here."}],

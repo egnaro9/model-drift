@@ -1,20 +1,45 @@
 [
   {
     "date": "2026-07-24",
-    "title": "Regression: Gemini 3.1 Pro -2.9 pts",
+    "title": "Four regression alerts, zero regressions",
     "metric": "accuracy",
     "models": [
-      "anthropic:claude-sonnet-5",
+      "google:gemini-3.5-flash",
       "google:gemini-3.1-pro",
-      "xai:grok-4-fast"
+      "meta:llama-3.3-70b",
+      "xai:grok-4.3"
     ],
-    "summary": "3 model(s) regressed week-over-week; worst was Gemini 3.1 Pro at -2.9 pts. Auto-logged — confirm it's real before writing it up.",
+    "summary": "The board flagged four regressions in four days — Gemini 3.5 Flash -11.4, Grok 4.3 -5.7, Llama 3.3 70B -2.9, Gemini 3.1 Pro -2.9. None of them was a model getting worse. Two were failed calls; two were a single question.",
     "body": [
       {
-        "p": "Auto-logged when the scheduled probe flagged a week-over-week regression. Before this becomes a post, check the run log and the Reliability metric — a rate limit or provider outage can look exactly like a regression. If it holds up, the written explanation goes here."
+        "p": "Between 21 and 24 July the scheduled probe opened four regression alerts. Every one of them was auto-logged with the same warning — confirm it's real before writing it up. Here is what confirming looked like, and why none of the four became a post."
+      },
+      {
+        "p": "Start with the two big ones. Both are Google, and both come with a reliability drop in the same run:"
+      },
+      {
+        "code": "gemini-3.5-flash  22 Jul  acc 1.000  reliability 1.000\n                  23 Jul  acc 0.886  reliability 0.914   <- -11.4 pts\n\ngemini-3.1-pro    22 Jul  acc 0.914  reliability 0.943\n                  23 Jul  acc 0.886  reliability 0.914   <- -2.9 pts\n                  24 Jul  acc 0.971  reliability 1.000   <- rebounds"
+      },
+      {
+        "p": "Reliability is the share of calls that came back at all. When it falls with accuracy, the probe failed, not the model — a call that never returned is scored as a wrong answer, which is exactly the failure mode this board documented on 20 July when Groq's rate limit took Llama to 3%. Gemini 3.1 Pro settles it: the next clean run came back at 97.1%, higher than before the 'regression'. Nothing regressed; some calls didn't land."
+      },
+      {
+        "p": "The other two are cleaner and more interesting, because reliability stayed at 1.000 the whole time — those numbers are real:"
+      },
+      {
+        "code": "grok-4.3        0.800 -> 0.743   = -5.7 pts\nllama-3.3-70b   0.800 -> 0.771   = -2.9 pts"
+      },
+      {
+        "p": "The suite is 35 frozen tasks. One task is 100/35 = 2.86 points. So -2.9 points is one question changing its answer, and -5.7 is two. Those aren't regressions; they're the smallest movement the instrument can register. A 35-task suite cannot resolve anything finer than about three points, and reporting a one-question flip as a model regression would be reading noise as signal."
+      },
+      {
+        "p": "So: four alerts, four days, zero posts. Two artifacts and two single-question flips. The alerting is doing its job — it is supposed to be sensitive, and a tracker that only fires on catastrophes misses real drift. But sensitivity is only useful if something downstream is willing to say no, which is why the stub the probe writes tells its own author to go check the run log and the reliability metric first."
+      },
+      {
+        "p": "The uncomfortable version: the most common output of a drift tracker is a false positive. Publishing 'Gemini regressed 11 points' would have been fast, legible, and wrong — about a named company's model, in public. The measurement that matters most here isn't any model's accuracy. It's the share of my own alerts that survive checking, and this week that share was zero."
       }
     ],
-    "stub": true
+    "pr": "https://github.com/egnaro9/model-drift"
   },
   {
     "date": "2026-07-23",
