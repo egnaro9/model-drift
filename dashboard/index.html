@@ -58,6 +58,10 @@
   .axis{stroke:var(--line); stroke-width:1}
   .gl{stroke:var(--line-2); stroke-width:1}
   .tick{font-family:var(--mono); font-size:10px; fill:var(--fg-faint)}
+  /* label sitting on an overlapping series — brighter than an axis tick, and
+     given a halo so it stays legible where it crosses the line it describes */
+  .tick.overlay{fill:var(--fg-dim); font-size:11px;
+    paint-order:stroke; stroke:var(--panel); stroke-width:3px; stroke-linejoin:round}
   .series{fill:none; stroke-width:2}
   .dot{stroke:var(--panel); stroke-width:1.5}
 
@@ -402,6 +406,18 @@ function render() {
           : `${lastVals.length} models, only ${distinct.size} distinct values — most lines overlap exactly`}`
     : "";
 
+  // The same fact, positioned on the chart: which values have several models
+  // stacked on them. Only worth annotating when a value carries a real crowd
+  // (>2), so a normal chart with a couple of coincidences stays unlabelled.
+  const byValue = new Map();
+  for (const v of lastVals){
+    const k = Math.round(v * 1e6) / 1e6;
+    byValue.set(k, (byValue.get(k) || 0) + 1);
+  }
+  const overlapGroups = [...byValue.entries()]
+    .filter(([, n]) => n > 2)
+    .map(([v, n]) => ({ v, n }));
+
   updated.textContent = !anyData
     ? (ACTIVE === "accuracy" ? "No runs recorded yet — the first scheduled probe will populate this."
                              : "No speed/verbosity data yet — it starts filling on the next scheduled run.")
@@ -436,6 +452,18 @@ function render() {
       const pp = pts(s);
       svg += `<polyline class="series" points="${pp.map(r=>`${px(r.t)},${py(r.v)}`).join(" ")}" stroke="${s.color}"/>`;
       svg += pp.map(r=>`<circle class="dot" cx="${px(r.t)}" cy="${py(r.v)}" r="3" fill="${s.color}"/>`).join("");
+    }
+
+    // When every visible model sits on the same value, the chart is N lines
+    // stacked into what looks like one — and a caption above the chart doesn't
+    // help someone staring at the chart. Label the line itself, where the eye
+    // already is, so "where are the other 15 models?" answers itself.
+    if (overlapGroups.length){
+      for (const grp of overlapGroups){
+        const y = py(grp.v);
+        svg += `<text class="tick overlay" x="${W-m.r-6}" y="${y - 9}" text-anchor="end">`
+             + `${grp.n} models, all at ${cfg.tick(grp.v)} — lines overlap</text>`;
+      }
     }
     chart.innerHTML = svg;
   }
