@@ -388,11 +388,25 @@ function render() {
   const empty = document.getElementById("empty");
 
   const allPts = SERIES.flatMap(s => pts(s));
+
+  // On reliability and refusals nearly every model lands on the same value, so
+  // all N lines are drawn on top of each other and the chart reads as one line
+  // — or as a bug. It isn't: "they are all identical" is the finding. Say so,
+  // rather than jittering the data to make agreement look like spread.
+  const lastVals = visWithData.map(s => { const p = pts(s); return p[p.length - 1].v; })
+                              .filter(v => v != null);
+  const distinct = new Set(lastVals.map(v => Math.round(v * 1e6) / 1e6));
+  const overlapNote = (lastVals.length > 2 && distinct.size <= 2)
+    ? ` · ${distinct.size === 1
+          ? `every one of these ${lastVals.length} models is identical here — the lines overlap exactly`
+          : `${lastVals.length} models, only ${distinct.size} distinct values — most lines overlap exactly`}`
+    : "";
+
   updated.textContent = !anyData
     ? (ACTIVE === "accuracy" ? "No runs recorded yet — the first scheduled probe will populate this."
                              : "No speed/verbosity data yet — it starts filling on the next scheduled run.")
     : `Last updated ${new Date(Math.max(...allPts.map(r => +r.t))).toLocaleString()} · `
-      + `showing ${vis.length} of ${MODELS.length} models · ${cfg.label}`;
+      + `showing ${vis.length} of ${MODELS.length} models · ${cfg.label}${overlapNote}`;
 
   if (!shown.length) {
     chart.innerHTML = `<text x="430" y="170" text-anchor="middle" class="tick">`
