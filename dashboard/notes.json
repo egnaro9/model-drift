@@ -1,5 +1,22 @@
 [
   {
+    "date": "2026-07-24",
+    "title": "Regression: Gemini 3.1 Pro -2.9 pts",
+    "metric": "accuracy",
+    "models": [
+      "anthropic:claude-sonnet-5",
+      "google:gemini-3.1-pro",
+      "xai:grok-4-fast"
+    ],
+    "summary": "3 model(s) regressed week-over-week; worst was Gemini 3.1 Pro at -2.9 pts. Auto-logged — confirm it's real before writing it up.",
+    "body": [
+      {
+        "p": "Auto-logged when the scheduled probe flagged a week-over-week regression. Before this becomes a post, check the run log and the Reliability metric — a rate limit or provider outage can look exactly like a regression. If it holds up, the written explanation goes here."
+      }
+    ],
+    "stub": true
+  },
+  {
     "date": "2026-07-23",
     "title": "Regression: Gemini 3.5 Flash -11.4 pts",
     "metric": "accuracy",
