@@ -146,5 +146,9 @@ pip install -e ".[dev]" && pytest -q     # 135 tests, stdlib only
 
 - [The drift that was a rate limit](docs/a-rate-limit-not-a-regression.md) — a Llama model "dropped" 66 points overnight. It was Groq's 30 RPM cap, not the model. How I caught it and hardened the probe so a rate limit can't read as a regression.
 
+## Acknowledgments
+
+- **Bartłomiej Nawara, PhD** ([th00masml](https://github.com/th00masml)) — for the missing-not-at-random critique of the 429 handling that shaped the reliability-floor design: a cut-off reply and a wrong reply fail differently and shouldn't share a metric.
+
 ---
 MIT · by [Erik Hill](https://egnaro9.github.io)
