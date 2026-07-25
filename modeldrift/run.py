@@ -85,6 +85,7 @@ def probe(model: Model) -> dict:
             graded_total += 1
             graded_pass += 1 if passed else 0
         cases.append({
+            "id": t.id,                   # kept so a flip can be traced to a task
             "q": f"[{t.id}] {t.prompt}",
             "answer": out[:500],
             "scores": {"faithfulness": 1.0 if passed else 0.0,
@@ -117,6 +118,12 @@ def probe(model: Model) -> dict:
         # responses that read like an over-refusal.
         "_reliability": round((len(SUITE) - errors - truncations) / len(SUITE), 4),
         "_truncations": truncations,
+        # WHICH tasks failed, not just how many. One task flipping is noise; the
+        # same task flipping across runs is signal; the same task flipping across
+        # several providers on one day indicts the probe, not the models. None of
+        # that is answerable from an aggregate, and the identity was being thrown
+        # away here. Read of this is ANP2 Network's.
+        "_fails": sorted(c["id"] for c in cases if c["flagged"]),
         "_refusal_rate": round(refusals / len(latencies), 4) if latencies else None,
     }
 
@@ -224,7 +231,9 @@ def update_metrics_file(path: str, results: List[dict], stamp: str, cap: int = 1
                     # how many samples the median came from, and how far apart
                     # they were - so a reader can see the noise, not just the
                     # number that survived it
-                    "runs": r.get("_runs", 1), "acc_spread": r.get("_acc_spread", 0.0)})
+                    "runs": r.get("_runs", 1), "acc_spread": r.get("_acc_spread", 0.0),
+                    # the identity of what failed, so flips are computable later
+                    "fails": r.get("_fails", [])})
         del pts[:-cap]                    # keep the series bounded
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps({"updated": stamp, "series": series}, indent=1), encoding="utf-8")
@@ -317,6 +326,20 @@ def main(argv: Optional[List[str]] = None) -> int:
         print(f"wrote {blurb['claims_fired']} generated claim(s) to {args.narrative}")
     except Exception as e:                     # noqa: BLE001 - never fail the probe
         print(f"    (narrative not written: {e})")
+
+    # Per-task flip read. An aggregate delta cannot separate noise from signal
+    # from a broken probe; this can, because every run now records WHICH tasks
+    # failed. Printed, never fatal — diagnosis must not be able to redden a run.
+    try:
+        from .flips import analyze, summarize
+        report = analyze(json.loads(Path(args.metrics).read_text(encoding="utf-8"))["series"])
+        print("\n--- per-task flips ---")
+        print(summarize(report))
+        if report["probe_alarms"]:
+            print("    ^ a task failing across providers at once accuses the harness, "
+                  "not the models — check the prompt and grader before writing anything up.")
+    except Exception as e:                     # noqa: BLE001
+        print(f"    (flip analysis skipped: {e})")
 
     if args.out:
         with open(args.out, "w", encoding="utf-8") as fh:

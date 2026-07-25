@@ -102,7 +102,11 @@ def test_metrics_file_accumulates_and_skips_total_failures(tmp_path):
     d = json.loads(f.read_text())
     point = d["series"]["mock:stable"][0]
     assert set(point) == {"t", "acc", "latency_ms", "out_chars", "reliability",
-                          "refusal_rate", "by_kind", "runs", "acc_spread"}
+                          "refusal_rate", "by_kind", "runs", "acc_spread",
+                          # which tasks failed — identity kept so flips are
+                          # computable across runs and across providers
+                          "fails"}
+    assert isinstance(point["fails"], list)
     # by_kind is the per-capability breakdown — the aggregate hides which kind of
     # thing moved, which is the useful half of a drift signal.
     assert point["by_kind"]["formatting"] == 1.0
