@@ -222,7 +222,9 @@
 
   <div class="card">
     <h2>How it works</h2>
-    <p class="note">A fixed suite of <strong>22 unambiguous tasks</strong> (instruction-following,
+    <!-- Task count must match len(SUITE) in modeldrift/suite.py (35 as of 2026-07-v3).
+         It is not derived from metrics.json, so it can rot — check it when the suite grows. -->
+    <p class="note">A fixed suite of <strong>35 unambiguous tasks</strong> (instruction-following,
       factual recall, arithmetic, multi-step reasoning, counting, string manipulation, formatting,
       refusal calibration) runs against each model — deterministic where the model allows it. Some
       tasks are deliberately chosen failure modes for strong models (letter-counting, numeric vs.
