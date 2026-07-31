@@ -7,10 +7,13 @@ GitHub issue, a ready-to-post writeup — is produced *only when a model regress
 against its previous run*. A daily "nothing changed" post is spam; the post worth
 making is "Claude dropped 8 points", and this writes exactly that, only then.
 
-Note the resolution limit this implies: the suite is 35 tasks, so one task is
-2.86 points and nothing smaller than that is measurable. A "-2.9 pt regression"
-is one question changing answer — which is why every stub says to confirm before
-writing it up.
+Note the resolution limit this implies. Accuracy is graded_pass/graded_total and a
+truncated call leaves the *denominator* rather than counting as wrong, so the smallest
+measurable movement is 100/graded_total — about 2.9 points when all 35 tasks grade, and
+coarser when they do not. It is not a constant, which is the trap: the board once showed
+a model at -1.0 pts, and one point is not even a whole question. That delta was the
+denominator moving, not the model. `min_detectable_change` computes the floor per run and
+`results_md` prints it beside the delta, flagging any movement that falls beneath it.
 
 Reads eval-history (no key needed). The per-model verdict is eval-history's own
 `latest-comparison` — this doesn't recompute regressions, it asks the store that
@@ -36,6 +39,7 @@ class ModelStatus:
     delta: Optional[float]       # vs previous run
     verdict: str                 # regressed | improved | unchanged | baseline | no-data
     when: Optional[str]
+    graded: Optional[int] = None  # calls actually graded in the latest run; sets the floor
 
 
 def _get(url: str):
@@ -46,19 +50,36 @@ def _get(url: str):
         return None
 
 
+def min_detectable_change(graded: Optional[int]) -> Optional[float]:
+    """Smallest movement this run could possibly show, in points.
+
+    Accuracy is graded_pass/graded_total, and a truncated call leaves the denominator
+    rather than counting as wrong (see run.probe). So the floor is 100/graded_total, and
+    it is *not* a constant: a run that grades 33 of 35 has a coarser floor than one that
+    grades all 35. Any delta smaller than this is the denominator moving, not the model.
+
+    Returns None when the run predates graded_total being emitted.
+    """
+    if not graded:
+        return None
+    return 100.0 / graded
+
+
 def status_for(api: str, model) -> ModelStatus:
     from urllib.parse import quote
     runs = _get(f"{api.rstrip('/')}/runs?name={quote(model.id)}&limit=2") or []
     if not runs:
-        return ModelStatus(model.id, model.label, None, None, "no-data", None)
+        return ModelStatus(model.id, model.label, None, None, "no-data", None, None)
     latest = runs[0]
     acc = latest["faithfulness"]
     when = (latest.get("created_at") or "")[:10]
+    graded = latest.get("graded_total")
+    graded = int(graded) if graded else None
     if len(runs) < 2:
-        return ModelStatus(model.id, model.label, acc, None, "baseline", when)
+        return ModelStatus(model.id, model.label, acc, None, "baseline", when, graded)
     delta = round(acc - runs[1]["faithfulness"], 4)
     verdict = "regressed" if delta < -1e-9 else "improved" if delta > 1e-9 else "unchanged"
-    return ModelStatus(model.id, model.label, acc, delta, verdict, when)
+    return ModelStatus(model.id, model.label, acc, delta, verdict, when, graded)
 
 
 def gather(api: str, registry: Optional[str] = None) -> List[ModelStatus]:
@@ -70,15 +91,32 @@ def results_md(statuses: List[ModelStatus]) -> str:
     rows = []
     for s in statuses:
         if s.latest is None:
-            rows.append(f"| {s.label} | — | — | ⚫ no runs yet |")
+            rows.append(f"| {s.label} | — | — | — | ⚫ no runs yet |")
             continue
         d = "—" if s.delta is None else f"{s.delta*100:+.1f} pts"
-        rows.append(f"| {s.label} | {s.latest*100:.1f}% | {d} | {icon[s.verdict]} {s.verdict} |")
+        floor = min_detectable_change(s.graded)
+        # Print the floor beside the delta so a movement smaller than one question cannot
+        # be read as a result. Flag it explicitly when the delta is under the floor — that
+        # is the denominator moving, not the model.
+        if floor is None:
+            f_txt = "—"
+        elif s.delta is not None and 1e-9 < abs(s.delta * 100) < floor:
+            f_txt = f"±{floor:.1f} ⚠ below floor"
+        else:
+            f_txt = f"±{floor:.1f}"
+        rows.append(
+            f"| {s.label} | {s.latest*100:.1f}% | {d} | {f_txt} | {icon[s.verdict]} {s.verdict} |"
+        )
     return (
         f"# Latest standings — suite `{SUITE_VERSION}`\n\n"
         "_Auto-generated after each scheduled probe. Live chart: "
         "[egnaro9.github.io/model-drift](https://egnaro9.github.io/model-drift/)._\n\n"
-        "| Model | Accuracy | Δ vs previous | Status |\n| --- | --- | --- | --- |\n"
+        "**Min detectable** is the smallest movement a run could show: `100 / graded calls`. "
+        "Accuracy is scored over graded calls only — a truncated call leaves the denominator "
+        "rather than counting as wrong — so the floor is not a constant, and a delta beneath "
+        "it is the denominator moving, not the model.\n\n"
+        "| Model | Accuracy | Δ vs previous | Min detectable | Status |\n"
+        "| --- | --- | --- | --- | --- |\n"
         + "\n".join(rows) + "\n"
     )
 

@@ -106,6 +106,12 @@ def probe(model: Model) -> dict:
             "faithfulness": round(acc, 4), "precision@k": round(acc, 4),
             "recall@k": round(acc, 4), "citation_rate": round(acc, 4),
             "flagged_cases": float(sum(1 for c in cases if c["flagged"])), "n_cases": float(n),
+            # How many calls were actually graded. accuracy is graded_pass/graded_total,
+            # so this is the denominator — and it is NOT constant: a truncated call leaves
+            # it. That makes the smallest detectable change 100/graded_total rather than a
+            # fixed 100/len(SUITE), which is why it has to travel with the score instead of
+            # being assumed downstream. See report.min_detectable_change.
+            "graded_total": float(graded_total),
         },
         "cases": cases,
         "_errors": errors,          # stripped before POST; used for the console summary

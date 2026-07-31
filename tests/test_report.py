@@ -7,8 +7,9 @@ model and number.
 """
 import json
 
-from modeldrift.report import (ModelStatus, alert_issue, append_stub_note, regressions,
-                               results_md, social_draft)
+from modeldrift.report import (ModelStatus, alert_issue, append_stub_note,
+                               min_detectable_change, regressions, results_md,
+                               social_draft)
 
 
 def S(label, latest, delta, verdict, when="2026-07-20"):
@@ -80,3 +81,43 @@ def test_stub_note_prepends_and_keeps_hand_written_notes(tmp_path):
     assert len(notes) == 2
     assert notes[0]["date"] == "2026-07-20"       # newest first
     assert notes[1]["title"] == "hand-written"    # existing note preserved
+
+
+# ── minimum detectable change ───────────────────────────────────────────────
+# Accuracy is graded_pass/graded_total and a truncated call leaves the denominator,
+# so the floor is 100/graded_total and moves run to run. The board once showed a model
+# at -1.0 pts on 33 graded calls — less than one question, i.e. the denominator moving.
+
+def test_min_detectable_change_scales_with_graded_count():
+    assert round(min_detectable_change(35), 3) == 2.857
+    assert round(min_detectable_change(33), 3) == 3.030
+    # coarser when fewer calls grade — the whole reason it is not hardcoded
+    assert min_detectable_change(33) > min_detectable_change(35)
+
+
+def test_min_detectable_change_is_none_without_a_graded_count():
+    assert min_detectable_change(None) is None
+    assert min_detectable_change(0) is None
+
+
+def test_results_md_flags_a_delta_beneath_the_floor():
+    below = ModelStatus("s", "Claude Sonnet 5", 0.8182, -0.010, "regressed",
+                        "2026-07-31", 33)
+    md = results_md([below])
+    assert "below floor" in md, "a sub-question delta must be marked, not printed bare"
+    assert "±3.0" in md
+
+
+def test_results_md_does_not_flag_a_delta_above_the_floor():
+    above = ModelStatus("g", "Gemini 3.1 Pro", 0.886, -0.029, "regressed",
+                        "2026-07-31", 35)
+    md = results_md([above])
+    assert "below floor" not in md
+    assert "±2.9" in md
+
+
+def test_results_md_tolerates_runs_predating_graded_total():
+    old = ModelStatus("o", "Old Run", 0.90, -0.029, "regressed", "2026-07-20", None)
+    md = results_md([old])
+    assert "below floor" not in md
+    assert "Old Run" in md
