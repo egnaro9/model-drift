@@ -2,6 +2,14 @@ name: pages
 on:
   push:
     branches: [main]
+  # The daily tracker commits with [skip ci] so it cannot retrigger itself, but that
+  # also suppresses this deploy — so fresh standings landed on main and were never
+  # published. Between 2026-07-28 and 2026-07-31 the repo updated daily while the live
+  # board served three-day-old numbers under copy that says "updated daily".
+  # workflow_run fires after track completes regardless of [skip ci] on its commit.
+  workflow_run:
+    workflows: [track]
+    types: [completed]
   workflow_dispatch:
 permissions:
   contents: read
@@ -17,7 +25,12 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # Pin to main. On a workflow_run event the default ref is the SHA that *started*
+      # `track` — i.e. main before the standings commit — so an unpinned checkout would
+      # publish the previous day's numbers and look like the bug was still there.
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
