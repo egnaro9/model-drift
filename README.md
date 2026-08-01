@@ -24,6 +24,10 @@ The last four are byproducts of calls already made (near-zero extra cost) and li
 frozen suite ──►  live model APIs  ──►  deterministic grader  ──►  eval-history  ──►  chart + "▼ regressed"
 ```
 
+<img src="docs/demo.gif" alt="Flip analysis separating harness failures from model regressions" width="100%">
+
+*A task that flips on one model on one day is inside the instrument's resolution. The same task flipping on five providers on one day is the harness, not five simultaneous regressions — read straight from the committed board history: `python3 -m demos.flips`. [Play it as a terminal session](https://asciinema.org/a/ifpxSjMJXaXF0U1V) — the text is selectable.*
+
 ## Why it's trustworthy
 
 - **The grader is not a model.** Every one of the 35 tasks is graded mechanically — exact match, substring, regex, or a numeric compare. If the judge were an LLM you couldn't tell a real regression from the judge having a bad day; here a score change means the *model* moved. ([`suite.py`](modeldrift/suite.py))
