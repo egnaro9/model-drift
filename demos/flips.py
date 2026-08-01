@@ -10,7 +10,7 @@ import json
 import re
 import textwrap
 
-from demos._ansi import amber, dim, faint, fg, red, teal, violet
+from demos._ansi import dim, fail, ident, muted, ok, text, warn
 from modeldrift.flips import analyze, summarize
 
 series = json.load(open("dashboard/metrics.json"))["series"]
@@ -19,21 +19,22 @@ for raw in summarize(analyze(series)).splitlines():
     indent = re.match(r"\s*", raw).group()
     body = raw.strip()
 
+    # Colour by what the reader should do about the line, not by its shape.
     if body.startswith("PROBE ALARM"):
-        colour = lambda s: red(s, bold=True)  # noqa: E731
-    elif body.startswith(("15 ", "14 ")) or re.match(r"^\d+ (task|single)", body):
-        colour = fg
+        paint = lambda s: fail(s, bold=True)  # noqa: E731 — stop and check the harness
+    elif re.match(r"^\d+ (task|single)", body):
+        paint = text  # section headings
     elif "recovered" in body:
-        colour = teal
+        paint = ok
     elif "broke" in body:
-        colour = amber
+        paint = warn
     elif re.match(r"^\d{4}-\d{2}-\d{2}", body):
-        colour = violet
+        paint = ident
     else:
-        colour = faint
+        paint = dim
 
     for i, line in enumerate(textwrap.wrap(body, width=80 - len(indent)) or [""]):
-        print(indent + ("  " if i else "") + colour(line))
+        print(indent + ("  " if i else "") + paint(line))
 
 print()
-print(dim("  ") + faint("read-only · dashboard/metrics.json · no API calls"))
+print("  " + muted("read-only · dashboard/metrics.json · no API calls"))
