@@ -242,7 +242,21 @@ def update_metrics_file(path: str, results: List[dict], stamp: str, cap: int = 1
                     "fails": r.get("_fails", [])})
         del pts[:-cap]                    # keep the series bounded
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps({"updated": stamp, "series": series}, indent=1), encoding="utf-8")
+    # suite_size travels with the data so the dashboard can state it instead of
+    # hardcoding it. It had already rotted once — the page said 22 while len(SUITE)
+    # was 35, so the public copy contradicted the numbers directly beneath it.
+    p.write_text(
+        json.dumps(
+            {
+                "updated": stamp,
+                "suite_version": SUITE_VERSION,
+                "suite_size": len(SUITE),
+                "series": series,
+            },
+            indent=1,
+        ),
+        encoding="utf-8",
+    )
 
 
 def main(argv: Optional[List[str]] = None) -> int:

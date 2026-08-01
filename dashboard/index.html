@@ -222,9 +222,10 @@
 
   <div class="card">
     <h2>How it works</h2>
-    <!-- Task count must match len(SUITE) in modeldrift/suite.py (35 as of 2026-07-v3).
-         It is not derived from metrics.json, so it can rot — check it when the suite grows. -->
-    <p class="note">A fixed suite of <strong>35 unambiguous tasks</strong> (instruction-following,
+    <!-- Task count is written into metrics.json as suite_size and injected below,
+         so it cannot drift from len(SUITE). It previously said 22 while the suite
+         held 35 — the page contradicting its own data. -->
+    <p class="note">A fixed suite of <strong><span id="suite-size">35</span> unambiguous tasks</strong> (instruction-following,
       factual recall, arithmetic, multi-step reasoning, counting, string manipulation, formatting,
       refusal calibration) runs against each model — deterministic where the model allows it. Some
       tasks are deliberately chosen failure modes for strong models (letter-counting, numeric vs.
@@ -341,6 +342,12 @@ async function fetchAll() {
       const r = await fetch(url, {cache:"no-store"});
       if (!r.ok) continue;
       const j = await r.json();
+      // State the suite size from the data rather than from a number typed into
+      // the page. The hardcoded copy had already gone stale once.
+      if (j.suite_size) {
+        const el = document.getElementById("suite-size");
+        if (el) el.textContent = j.suite_size;
+      }
       if (Object.keys(j.series || {}).length) { extra = j.series; break; }
       extra = j.series || {};
     } catch {}
