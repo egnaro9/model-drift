@@ -1,10 +1,10 @@
 # model-drift — *Is My Model Drifting?*
 
+**A small public LLM observability board. A frozen suite runs against live models on a schedule and keeps every result — so you can watch each model's quality *and* speed, verbosity, reliability, and refusal rate over time, and see when any of them moves.**
+
 [![ci](https://github.com/egnaro9/model-drift/actions/workflows/ci.yml/badge.svg)](https://github.com/egnaro9/model-drift/actions/workflows/ci.yml)
 [![python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org/)
 [![tests](https://img.shields.io/badge/tests-169-brightgreen)](tests)
-
-**A small public LLM observability board. A frozen suite runs against live models on a schedule and keeps every result — so you can watch each model's quality *and* speed, verbosity, reliability, and refusal rate over time, and see when any of them moves.**
 
 ### ▶ [Live tracker](https://egnaro9.github.io/model-drift/)
 
