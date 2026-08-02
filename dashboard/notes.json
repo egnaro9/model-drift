@@ -1,5 +1,21 @@
 [
   {
+    "date": "2026-08-02",
+    "title": "Regression: Grok 4 Fast -2.9 pts",
+    "metric": "accuracy",
+    "models": [
+      "anthropic:claude-sonnet-5",
+      "xai:grok-4-fast"
+    ],
+    "summary": "2 model(s) regressed against the previous run; worst was Grok 4 Fast at -2.9 pts. Auto-logged — confirm it's real before writing it up.",
+    "body": [
+      {
+        "p": "Auto-logged when the scheduled probe flagged a run-over-run regression. Before this becomes a post, check the run log and the Reliability metric — a rate limit or provider outage can look exactly like a regression. If it holds up, the written explanation goes here."
+      }
+    ],
+    "stub": true
+  },
+  {
     "date": "2026-08-01",
     "title": "Regression: Claude Fable 5 -2.9 pts",
     "metric": "accuracy",
