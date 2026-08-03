@@ -1,5 +1,5 @@
 {
- "updated": "2026-08-02T10:58:13Z",
+ "updated": "2026-08-03T13:05:44Z",
  "suite_version": "2026-07-v3",
  "suite_size": 35,
  "series": {
@@ -386,6 +386,28 @@
    },
    {
     "t": "2026-08-02T10:58:13Z",
+    "acc": 1.0,
+    "latency_ms": 0.0,
+    "out_chars": 5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": []
+   },
+   {
+    "t": "2026-08-03T13:05:44Z",
     "acc": 1.0,
     "latency_ms": 0.0,
     "out_chars": 5,
@@ -809,6 +831,28 @@
     "runs": 3,
     "acc_spread": 0.0,
     "fails": []
+   },
+   {
+    "t": "2026-08-03T13:05:44Z",
+    "acc": 1.0,
+    "latency_ms": 2048.5,
+    "out_chars": 4.8,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": []
    }
   ],
   "openai:gpt-5-mini": [
@@ -1196,6 +1240,28 @@
     "t": "2026-08-02T10:58:13Z",
     "acc": 1.0,
     "latency_ms": 1659.6,
+    "out_chars": 4.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": []
+   },
+   {
+    "t": "2026-08-03T13:05:44Z",
+    "acc": 1.0,
+    "latency_ms": 1825.7,
     "out_chars": 4.9,
     "reliability": 1.0,
     "refusal_rate": 0.0,
@@ -1689,6 +1755,36 @@
      "nth-word",
      "sort-magnitude"
     ]
+   },
+   {
+    "t": "2026-08-03T13:05:44Z",
+    "acc": 0.8,
+    "latency_ms": 502.1,
+    "out_chars": 9.4,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.714,
+     "factual-recall": 0.333,
+     "arithmetic": 0.75,
+     "reasoning": 0.75,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "fact-element",
+     "fact-planet",
+     "float-subtract",
+     "if-one-word",
+     "logic-syllogism",
+     "nth-word",
+     "sort-magnitude"
+    ]
    }
   ],
   "openai:gpt-5-nano": [
@@ -2076,6 +2172,28 @@
     "t": "2026-08-02T10:58:13Z",
     "acc": 1.0,
     "latency_ms": 1579.3,
+    "out_chars": 4.8,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": []
+   },
+   {
+    "t": "2026-08-03T13:05:44Z",
+    "acc": 1.0,
+    "latency_ms": 1765.4,
     "out_chars": 4.8,
     "reliability": 1.0,
     "refusal_rate": 0.0,
@@ -2529,6 +2647,32 @@
      "needle-extract",
      "nth-char"
     ]
+   },
+   {
+    "t": "2026-08-03T13:05:44Z",
+    "acc": 0.9143,
+    "latency_ms": 3804.8,
+    "out_chars": 10.7,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 0.5,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0286,
+    "fails": [
+     "float-subtract",
+     "needle-extract",
+     "nth-char"
+    ]
    }
   ],
   "anthropic:claude-opus-4-8": [
@@ -2963,6 +3107,32 @@
     },
     "runs": 3,
     "acc_spread": 0.0,
+    "fails": [
+     "constraint-no-e",
+     "float-subtract",
+     "nth-char"
+    ]
+   },
+   {
+    "t": "2026-08-03T13:05:44Z",
+    "acc": 0.9143,
+    "latency_ms": 1186.5,
+    "out_chars": 6.4,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.857,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0286,
     "fails": [
      "constraint-no-e",
      "float-subtract",
@@ -3435,6 +3605,35 @@
      "float-subtract",
      "nth-char"
     ]
+   },
+   {
+    "t": "2026-08-03T13:05:44Z",
+    "acc": 0.8286,
+    "latency_ms": 2068.7,
+    "out_chars": 12.7,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 0.333,
+     "arithmetic": 0.75,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 0.5,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0571,
+    "fails": [
+     "count-s-mississippi",
+     "days-feb-2024",
+     "fact-element",
+     "fact-planet",
+     "float-subtract",
+     "nth-char"
+    ]
    }
   ],
   "anthropic:claude-haiku-4-5": [
@@ -3893,6 +4092,34 @@
      "logic-syllogism",
      "vowel-json"
     ]
+   },
+   {
+    "t": "2026-08-03T13:05:44Z",
+    "acc": 0.8571,
+    "latency_ms": 673.5,
+    "out_chars": 6.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.571,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "constraint-no-e",
+     "float-subtract",
+     "if-json",
+     "logic-syllogism",
+     "vowel-json"
+    ]
    }
   ],
   "google:gemini-3.1-pro": [
@@ -4323,6 +4550,30 @@
     "fails": [
      "logic-syllogism"
     ]
+   },
+   {
+    "t": "2026-08-03T13:05:44Z",
+    "acc": 0.9714,
+    "latency_ms": 15755.0,
+    "out_chars": 4.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "logic-syllogism"
+    ]
    }
   ],
   "google:gemini-3.5-flash": [
@@ -4678,6 +4929,28 @@
     "t": "2026-08-02T10:58:13Z",
     "acc": 1.0,
     "latency_ms": 1070.2,
+    "out_chars": 4.8,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0286,
+    "fails": []
+   },
+   {
+    "t": "2026-08-03T13:05:44Z",
+    "acc": 1.0,
+    "latency_ms": 1580.5,
     "out_chars": 4.8,
     "reliability": 1.0,
     "refusal_rate": 0.0,
@@ -5126,6 +5399,31 @@
      "float-subtract",
      "logic-syllogism"
     ]
+   },
+   {
+    "t": "2026-08-03T13:05:44Z",
+    "acc": 0.9429,
+    "latency_ms": 440.8,
+    "out_chars": 5.5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "float-subtract",
+     "logic-syllogism"
+    ]
    }
   ],
   "xai:grok-4.5": [
@@ -5513,6 +5811,28 @@
     "t": "2026-08-02T10:58:13Z",
     "acc": 1.0,
     "latency_ms": 1574.1,
+    "out_chars": 4.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": []
+   },
+   {
+    "t": "2026-08-03T13:05:44Z",
+    "acc": 1.0,
+    "latency_ms": 1847.9,
     "out_chars": 4.9,
     "reliability": 1.0,
     "refusal_rate": 0.0,
@@ -5955,6 +6275,31 @@
     "fails": [
      "extract-year"
     ]
+   },
+   {
+    "t": "2026-08-03T13:05:44Z",
+    "acc": 0.9429,
+    "latency_ms": 1684.4,
+    "out_chars": 30.5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0571,
+    "fails": [
+     "days-feb-2024",
+     "nth-char"
+    ]
    }
   ],
   "xai:grok-4-fast": [
@@ -6391,6 +6736,33 @@
      "compare-decimals",
      "days-feb-2024",
      "nth-word"
+    ]
+   },
+   {
+    "t": "2026-08-03T13:05:44Z",
+    "acc": 0.8857,
+    "latency_ms": 521.5,
+    "out_chars": 4.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 0.667,
+     "arithmetic": 0.75,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0286,
+    "fails": [
+     "days-feb-2024",
+     "fact-planet",
+     "math-order",
+     "nth-char"
     ]
    }
   ],
@@ -6876,6 +7248,36 @@
      "if-one-word",
      "logic-syllogism",
      "sort-magnitude"
+    ]
+   },
+   {
+    "t": "2026-08-03T13:05:44Z",
+    "acc": 0.8,
+    "latency_ms": 2005.8,
+    "out_chars": 5.6,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.714,
+     "factual-recall": 0.667,
+     "arithmetic": 0.75,
+     "reasoning": 0.75,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 0.5,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0286,
+    "fails": [
+     "compare-decimals",
+     "constraint-no-e",
+     "count-r",
+     "fact-planet",
+     "float-subtract",
+     "if-one-word",
+     "logic-syllogism"
     ]
    }
   ],
@@ -7392,6 +7794,44 @@
     "t": "2026-08-02T10:58:13Z",
     "acc": 0.5714,
     "latency_ms": 1998.4,
+    "out_chars": 17.5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.429,
+     "factual-recall": 0.333,
+     "arithmetic": 0.5,
+     "reasoning": 0.375,
+     "formatting": 0.8,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "compare-decimals",
+     "compare-negatives",
+     "constraint-no-e",
+     "fact-element",
+     "fact-planet",
+     "float-subtract",
+     "fmt-repeat-join",
+     "if-one-word",
+     "logic-syllogism",
+     "math-order",
+     "multi-step-math",
+     "nth-char",
+     "nth-word",
+     "sort-magnitude",
+     "vowel-json"
+    ]
+   },
+   {
+    "t": "2026-08-03T13:05:44Z",
+    "acc": 0.5714,
+    "latency_ms": 2023.3,
     "out_chars": 17.5,
     "reliability": 1.0,
     "refusal_rate": 0.0,
