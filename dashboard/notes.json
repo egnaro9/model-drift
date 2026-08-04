@@ -1,5 +1,20 @@
 [
   {
+    "date": "2026-08-04",
+    "title": "Regression: Llama 3.3 70B -2.9 pts",
+    "metric": "accuracy",
+    "models": [
+      "meta:llama-3.3-70b"
+    ],
+    "summary": "1 model(s) regressed against the previous run; worst was Llama 3.3 70B at -2.9 pts. Auto-logged — confirm it's real before writing it up.",
+    "body": [
+      {
+        "p": "Auto-logged when the scheduled probe flagged a run-over-run regression. Before this becomes a post, check the run log and the Reliability metric — a rate limit or provider outage can look exactly like a regression. If it holds up, the written explanation goes here."
+      }
+    ],
+    "stub": true
+  },
+  {
     "date": "2026-08-03",
     "title": "Regression: Grok 4 Fast -2.9 pts",
     "metric": "accuracy",
