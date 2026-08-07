@@ -1,5 +1,22 @@
 [
   {
+    "date": "2026-08-07",
+    "title": "Regression: GPT-5 nano -2.9 pts",
+    "metric": "accuracy",
+    "models": [
+      "openai:gpt-5-nano",
+      "anthropic:claude-fable-5",
+      "xai:grok-4.3"
+    ],
+    "summary": "3 model(s) regressed against the previous run; worst was GPT-5 nano at -2.9 pts. Auto-logged — confirm it's real before writing it up.",
+    "body": [
+      {
+        "p": "Auto-logged when the scheduled probe flagged a run-over-run regression. Before this becomes a post, check the run log and the Reliability metric — a rate limit or provider outage can look exactly like a regression. If it holds up, the written explanation goes here."
+      }
+    ],
+    "stub": true
+  },
+  {
     "date": "2026-08-06",
     "title": "Regression: Gemini 3.1 Pro -20.0 pts",
     "metric": "accuracy",
