@@ -1,0 +1,142 @@
+{
+ "vac_version": "0.1",
+ "claim": {
+  "capability": "the public drift board's derivation layer recomputes deterministically and byte-identically offline from the repo-committed per-run rows: the standings table (17 rows \u2014 accuracy, delta vs previous run, verdict, and the min-detectable-regression floor 100/graded-calls), the generated narrative paragraph (3 claims fired), and the per-task flip / probe-alarm analysis (78 repeat offenders, 129 probe alarms), under frozen suite 2026-07-v3 (35 tasks, mechanical graders only, no LLM judge)",
+  "scope": "exactly the committed artifacts at the stamped commit: dashboard/metrics.json (17 series, 511 stored rows) joined to modeldrift/models.json under suite 2026-07-v3; grading/aggregation replay over stored artifacts only \u2014 offline, stdlib-only, no network, no model calls, no clock",
+  "limitations": [
+   "the model responses are HISTORICAL: replay re-earns every derivation (standings, narrative, flips, floors) from the stored rows, never the measurements \u2014 the rows were written by the same scheduled job that made the model calls, and the live probes are nondeterministic by construction (no tracked model accepts temperature=0; a documented 9-point spread across 3 identical runs), so no part of this claim covers reproducing a model's answers",
+   "the eval-history database (full per-task prompts and answers) is a mutable external store outside this bundle: corroborating, never load-bearing \u2014 no bundled number depends on it",
+   "RESULTS.md's generator reads the live eval-history API; this bundle proves the committed table re-renders byte-identically from the committed rows (the emitter refuses to bundle otherwise), not that the generator ran; the two stores skip failed probes under slightly different rules, and a future divergence fails that gate by design",
+   "stored rows that predate per-point emission of `graded` carry no per-run floor: their min_detectable_pts is null and the standings' Min-detectable column prints '\u2014' for them; the suite-level floor 100/tasks = 2.857 pts is the finest this instrument can ever resolve, and per-run floors appear as points carry `graded`",
+   "per-task failure identity in `fails` is the median-representative sample's; the other samples' identities land in `fails_runs` only from this code commit on \u2014 earlier points keep only their spread (acc_spread)",
+   "rows that predate per-point suite stamping carry no `suite`/`suite_hash` field; for those rows the single-suite claim rests on the repo history of the frozen suite file, not on a per-row stamp",
+   "byte-identity of the derived artifacts depends on CPython's shortest-roundtrip float formatting (see replay.expected for the versions it was verified under); the pytest suite is the semantic backstop"
+  ]
+ },
+ "subject": {
+  "kind": "suite-archetype",
+  "id": "model-drift public board \u2014 the derivation layer over dashboard/metrics.json",
+  "version": {
+   "suite_version": "2026-07-v3",
+   "suite_hash": "e76f17b6c56e",
+   "board_commit": "643d834"
+  }
+ },
+ "protocol": {
+  "issuer": "egnaro9/model-drift",
+  "issuer_commit": "643d834",
+  "task": "drift standings board over the frozen probe suite: standings, narrative, and flip analysis derived from the committed per-run rows",
+  "hashes": {
+   "suite_hash": "e76f17b6c56e",
+   "metrics_sha256": "dd1c7f7df7d542c211ead790688d2ccb3997d388d0390a520fcc8a9a58b89ad5",
+   "registry_sha256": "00792e5b1c54543b40e657729c6b94ea251c59b4d19ff94eaf5733d17d6a1116"
+  },
+  "grading": "deterministic end to end: the stored rows were graded by the frozen suite's mechanical graders (exact / substring / regex / numeric compare \u2014 no LLM judge), and every bundled number is a pure, clock-free function of those committed rows \u2014 standings from the last two stored points per series (verdict thresholds at \u00b11e-9, delta rounded to 4 places), min-detectable floor = 100/graded, flip analysis from the stored per-task failure identities, narrative from the claims generator; byte-identical on re-emission",
+  "control_policy": "the mock:stable series is the live null control: a deterministic fixture probed through the identical pipeline every scheduled run, committed beside the real series, and excluded from the narrative (by registry tier) and the flip analysis (by id) \u2014 the emitter refuses to bundle any control point below 100% or carrying a failure, because a moved control indicts the harness, not the models"
+ },
+ "evidence": [
+  {
+   "path": "RESULTS.md",
+   "sha256": "85478db50e66e5d366056097f0882cb62a44b544a80979fa05e33e70d85bf5e6"
+  },
+  {
+   "path": "flips.json",
+   "sha256": "f2f29ab52d2bb0cef55ab56031cf812237d7ced86770068a82ff717dc6282cf1"
+  },
+  {
+   "path": "metrics.json",
+   "sha256": "dd1c7f7df7d542c211ead790688d2ccb3997d388d0390a520fcc8a9a58b89ad5"
+  },
+  {
+   "path": "models.json",
+   "sha256": "00792e5b1c54543b40e657729c6b94ea251c59b4d19ff94eaf5733d17d6a1116"
+  },
+  {
+   "path": "narrative.json",
+   "sha256": "51b4a5b2b179bece3114e28d3e17429e55e287bedc1875b2909763c9be88af50"
+  },
+  {
+   "path": "standings.json",
+   "sha256": "4add0ef4169992090a52c3d9d66e03741b2f1bcd6d3de486f11aedf6b09eae1d"
+  },
+  {
+   "path": "suite-fingerprint.json",
+   "sha256": "88369aede328e1292f76c65dfe61cbab655efb633e35afc94c0b7e437e79106b"
+  }
+ ],
+ "results": {
+  "summary": {
+   "standings": {
+    "rows": 17,
+    "regressed": 6,
+    "improved": 0,
+    "unchanged": 11,
+    "baseline": 0,
+    "no_data": 0
+   },
+   "stored_rows": {
+    "series": 17,
+    "points": 511
+   },
+   "suite": {
+    "tasks": 35,
+    "min_detectable_pts_full_grade": 2.857
+   },
+   "flips": {
+    "probe_alarms": 129,
+    "repeat_offenders": 78,
+    "one_offs": 55,
+    "models_with_enough_history": 17
+   },
+   "narrative": {
+    "claims_fired": 3
+   }
+  },
+  "checks": [
+   {
+    "profile": "modeldrift-board-v1",
+    "metrics": "metrics.json",
+    "registry": "models.json",
+    "standings": "standings.json",
+    "flips": "flips.json",
+    "narrative": "narrative.json",
+    "results_md": "RESULTS.md",
+    "fingerprint": "suite-fingerprint.json",
+    "expect": {
+     "rows": 17,
+     "regressed": 6,
+     "improved": 0,
+     "unchanged": 11,
+     "baseline": 0,
+     "no_data": 0,
+     "series": 17,
+     "points": 511,
+     "tasks": 35,
+     "min_detectable_pts_full_grade": 2.857,
+     "probe_alarms": 129,
+     "repeat_offenders": 78,
+     "one_offs": 55,
+     "models_with_enough_history": 17,
+     "claims_fired": 3
+    }
+   }
+  ]
+ },
+ "replay": {
+  "issuer_commit": "643d834",
+  "commands": [
+   "git clone https://github.com/egnaro9/model-drift issuer",
+   "git -C issuer checkout 643d834",
+   "( cd issuer && python3 emit_vac.py )",
+   "for f in RESULTS.md flips.json metrics.json models.json narrative.json standings.json suite-fingerprint.json vac.json; do cmp issuer/vac/$f $f || exit 1; done",
+   "python3 -m venv v && v/bin/pip install -q -e 'issuer[dev]' && v/bin/pytest -q issuer"
+  ],
+  "expected": "every command exits 0 and every cmp stays silent: the emitter re-derives the whole bundle offline from the rows committed at the stamped commit \u2014 no network, no model calls, no clock \u2014 byte-identical to this one (commands run from the bundle directory), and the full test suite passes. Requires CPython >= 3.11; the committed narrative.json was produced under CI's 3.12 and this bundle was cut and byte-verified against it under 3.14 \u2014 repo CI re-emits at the stamped commit under 3.12 and diffs"
+ },
+ "monitor": {
+  "cadence": "daily \u2014 track.yml cron '17 8 * * *'",
+  "snapshot": "2026-08-14T11:28:46Z",
+  "freshness_gate": "a registry entry seeded from this bundle MUST fail red \u2014 never skip \u2014 when it cannot fetch dashboard/metrics.json from the issuer's main, or when the newest stored row is older than 3x the cadence; 'checked and fresh' and 'never checked' must be distinguishable outcomes (this repo has already shipped three distinct stale-publish mechanisms)",
+  "supersession": "each refresh cuts a NEW closed bundle at the new standings commit and supersedes this entry \u2014 the monitored claim is a chain of frozen snapshots, never an edited one"
+ }
+}
