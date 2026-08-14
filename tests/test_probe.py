@@ -105,8 +105,17 @@ def test_metrics_file_accumulates_and_skips_total_failures(tmp_path):
                           "refusal_rate", "by_kind", "runs", "acc_spread",
                           # which tasks failed — identity kept so flips are
                           # computable across runs and across providers
-                          "fails"}
+                          "fails",
+                          # per-point provenance + resolution: which suite
+                          # graded this row, the accuracy denominator the
+                          # min-detectable floor divides by, and every
+                          # sample's failure identity
+                          "suite", "suite_hash", "graded", "fails_runs"}
     assert isinstance(point["fails"], list)
+    from modeldrift.suite import SUITE_VERSION
+    assert point["suite"] == SUITE_VERSION and point["suite_hash"] == suite_hash()
+    assert point["graded"] == len(SUITE)      # mock never truncates: all graded
+    assert point["fails"] in point["fails_runs"]
     # by_kind is the per-capability breakdown — the aggregate hides which kind of
     # thing moved, which is the useful half of a drift signal.
     assert point["by_kind"]["formatting"] == 1.0
@@ -178,6 +187,28 @@ def test_runs_1_is_still_a_single_sample(monkeypatch):
     _fake_runs(monkeypatch, [0.42])
     out = probe_repeated(STABLE, runs=1)
     assert out["metrics"]["faithfulness"] == 0.42 and out["_acc_spread"] == 0.0
+
+
+def test_every_samples_failure_identity_is_kept(monkeypatch):
+    """`fails` is the median-representative sample's; `_fails_runs` keeps all
+    of them, in order — the raw material for per-task claims stronger than
+    'the median run failed these'."""
+    from modeldrift import run as runmod
+    from modeldrift.run import probe_repeated
+    seq = [(0.90, ["if-json"]), (0.85, ["if-json", "math-order"]), (0.95, [])]
+    def fake(model):
+        a, fails = seq.pop(0)
+        return {"run": model.id, "git_sha": "x", "label": "",
+                "metrics": {"faithfulness": a, "precision@k": a, "recall@k": a,
+                            "citation_rate": a, "flagged_cases": 0.0,
+                            "n_cases": float(len(SUITE)), "graded_total": 35.0},
+                "cases": [], "_errors": 0, "_first_error": None,
+                "_latency_ms": 100.0, "_out_chars": 5.0, "_reliability": 1.0,
+                "_truncations": 0, "_refusal_rate": 0.0, "_fails": fails}
+    monkeypatch.setattr(runmod, "probe", fake)
+    out = probe_repeated(STABLE, runs=3)
+    assert out["_fails_runs"] == [["if-json"], ["if-json", "math-order"], []]
+    assert out["_fails"] == ["if-json"]        # the median (0.90) sample's
 
 
 # ── truncation lands on reliability, not accuracy (B. Nawara, th00masml) ──

@@ -22,3 +22,44 @@ jobs:
         run: python -m modeldrift.run | tee /dev/stderr | grep -q "acc 100%"
       - name: The identity check runs end to end on the mock (no keys, no spend)
         run: python -m modeldrift.identity | tee /dev/stderr | grep -q "0 mismatch"
+
+  # The VAC bundle's freshness gate: regenerate-and-diff, in THIS job. Never a
+  # second triggered workflow — GITHUB_TOKEN pushes don't trigger workflows,
+  # which is exactly how this board has published stale before. The bundle is a
+  # frozen snapshot of one standings commit, so it is re-derived at its OWN
+  # stamped commit (not at HEAD, where the daily data has moved on) and must
+  # come back byte-identical; `diff -r` also fails on any file the emitter
+  # would not write, keeping the committed bundle closed.
+  vac-bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # the stamped commit must be reachable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Re-emit the bundle at its stamped commit; demand byte-identity
+        run: |
+          stamp=$(python3 -c "import json; print(json.load(open('vac/vac.json'))['protocol']['issuer_commit'])")
+          git worktree add "$RUNNER_TEMP/at-stamp" "$stamp"
+          ( cd "$RUNNER_TEMP/at-stamp" && python3 emit_vac.py )
+          diff -r "$RUNNER_TEMP/at-stamp/vac" vac
+      - name: The committed narrative re-derives from the committed rows at HEAD
+        run: |
+          python3 -m modeldrift.narrative --metrics dashboard/metrics.json --out "$RUNNER_TEMP/narrative.json"
+          cmp "$RUNNER_TEMP/narrative.json" dashboard/narrative.json
+      - name: The committed standings re-render from the committed rows at HEAD
+        run: |
+          python3 - <<'EOF'
+          import json, pathlib, sys
+          sys.path.insert(0, ".")
+          from modeldrift.board import results_md_offline
+          series = json.loads(pathlib.Path("dashboard/metrics.json").read_text())["series"]
+          registry = json.loads(pathlib.Path("modeldrift/models.json").read_text())
+          committed = pathlib.Path("RESULTS.md").read_text()
+          if results_md_offline(series, registry) != committed:
+              sys.exit("RESULTS.md no longer re-renders from dashboard/metrics.json "
+                       "— the board's two stores (eval-history and the committed "
+                       "rows) have diverged; diagnose which one is lying")
+          EOF

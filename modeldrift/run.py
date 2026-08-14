@@ -178,6 +178,11 @@ def probe_repeated(model: Model, runs: int = 3) -> dict:
     out["_refusal_rate"] = med("_refusal_rate")
     out["_runs"] = len(usable)
     out["_acc_spread"] = round(max(accs) - min(accs), 4)
+    # Every sample's failure identity, not just the representative's. The other
+    # two runs' identities were being discarded with the aggregate — cheap to
+    # keep (task-id lists), and per-task claims are only as strong as the
+    # samples they can be traced to.
+    out["_fails_runs"] = [r.get("_fails", []) for r in usable]
     out["label"] = f"suite {SUITE_VERSION} · median of {len(usable)} runs"
     return out
 
@@ -239,7 +244,22 @@ def update_metrics_file(path: str, results: List[dict], stamp: str, cap: int = 1
                     # number that survived it
                     "runs": r.get("_runs", 1), "acc_spread": r.get("_acc_spread", 0.0),
                     # the identity of what failed, so flips are computable later
-                    "fails": r.get("_fails", [])})
+                    "fails": r.get("_fails", []),
+                    # ── per-point provenance + resolution ──
+                    # Which suite graded this row. The top-level suite_version
+                    # only covers the newest write; without a per-point stamp a
+                    # future version bump would silently mix two question sets
+                    # inside one series and every flip comparison across the
+                    # bump would be comparing different questions.
+                    "suite": SUITE_VERSION, "suite_hash": r.get("git_sha") or suite_hash(),
+                    # The accuracy denominator. eval-history's schema drops
+                    # graded_total, which left the min-detectable floor
+                    # (100/graded) computable from NO stored artifact; the
+                    # committed row is its home.
+                    "graded": int(g) if (g := r["metrics"].get("graded_total")) else None,
+                    # every sample's failure identity (fails is the
+                    # median-representative's; these are all of them)
+                    "fails_runs": r.get("_fails_runs") or [r.get("_fails", [])]})
         del pts[:-cap]                    # keep the series bounded
     p.parent.mkdir(parents=True, exist_ok=True)
     # suite_size travels with the data so the dashboard can state it instead of

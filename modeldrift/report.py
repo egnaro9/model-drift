@@ -86,6 +86,27 @@ def gather(api: str, registry: Optional[str] = None) -> List[ModelStatus]:
     return [status_for(api, m) for m in load_registry(registry)]
 
 
+def fill_graded_from_metrics(statuses: List[ModelStatus], metrics: dict) -> None:
+    """Join the accuracy denominator from the committed rows.
+
+    run.py posts graded_total to eval-history, but eval-history's schema has no
+    such column — it is dropped on write, `status_for` always got None back, and
+    every published Min-detectable cell printed "—": the floor was structurally
+    unpublishable from any stored artifact. The committed metrics file is its
+    real home now (each point carries `graded`), so take the denominator from
+    the model's newest stored point — written by the same probe run this report
+    reads — and the column fills in as points carry it. Points that predate the
+    field leave the status untouched, and the cell keeps printing "—"; visible
+    absence, never a guessed constant.
+    """
+    series = (metrics or {}).get("series") or {}
+    for s in statuses:
+        pts = series.get(s.id)
+        g = pts[-1].get("graded") if pts else None
+        if s.graded is None and g:
+            s.graded = int(g)
+
+
 def results_md(statuses: List[ModelStatus]) -> str:
     icon = {"regressed": "🔴", "improved": "🟢", "unchanged": "⚪", "baseline": "🔵", "no-data": "⚫"}
     rows = []
@@ -200,12 +221,21 @@ def main(argv: Optional[List[str]] = None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--api", default="https://eval-history.onrender.com")
     p.add_argument("--results", default="RESULTS.md")
+    p.add_argument("--metrics", default="dashboard/metrics.json",
+                   help="committed time-series file; supplies the graded-call "
+                        "denominator the Min-detectable column needs")
     p.add_argument("--alert", default=None, help="write issue title+body here if any regression")
     p.add_argument("--draft", default=None, help="write a social draft here if any regression")
     p.add_argument("--notes", default=None, help="append a stub Field Note here on a regression")
     args = p.parse_args(argv)
 
     statuses = gather(args.api)
+    try:
+        from pathlib import Path
+        fill_graded_from_metrics(
+            statuses, json.loads(Path(args.metrics).read_text(encoding="utf-8")))
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass   # no stored rows to join — the column prints "—", same as before
     with open(args.results, "w", encoding="utf-8") as fh:
         fh.write(results_md(statuses))
     print(f"wrote {args.results}")
