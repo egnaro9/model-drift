@@ -589,7 +589,7 @@ function noteEl(n) {
     });
     actions.append(btn);
   }
-  if (n.pr) { const a = document.createElement("a"); a.href = n.pr; a.target = "_blank"; a.rel = "noopener"; a.className = "note-src"; a.textContent = "source →"; actions.append(a); }
+  if (n.pr) { const a = document.createElement("a"); a.href = n.pr; a.target = "erikhill-out"; a.className = "note-src"; a.textContent = "source →"; actions.append(a); }
   if (actions.childNodes.length) d.append(actions);
   return d;
 }
