@@ -8,6 +8,8 @@
 
 ### ▶ [Live tracker](https://egnaro9.github.io/model-drift/)
 
+The board's standings are registered as replayable evidence: [`vac/`](vac) holds a closed, stamped snapshot recomputable offline from the stored rows, listed in the [vac-protocol registry](https://egnaro9.github.io/vac-protocol/) ([registry.json](https://github.com/egnaro9/vac-protocol/blob/main/registry.json)) — and [REPLAY_REQUEST.md](https://github.com/egnaro9/vac-protocol/blob/main/REPLAY_REQUEST.md) walks you through a replay in about ten minutes.
+
 Model providers ship silent updates. A [peer-reviewed study](https://arxiv.org/abs/2311.11123) found that on a silent model change, **58.8% of prompt+model combinations lost accuracy** — no error, no version bump, no way to know except to keep measuring. This measures — across five metrics, toggled on the dashboard:
 
 | Metric | What it answers | Source |
