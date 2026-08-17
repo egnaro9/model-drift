@@ -28,6 +28,31 @@ from typing import Any, Dict, List, Optional, Sequence
 from .report import ModelStatus, min_detectable_change, results_md
 
 
+REL_FLOOR = 0.5
+"""Accuracy points from runs below this aggregate reliability are not scored.
+
+A rate limit, timeout or provider outage makes a call *absent*, not *wrong*.
+Scoring it 0 publishes the provider's bad morning as the model getting dumber.
+The Reliability metric keeps these points, because reliability genuinely did
+drop and that is the true signal. Keyed on aggregate reliability, never on
+"a call failed": a blanket drop-on-failure would inflate accuracy on exactly
+the hardest tasks. See docs/a-rate-limit-not-a-regression.md.
+
+This constant is the single source of truth. dashboard/index.html carries the
+same 0.5 for its client-side charts; tests/test_reliability_floor.py pins the
+two together so they cannot drift apart again. They did drift once: the floor
+lived only in the dashboard JS, so RESULTS.md published a Google outage as
+three Gemini regressions (-37.1 and -94.3 pts) while the chart above it
+correctly showed nothing.
+"""
+
+
+def trusted_points(pts: Sequence[dict]) -> List[dict]:
+    """The accuracy-bearing subset of a series: reliability missing or >= floor."""
+    return [p for p in pts
+            if p.get("reliability") is None or p["reliability"] >= REL_FLOOR]
+
+
 def statuses_from_series(series: Dict[str, List[dict]],
                          registry: Sequence[dict]) -> List[ModelStatus]:
     """One ModelStatus per registry entry, in registry order, from stored rows.
@@ -36,11 +61,14 @@ def statuses_from_series(series: Dict[str, List[dict]],
     one point → baseline, else the delta between the last two points with the
     same ±1e-9 thresholds. `graded` comes from the newest point (null on rows
     that predate per-point emission), same as report's metrics join.
+
+    Points below REL_FLOOR are dropped first, so an outage reads as no-data or
+    a stale-but-honest number rather than a regression.
     """
     out = []
     for m in registry:
         label = m.get("label") or m["id"]
-        pts = series.get(m["id"]) or []
+        pts = trusted_points(series.get(m["id"]) or [])
         if not pts:
             out.append(ModelStatus(m["id"], label, None, None, "no-data", None, None))
             continue

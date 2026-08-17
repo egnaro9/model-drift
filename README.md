@@ -4,7 +4,7 @@
 
 [![ci](https://github.com/egnaro9/model-drift/actions/workflows/ci.yml/badge.svg)](https://github.com/egnaro9/model-drift/actions/workflows/ci.yml)
 [![python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org/)
-[![tests](https://img.shields.io/badge/tests-169-brightgreen)](tests)
+[![tests](https://img.shields.io/badge/tests-198-brightgreen)](tests)
 
 ### ▶ [Live tracker](https://egnaro9.github.io/model-drift/)
 
@@ -145,7 +145,7 @@ The tracker runs daily on a free cron and a small spend. The dashboard shows **"
 Built on the pieces it needed already: [eval-history](https://github.com/egnaro9/eval-history) stores the runs and computes the run-to-run comparison; the scoring mirrors [rag-eval-lab](https://github.com/egnaro9/rag-eval-lab). stdlib `urllib` only. No SDKs, no dependencies.
 
 ```bash
-pip install -e ".[dev]" && pytest -q     # 169 tests, stdlib only
+pip install -e ".[dev]" && pytest -q     # 198 tests, stdlib only
 ```
 
 ## Field notes
