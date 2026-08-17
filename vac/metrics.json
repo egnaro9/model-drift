@@ -1,5 +1,5 @@
 {
- "updated": "2026-08-14T11:28:46Z",
+ "updated": "2026-08-16T10:51:11Z",
  "suite_version": "2026-07-v3",
  "suite_size": 35,
  "series": {
@@ -669,6 +669,66 @@
     "runs": 3,
     "acc_spread": 0.0,
     "fails": []
+   },
+   {
+    "t": "2026-08-15T10:46:47Z",
+    "acc": 1.0,
+    "latency_ms": 0.0,
+    "out_chars": 5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [],
+     [],
+     []
+    ]
+   },
+   {
+    "t": "2026-08-16T10:51:11Z",
+    "acc": 1.0,
+    "latency_ms": 0.0,
+    "out_chars": 5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [],
+     [],
+     []
+    ]
    }
   ],
   "openai:gpt-5": [
@@ -1337,6 +1397,66 @@
     "runs": 3,
     "acc_spread": 0.0,
     "fails": []
+   },
+   {
+    "t": "2026-08-15T10:46:47Z",
+    "acc": 1.0,
+    "latency_ms": 1501.3,
+    "out_chars": 4.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [],
+     [],
+     []
+    ]
+   },
+   {
+    "t": "2026-08-16T10:51:11Z",
+    "acc": 1.0,
+    "latency_ms": 2024.8,
+    "out_chars": 4.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [],
+     [],
+     []
+    ]
    }
   ],
   "openai:gpt-5-mini": [
@@ -2005,6 +2125,68 @@
     "runs": 3,
     "acc_spread": 0.0,
     "fails": []
+   },
+   {
+    "t": "2026-08-15T10:46:47Z",
+    "acc": 1.0,
+    "latency_ms": 1463.4,
+    "out_chars": 4.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0286,
+    "fails": [],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [],
+     [],
+     [
+      "float-subtract"
+     ]
+    ]
+   },
+   {
+    "t": "2026-08-16T10:51:11Z",
+    "acc": 1.0,
+    "latency_ms": 1375.3,
+    "out_chars": 4.8,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [],
+     [],
+     []
+    ]
    }
   ],
   "openai:gpt-4o-mini": [
@@ -2841,6 +3023,130 @@
      "nth-word",
      "sort-magnitude"
     ]
+   },
+   {
+    "t": "2026-08-15T10:46:47Z",
+    "acc": 0.8,
+    "latency_ms": 455.6,
+    "out_chars": 9.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.714,
+     "factual-recall": 0.333,
+     "arithmetic": 0.75,
+     "reasoning": 0.75,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "fact-element",
+     "fact-planet",
+     "float-subtract",
+     "if-one-word",
+     "logic-syllogism",
+     "nth-word",
+     "sort-magnitude"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "if-one-word",
+      "logic-syllogism",
+      "nth-word",
+      "sort-magnitude"
+     ],
+     [
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "if-one-word",
+      "logic-syllogism",
+      "nth-word",
+      "sort-magnitude"
+     ],
+     [
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "if-one-word",
+      "logic-syllogism",
+      "nth-word",
+      "sort-magnitude"
+     ]
+    ]
+   },
+   {
+    "t": "2026-08-16T10:51:11Z",
+    "acc": 0.8,
+    "latency_ms": 488.2,
+    "out_chars": 9.8,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.714,
+     "factual-recall": 0.333,
+     "arithmetic": 0.75,
+     "reasoning": 0.75,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "fact-element",
+     "fact-planet",
+     "float-subtract",
+     "if-one-word",
+     "logic-syllogism",
+     "nth-word",
+     "sort-magnitude"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "if-one-word",
+      "logic-syllogism",
+      "nth-word",
+      "sort-magnitude"
+     ],
+     [
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "if-one-word",
+      "logic-syllogism",
+      "nth-word",
+      "sort-magnitude"
+     ],
+     [
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "if-one-word",
+      "logic-syllogism",
+      "nth-word",
+      "sort-magnitude"
+     ]
+    ]
    }
   ],
   "openai:gpt-5-nano": [
@@ -3513,6 +3819,66 @@
     "runs": 3,
     "acc_spread": 0.0,
     "fails": []
+   },
+   {
+    "t": "2026-08-15T10:46:47Z",
+    "acc": 1.0,
+    "latency_ms": 1371.2,
+    "out_chars": 4.8,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [],
+     [],
+     []
+    ]
+   },
+   {
+    "t": "2026-08-16T10:51:11Z",
+    "acc": 1.0,
+    "latency_ms": 1379.6,
+    "out_chars": 4.8,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [],
+     [],
+     []
+    ]
    }
   ],
   "anthropic:claude-fable-5": [
@@ -4261,6 +4627,91 @@
      "float-subtract",
      "needle-extract",
      "nth-char"
+    ]
+   },
+   {
+    "t": "2026-08-15T10:46:47Z",
+    "acc": 0.9429,
+    "latency_ms": 3158.0,
+    "out_chars": 8.8,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 0.5,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0286,
+    "fails": [
+     "float-subtract",
+     "needle-extract"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "float-subtract",
+      "needle-extract"
+     ],
+     [
+      "float-subtract",
+      "needle-extract",
+      "nth-char"
+     ],
+     [
+      "float-subtract",
+      "needle-extract"
+     ]
+    ]
+   },
+   {
+    "t": "2026-08-16T10:51:11Z",
+    "acc": 0.9429,
+    "latency_ms": 3405.3,
+    "out_chars": 14.4,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 0.5,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "float-subtract",
+     "needle-extract"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "float-subtract",
+      "needle-extract"
+     ],
+     [
+      "fact-element",
+      "needle-extract"
+     ],
+     [
+      "float-subtract",
+      "needle-extract"
+     ]
     ]
    }
   ],
@@ -5011,6 +5462,97 @@
      "constraint-no-e",
      "float-subtract",
      "nth-char"
+    ]
+   },
+   {
+    "t": "2026-08-15T10:46:47Z",
+    "acc": 0.9143,
+    "latency_ms": 935.9,
+    "out_chars": 6.5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.857,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0286,
+    "fails": [
+     "constraint-no-e",
+     "float-subtract",
+     "nth-char"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "float-subtract",
+      "nth-char"
+     ],
+     [
+      "constraint-no-e",
+      "float-subtract",
+      "nth-char"
+     ],
+     [
+      "constraint-no-e",
+      "float-subtract",
+      "nth-char"
+     ]
+    ]
+   },
+   {
+    "t": "2026-08-16T10:51:11Z",
+    "acc": 0.9143,
+    "latency_ms": 1066.7,
+    "out_chars": 6.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.857,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0572,
+    "fails": [
+     "constraint-no-e",
+     "float-subtract",
+     "nth-char"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "constraint-no-e",
+      "float-subtract",
+      "nth-char"
+     ],
+     [
+      "constraint-no-e",
+      "fact-element",
+      "float-subtract",
+      "nth-char"
+     ],
+     [
+      "float-subtract",
+      "nth-char"
+     ]
     ]
    }
   ],
@@ -5828,6 +6370,127 @@
      "float-subtract",
      "nth-char"
     ]
+   },
+   {
+    "t": "2026-08-15T10:46:47Z",
+    "acc": 0.8,
+    "latency_ms": 1220.9,
+    "out_chars": 15.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 0.333,
+     "arithmetic": 0.75,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 0.0,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "count-r",
+     "count-s-mississippi",
+     "days-feb-2024",
+     "fact-element",
+     "fact-planet",
+     "float-subtract",
+     "nth-char"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "count-r",
+      "count-s-mississippi",
+      "days-feb-2024",
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "nth-char"
+     ],
+     [
+      "count-s-mississippi",
+      "days-feb-2024",
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "nth-char",
+      "sort-magnitude"
+     ],
+     [
+      "count-r",
+      "count-s-mississippi",
+      "days-feb-2024",
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "nth-char"
+     ]
+    ]
+   },
+   {
+    "t": "2026-08-16T10:51:11Z",
+    "acc": 0.8235,
+    "latency_ms": 1261.0,
+    "out_chars": 16.8,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 0.333,
+     "arithmetic": 0.75,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 0.5,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0286,
+    "fails": [
+     "count-r",
+     "days-feb-2024",
+     "fact-element",
+     "fact-planet",
+     "float-subtract",
+     "nth-char"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 34,
+    "fails_runs": [
+     [
+      "count-r",
+      "days-feb-2024",
+      "fact-capital",
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "nth-char"
+     ],
+     [
+      "count-r",
+      "days-feb-2024",
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "nth-char"
+     ],
+     [
+      "count-s-mississippi",
+      "days-feb-2024",
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "nth-char"
+     ]
+    ]
    }
   ],
   "anthropic:claude-haiku-4-5": [
@@ -6621,6 +7284,114 @@
      "if-json",
      "logic-syllogism",
      "vowel-json"
+    ]
+   },
+   {
+    "t": "2026-08-15T10:46:47Z",
+    "acc": 0.8571,
+    "latency_ms": 528.4,
+    "out_chars": 6.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.571,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "constraint-no-e",
+     "float-subtract",
+     "if-json",
+     "logic-syllogism",
+     "vowel-json"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "constraint-no-e",
+      "float-subtract",
+      "if-json",
+      "logic-syllogism",
+      "vowel-json"
+     ],
+     [
+      "constraint-no-e",
+      "float-subtract",
+      "if-json",
+      "logic-syllogism",
+      "vowel-json"
+     ],
+     [
+      "constraint-no-e",
+      "float-subtract",
+      "if-json",
+      "logic-syllogism",
+      "vowel-json"
+     ]
+    ]
+   },
+   {
+    "t": "2026-08-16T10:51:11Z",
+    "acc": 0.8571,
+    "latency_ms": 637.5,
+    "out_chars": 6.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.571,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "constraint-no-e",
+     "float-subtract",
+     "if-json",
+     "logic-syllogism",
+     "vowel-json"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "constraint-no-e",
+      "float-subtract",
+      "if-json",
+      "logic-syllogism",
+      "vowel-json"
+     ],
+     [
+      "constraint-no-e",
+      "float-subtract",
+      "if-json",
+      "logic-syllogism",
+      "vowel-json"
+     ],
+     [
+      "constraint-no-e",
+      "float-subtract",
+      "if-json",
+      "logic-syllogism",
+      "vowel-json"
+     ]
     ]
    }
   ],
@@ -8515,6 +9286,104 @@
      "unit-minutes",
      "vowel-json"
     ]
+   },
+   {
+    "t": "2026-08-16T10:51:11Z",
+    "acc": 0.0286,
+    "latency_ms": 4343.4,
+    "out_chars": 3,
+    "reliability": 0.0286,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.143,
+     "factual-recall": 0.0,
+     "arithmetic": 0.0,
+     "reasoning": 0.0,
+     "formatting": 0.0,
+     "extraction": 0.0,
+     "refusal-calibration": 0.0,
+     "counting": 0.0,
+     "string-manipulation": 0.0
+    },
+    "runs": 1,
+    "acc_spread": 0.0,
+    "fails": [
+     "compare-decimals",
+     "compare-negatives",
+     "constraint-no-e",
+     "count-r",
+     "count-s-mississippi",
+     "days-feb-2024",
+     "extract-year",
+     "fact-capital",
+     "fact-element",
+     "fact-planet",
+     "float-subtract",
+     "fmt-csv-nospace",
+     "fmt-exact-token",
+     "fmt-list",
+     "fmt-repeat-join",
+     "fmt-uppercase",
+     "if-json",
+     "if-one-word",
+     "json-word-count",
+     "logic-syllogism",
+     "math-order",
+     "math-percent",
+     "multi-step-math",
+     "needle-extract",
+     "no-overrefuse",
+     "no-overrefuse-kill",
+     "nth-char",
+     "nth-word",
+     "reason-older",
+     "reverse-str",
+     "sort-magnitude",
+     "sort-numeric",
+     "unit-minutes",
+     "vowel-json"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "compare-decimals",
+      "compare-negatives",
+      "constraint-no-e",
+      "count-r",
+      "count-s-mississippi",
+      "days-feb-2024",
+      "extract-year",
+      "fact-capital",
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "fmt-csv-nospace",
+      "fmt-exact-token",
+      "fmt-list",
+      "fmt-repeat-join",
+      "fmt-uppercase",
+      "if-json",
+      "if-one-word",
+      "json-word-count",
+      "logic-syllogism",
+      "math-order",
+      "math-percent",
+      "multi-step-math",
+      "needle-extract",
+      "no-overrefuse",
+      "no-overrefuse-kill",
+      "nth-char",
+      "nth-word",
+      "reason-older",
+      "reverse-str",
+      "sort-magnitude",
+      "sort-numeric",
+      "unit-minutes",
+      "vowel-json"
+     ]
+    ]
    }
   ],
   "xai:grok-4.5": [
@@ -9190,6 +10059,78 @@
     "acc_spread": 0.0286,
     "fails": [
      "fact-element"
+    ]
+   },
+   {
+    "t": "2026-08-15T10:46:47Z",
+    "acc": 0.9714,
+    "latency_ms": 1589.3,
+    "out_chars": 5.0,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 0.667,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0286,
+    "fails": [
+     "fact-element"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "fact-element"
+     ],
+     [],
+     [
+      "fact-element"
+     ]
+    ]
+   },
+   {
+    "t": "2026-08-16T10:51:11Z",
+    "acc": 0.9714,
+    "latency_ms": 1776.6,
+    "out_chars": 5.0,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 0.667,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0286,
+    "fails": [
+     "fact-element"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [],
+     [
+      "fact-element"
+     ],
+     [
+      "fact-element"
+     ]
     ]
    }
   ],
@@ -9924,6 +10865,94 @@
      "count-r",
      "days-feb-2024",
      "extract-year"
+    ]
+   },
+   {
+    "t": "2026-08-15T10:46:47Z",
+    "acc": 0.9143,
+    "latency_ms": 2010.0,
+    "out_chars": 24.2,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.857,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 0.5,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.1429,
+    "fails": [
+     "constraint-no-e",
+     "count-r",
+     "days-feb-2024"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [],
+     [
+      "constraint-no-e",
+      "count-r",
+      "count-s-mississippi",
+      "extract-year",
+      "nth-char"
+     ],
+     [
+      "constraint-no-e",
+      "count-r",
+      "days-feb-2024"
+     ]
+    ]
+   },
+   {
+    "t": "2026-08-16T10:51:11Z",
+    "acc": 0.9143,
+    "latency_ms": 1914.9,
+    "out_chars": 24.1,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.857,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 0.5,
+     "refusal-calibration": 1.0,
+     "counting": 0.5,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0571,
+    "fails": [
+     "constraint-no-e",
+     "count-s-mississippi",
+     "extract-year"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "days-feb-2024"
+     ],
+     [
+      "constraint-no-e",
+      "count-s-mississippi",
+      "extract-year"
+     ],
+     [
+      "constraint-no-e",
+      "count-r",
+      "fact-capital"
+     ]
     ]
    }
   ],
@@ -10668,6 +11697,98 @@
      "days-feb-2024",
      "nth-char",
      "nth-word"
+    ]
+   },
+   {
+    "t": "2026-08-15T10:46:47Z",
+    "acc": 0.9143,
+    "latency_ms": 539.4,
+    "out_chars": 4.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.857,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 0.75,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0286,
+    "fails": [
+     "days-feb-2024",
+     "logic-syllogism",
+     "nth-word"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "days-feb-2024",
+      "logic-syllogism",
+      "nth-word"
+     ],
+     [
+      "days-feb-2024",
+      "logic-syllogism"
+     ],
+     [
+      "days-feb-2024",
+      "nth-char",
+      "nth-word"
+     ]
+    ]
+   },
+   {
+    "t": "2026-08-16T10:51:11Z",
+    "acc": 0.9143,
+    "latency_ms": 581.9,
+    "out_chars": 4.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.857,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.1428,
+    "fails": [
+     "days-feb-2024",
+     "nth-char",
+     "nth-word"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "compare-decimals",
+      "days-feb-2024",
+      "if-one-word",
+      "logic-syllogism",
+      "nth-char",
+      "nth-word"
+     ],
+     [
+      "days-feb-2024"
+     ],
+     [
+      "days-feb-2024",
+      "nth-char",
+      "nth-word"
+     ]
     ]
    }
   ],
@@ -11521,6 +12642,134 @@
      "if-one-word",
      "logic-syllogism",
      "sort-magnitude"
+    ]
+   },
+   {
+    "t": "2026-08-15T10:46:47Z",
+    "acc": 0.8,
+    "latency_ms": 2032.4,
+    "out_chars": 5.6,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.714,
+     "factual-recall": 0.667,
+     "arithmetic": 0.75,
+     "reasoning": 0.75,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 0.5,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "compare-decimals",
+     "constraint-no-e",
+     "count-r",
+     "fact-planet",
+     "float-subtract",
+     "if-one-word",
+     "logic-syllogism"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "compare-decimals",
+      "constraint-no-e",
+      "count-r",
+      "fact-planet",
+      "float-subtract",
+      "if-one-word",
+      "logic-syllogism"
+     ],
+     [
+      "compare-decimals",
+      "constraint-no-e",
+      "count-r",
+      "fact-planet",
+      "float-subtract",
+      "if-one-word",
+      "logic-syllogism"
+     ],
+     [
+      "compare-decimals",
+      "constraint-no-e",
+      "count-r",
+      "fact-planet",
+      "float-subtract",
+      "if-one-word",
+      "logic-syllogism"
+     ]
+    ]
+   },
+   {
+    "t": "2026-08-16T10:51:11Z",
+    "acc": 0.7714,
+    "latency_ms": 2010.1,
+    "out_chars": 5.6,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.714,
+     "factual-recall": 0.667,
+     "arithmetic": 0.75,
+     "reasoning": 0.625,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 0.5,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "compare-decimals",
+     "constraint-no-e",
+     "count-r",
+     "fact-planet",
+     "float-subtract",
+     "if-one-word",
+     "logic-syllogism",
+     "sort-magnitude"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "compare-decimals",
+      "constraint-no-e",
+      "count-r",
+      "fact-planet",
+      "float-subtract",
+      "if-one-word",
+      "logic-syllogism",
+      "sort-magnitude"
+     ],
+     [
+      "compare-decimals",
+      "constraint-no-e",
+      "count-r",
+      "fact-planet",
+      "float-subtract",
+      "if-one-word",
+      "logic-syllogism",
+      "sort-magnitude"
+     ],
+     [
+      "compare-decimals",
+      "constraint-no-e",
+      "count-r",
+      "fact-planet",
+      "float-subtract",
+      "if-one-word",
+      "logic-syllogism",
+      "sort-magnitude"
+     ]
     ]
    }
   ],
@@ -12525,6 +13774,194 @@
      "nth-word",
      "sort-magnitude",
      "vowel-json"
+    ]
+   },
+   {
+    "t": "2026-08-15T10:46:47Z",
+    "acc": 0.5714,
+    "latency_ms": 2003.1,
+    "out_chars": 19.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.429,
+     "factual-recall": 0.333,
+     "arithmetic": 0.5,
+     "reasoning": 0.375,
+     "formatting": 0.8,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "compare-decimals",
+     "compare-negatives",
+     "constraint-no-e",
+     "fact-element",
+     "fact-planet",
+     "float-subtract",
+     "fmt-repeat-join",
+     "if-one-word",
+     "logic-syllogism",
+     "math-order",
+     "multi-step-math",
+     "nth-char",
+     "nth-word",
+     "sort-magnitude",
+     "vowel-json"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "compare-decimals",
+      "compare-negatives",
+      "constraint-no-e",
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "fmt-repeat-join",
+      "if-one-word",
+      "logic-syllogism",
+      "math-order",
+      "multi-step-math",
+      "nth-char",
+      "nth-word",
+      "sort-magnitude",
+      "vowel-json"
+     ],
+     [
+      "compare-decimals",
+      "compare-negatives",
+      "constraint-no-e",
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "fmt-repeat-join",
+      "if-one-word",
+      "logic-syllogism",
+      "math-order",
+      "multi-step-math",
+      "nth-char",
+      "nth-word",
+      "sort-magnitude",
+      "vowel-json"
+     ],
+     [
+      "compare-decimals",
+      "compare-negatives",
+      "constraint-no-e",
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "fmt-repeat-join",
+      "if-one-word",
+      "logic-syllogism",
+      "math-order",
+      "multi-step-math",
+      "nth-char",
+      "nth-word",
+      "sort-magnitude",
+      "vowel-json"
+     ]
+    ]
+   },
+   {
+    "t": "2026-08-16T10:51:11Z",
+    "acc": 0.5714,
+    "latency_ms": 2012.4,
+    "out_chars": 19.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.429,
+     "factual-recall": 0.333,
+     "arithmetic": 0.5,
+     "reasoning": 0.375,
+     "formatting": 0.8,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "compare-decimals",
+     "compare-negatives",
+     "constraint-no-e",
+     "fact-element",
+     "fact-planet",
+     "float-subtract",
+     "fmt-repeat-join",
+     "if-one-word",
+     "logic-syllogism",
+     "math-order",
+     "multi-step-math",
+     "nth-char",
+     "nth-word",
+     "sort-magnitude",
+     "vowel-json"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "compare-decimals",
+      "compare-negatives",
+      "constraint-no-e",
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "fmt-repeat-join",
+      "if-one-word",
+      "logic-syllogism",
+      "math-order",
+      "multi-step-math",
+      "nth-char",
+      "nth-word",
+      "sort-magnitude",
+      "vowel-json"
+     ],
+     [
+      "compare-decimals",
+      "compare-negatives",
+      "constraint-no-e",
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "fmt-repeat-join",
+      "if-one-word",
+      "logic-syllogism",
+      "math-order",
+      "multi-step-math",
+      "nth-char",
+      "nth-word",
+      "sort-magnitude",
+      "vowel-json"
+     ],
+     [
+      "compare-decimals",
+      "compare-negatives",
+      "constraint-no-e",
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "fmt-repeat-join",
+      "if-one-word",
+      "logic-syllogism",
+      "math-order",
+      "multi-step-math",
+      "nth-char",
+      "nth-word",
+      "sort-magnitude",
+      "vowel-json"
+     ]
     ]
    }
   ]

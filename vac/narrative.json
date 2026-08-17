@@ -1,13 +1,13 @@
 {
  "sentences": [
   "<strong>OpenAI's cheaper tiers match its own flagship</strong> \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy.",
-  "<strong>Llama 3.1 8B answers with 4.2x the characters of the tersest model</strong>, at 57%.",
-  "<strong>GPT-4o mini leads on speed</strong> at 423 ms and 80% accuracy."
+  "<strong>Grok 4.3 answers with 5x the characters of the tersest model</strong>, at 91%.",
+  "<strong>GPT-4o mini leads on speed</strong> at 488 ms and 80% accuracy."
  ],
- "html": "A frozen, deterministically-graded suite against <strong>13 models across 4 labs</strong>. 3 of the 16 tracked models did not return a clean run and are left out of the comparisons below. <strong>OpenAI's cheaper tiers match its own flagship</strong> \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy. <strong>Llama 3.1 8B answers with 4.2x the characters of the tersest model</strong>, at 57%. <strong>GPT-4o mini leads on speed</strong> at 423 ms and 80% accuracy. <em>Generated from the run of 14 Aug 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.</em>",
- "text": "A frozen, deterministically-graded suite against 13 models across 4 labs. 3 of the 16 tracked models did not return a clean run and are left out of the comparisons below. OpenAI's cheaper tiers match its own flagship \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy. Llama 3.1 8B answers with 4.2x the characters of the tersest model, at 57%. GPT-4o mini leads on speed at 423 ms and 80% accuracy. Generated from the run of 14 Aug 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.",
+ "html": "A frozen, deterministically-graded suite against <strong>13 models across 4 labs</strong>. 3 of the 16 tracked models did not return a clean run and are left out of the comparisons below. <strong>OpenAI's cheaper tiers match its own flagship</strong> \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy. <strong>Grok 4.3 answers with 5x the characters of the tersest model</strong>, at 91%. <strong>GPT-4o mini leads on speed</strong> at 488 ms and 80% accuracy. <em>Generated from the run of 16 Aug 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.</em>",
+ "text": "A frozen, deterministically-graded suite against 13 models across 4 labs. 3 of the 16 tracked models did not return a clean run and are left out of the comparisons below. OpenAI's cheaper tiers match its own flagship \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy. Grok 4.3 answers with 5x the characters of the tersest model, at 91%. GPT-4o mini leads on speed at 488 ms and 80% accuracy. Generated from the run of 16 Aug 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.",
  "models": 16,
  "clean": 13,
- "updated": "2026-08-14T11:28:46Z",
+ "updated": "2026-08-16T10:51:11Z",
  "claims_fired": 3
 }
