@@ -1,5 +1,24 @@
 [
   {
+    "date": "2026-08-19",
+    "title": "Regression: Gemini 3.5 Flash -94.3 pts",
+    "metric": "accuracy",
+    "models": [
+      "anthropic:claude-fable-5",
+      "google:gemini-3.1-pro",
+      "google:gemini-3.5-flash",
+      "xai:grok-4.3",
+      "meta:llama-3.3-70b"
+    ],
+    "summary": "5 model(s) regressed against the previous run; worst was Gemini 3.5 Flash at -94.3 pts. Auto-logged — confirm it's real before writing it up.",
+    "body": [
+      {
+        "p": "Auto-logged when the scheduled probe flagged a run-over-run regression. Before this becomes a post, check the run log and the Reliability metric — a rate limit or provider outage can look exactly like a regression. If it holds up, the written explanation goes here."
+      }
+    ],
+    "stub": true
+  },
+  {
     "date": "2026-08-18",
     "title": "Regression: Gemini 3.5 Flash -94.3 pts",
     "metric": "accuracy",
