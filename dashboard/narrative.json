@@ -1,13 +1,13 @@
 {
  "sentences": [
   "<strong>OpenAI's cheaper tiers match its own flagship</strong> \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy.",
-  "<strong>Grok 4.3 answers with 6.6x the characters of the tersest model</strong>, at 88%.",
-  "<strong>Grok 4 Fast leads on speed</strong> at 482 ms and 91% accuracy."
+  "<strong>Grok 4.3 answers with 7.5x the characters of the tersest model</strong>, at 94%.",
+  "<strong>GPT-4o mini answers fastest and scores lowest</strong> (523 ms at 80%) \u2014 a speed/quality tradeoff you can see rather than argue about."
  ],
- "html": "A frozen, deterministically-graded suite against <strong>11 models across 3 labs</strong>. 5 of the 16 tracked models did not return a clean run and are left out of the comparisons below. <strong>OpenAI's cheaper tiers match its own flagship</strong> \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy. <strong>Grok 4.3 answers with 6.6x the characters of the tersest model</strong>, at 88%. <strong>Grok 4 Fast leads on speed</strong> at 482 ms and 91% accuracy. <em>Generated from the run of 19 Aug 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.</em>",
- "text": "A frozen, deterministically-graded suite against 11 models across 3 labs. 5 of the 16 tracked models did not return a clean run and are left out of the comparisons below. OpenAI's cheaper tiers match its own flagship \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy. Grok 4.3 answers with 6.6x the characters of the tersest model, at 88%. Grok 4 Fast leads on speed at 482 ms and 91% accuracy. Generated from the run of 19 Aug 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.",
+ "html": "A frozen, deterministically-graded suite against <strong>11 models across 3 labs</strong>. 5 of the 16 tracked models did not return a clean run and are left out of the comparisons below. <strong>OpenAI's cheaper tiers match its own flagship</strong> \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy. <strong>Grok 4.3 answers with 7.5x the characters of the tersest model</strong>, at 94%. <strong>GPT-4o mini answers fastest and scores lowest</strong> (523 ms at 80%) \u2014 a speed/quality tradeoff you can see rather than argue about. <em>Generated from the run of 20 Aug 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.</em>",
+ "text": "A frozen, deterministically-graded suite against 11 models across 3 labs. 5 of the 16 tracked models did not return a clean run and are left out of the comparisons below. OpenAI's cheaper tiers match its own flagship \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy. Grok 4.3 answers with 7.5x the characters of the tersest model, at 94%. GPT-4o mini answers fastest and scores lowest (523 ms at 80%) \u2014 a speed/quality tradeoff you can see rather than argue about. Generated from the run of 20 Aug 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.",
  "models": 16,
  "clean": 11,
- "updated": "2026-08-19T11:03:37Z",
+ "updated": "2026-08-20T11:03:45Z",
  "claims_fired": 3
 }
