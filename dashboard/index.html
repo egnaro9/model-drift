@@ -162,8 +162,9 @@
     <p class="sub">Model providers ship silent updates. A prompt that worked can quietly get worse
       with no version bump and no error. This tracks it: a <strong>frozen, deterministically-graded
       suite</strong> runs against live models on a schedule, every score is kept, and a drop from one
-      run to the next is flagged. No LLM-as-judge — the grader is exact-match, so a score change means
-      the <em>model</em> moved.</p>
+      run to the next is flagged. No LLM-as-judge: the grader is exact-match, so a score change is never
+      the scorer drifting, but accuracy is scored over graded calls only, so a delta beneath the run's
+      detection floor is the denominator moving rather than the <em>model</em>.</p>
     <p class="updated" id="updated">Loading…</p>
   </header>
 
@@ -598,7 +599,12 @@ async function renderNotes() {
   if (!box) return;
   const notes = await fetchNotes();
   if (!Array.isArray(notes) || !notes.length) { if (card) card.hidden = true; return; }
-  box.replaceChildren(...notes.map(noteEl));
+  // Hand-written notes lead. The probe auto-logs a stub for every flagged run, so 33 of 35 entries
+  // are machine-written and array order put the two investigated ones at positions 31 and 35: a
+  // reader met thirty consecutive alerts before reaching anything a person wrote. Sort is stable,
+  // so each group keeps its existing newest-first order.
+  const ordered = [...notes].sort((a, b) => (a.stub === b.stub) ? 0 : (a.stub ? 1 : -1));
+  box.replaceChildren(...ordered.map(noteEl));
 }
 renderNotes();
 
