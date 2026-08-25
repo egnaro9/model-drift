@@ -67,3 +67,26 @@ def test_python_and_dashboard_floors_agree():
     assert m, "REL_FLOOR not found in dashboard/index.html"
     assert float(m.group(1)) == REL_FLOOR, (
         f"dashboard JS floor {m.group(1)} != Python REL_FLOOR {REL_FLOOR}")
+
+
+def test_report_consumes_the_floor_rather_than_redefining_it():
+    """Three surfaces now, one authority.
+
+    The 2026-08-17 fix moved the floor into Python, but into board.py only. report.py, which
+    track.yml actually runs to write RESULTS.md, kept deriving statuses from eval-history,
+    which carries no reliability column at all and so cannot apply a floor. The published
+    table went on scoring a Google outage as three Gemini regressions for three weeks while
+    the chart above it was correct, because nothing pinned the producer to the authority.
+
+    A fourth implementation is the failure mode, so this asserts absence: report.py must
+    import the derivation, never define a floor of its own.
+    """
+    src = (ROOT / "modeldrift" / "report.py").read_text()
+    assert not re.search(r"^\s*REL_FLOOR\s*=", src, re.M), (
+        "report.py defines its own reliability floor; it must import board.REL_FLOOR")
+    assert "statuses_from_series" in src, (
+        "report.py must derive statuses through board.statuses_from_series, the single "
+        "implementation of the trust floor")
+    assert not re.search(r"^\s*statuses\s*=\s*gather\(", src, re.M), (
+        "report.py still builds the published statuses from eval-history, which has no "
+        "reliability column and therefore cannot apply the floor")

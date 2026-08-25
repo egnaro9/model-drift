@@ -229,13 +229,30 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument("--notes", default=None, help="append a stub Field Note here on a regression")
     args = p.parse_args(argv)
 
-    statuses = gather(args.api)
+    # The committed rows are the authority for what gets published, not eval-history.
+    # eval-history has no reliability column (run.py never posts one), so a report built
+    # from it cannot apply the trust floor: it published a Google outage as three Gemini
+    # regressions for three weeks while the chart above it, which does apply the floor,
+    # correctly showed nothing. board.statuses_from_series is the single implementation of
+    # that floor; report renders what it returns rather than deriving statuses a second
+    # time. It also supplies `graded`, so the separate metrics join is no longer needed.
+    # Imported here, not at module scope: board imports this module for ModelStatus and
+    # results_md, so a top-level import would be circular.
+    from .board import statuses_from_series
+    from pathlib import Path
     try:
-        from pathlib import Path
-        fill_graded_from_metrics(
-            statuses, json.loads(Path(args.metrics).read_text(encoding="utf-8")))
-    except (FileNotFoundError, json.JSONDecodeError):
-        pass   # no stored rows to join — the column prints "—", same as before
+        metrics = json.loads(Path(args.metrics).read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        # Previously this degraded to eval-history. It cannot now: the stored rows are the
+        # only place reliability lives, so continuing would publish an unfloored table,
+        # which is the defect. Refuse instead of quietly emitting one.
+        raise SystemExit(f"report: cannot read {args.metrics} ({type(e).__name__}); "
+                         f"it carries the reliability the trust floor needs, so the "
+                         f"standings cannot be rendered without it") from None
+    # statuses_from_series reads the registry as models.json does, so hand it that shape
+    # rather than the Model dataclasses load_registry builds.
+    registry = [{"id": m.id, "label": m.label} for m in load_registry()]
+    statuses = statuses_from_series(metrics.get("series") or {}, registry)
     with open(args.results, "w", encoding="utf-8") as fh:
         fh.write(results_md(statuses))
     print(f"wrote {args.results}")

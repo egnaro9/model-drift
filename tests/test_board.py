@@ -12,6 +12,7 @@ Two disciplines pinned here, both paid for elsewhere in this repo:
     quietly publishing two disagreeing tables.
 """
 import json
+import pytest
 import pathlib
 
 from modeldrift.board import (coherence, results_md_offline, standings_rows,
@@ -127,14 +128,87 @@ def _committed():
 
 
 def test_committed_results_md_rerenders_from_the_committed_rows():
-    """The whole published table — every accuracy, delta, floor, and verdict —
-    is a byte-identical function of the stored rows. If this goes red, the
-    board's two stores (eval-history, which report.py reads live, and the
-    committed metrics file) have diverged: diagnose which one is lying before
-    anything else, and never 'fix' it by editing RESULTS.md by hand."""
+    """RESULTS.md on disk is exactly what the renderer emits from the stored rows.
+
+    This no longer cross-checks two stores. It used to, by accident: report.py built the
+    published table from eval-history while this rebuilt it from the committed rows, so a
+    disagreement showed up as a Markdown diff. That coincidence was also the bug's hiding
+    place, because eval-history has no reliability column and could not apply the trust
+    floor, so the two sides were never comparable in the first place. report.py now renders
+    through this same derivation, which makes this a staleness check: the committed file
+    matches the current code. The store agreement it used to imply is asserted directly by
+    test_eval_history_agrees_with_the_committed_series below.
+
+    Never 'fix' a failure here by editing RESULTS.md by hand; re-run the producer."""
     metrics, registry = _committed()
     derived = results_md_offline(metrics["series"], registry)
     assert derived == (ROOT / "RESULTS.md").read_text(encoding="utf-8")
+
+
+def test_eval_history_agrees_with_the_committed_series():
+    """The upstream evaluation record and the committed rows describe the same runs.
+
+    The real invariant behind the old Markdown comparison. run.py posts each probe to
+    eval-history and writes the same numbers into dashboard/metrics.json; if those two
+    stores disagree, one of them is lying and every published figure is suspect.
+
+    Handling, stated rather than implied:
+      * eval-history unreachable  -> skip. A repo test cannot assert a third-party service
+        is up. This is a real gap: the check does not run when the service is down, so it
+        is a companion to CI-side validation, not a substitute for it.
+      * model absent upstream     -> skip that model (newly added, never probed).
+      * model absent locally      -> skip that model.
+      * upstream ahead of commit  -> compare like-for-like by run DATE, never newest-to-newest.
+        The probe posts to eval-history immediately and the commit lands afterwards, so
+        upstream is routinely a day ahead. Comparing the two newest rows reports that
+        ordinary lag as a store disagreement, which is a false alarm, not a defect.
+      * no upstream run for the committed date -> skip that model.
+      * failed / sub-floor runs   -> NOT excluded. This compares what each store recorded,
+        not what is trustworthy. An outage must appear identically in both; filtering it
+        here would hide exactly the disagreement the test exists to find.
+    """
+    import urllib.error
+    import urllib.request
+    from urllib.parse import quote
+
+    api = "https://eval-history.onrender.com"
+    metrics, registry = _committed()
+    series = metrics["series"]
+
+    def upstream_runs(model_id):
+        url = f"{api}/runs?name={quote(model_id)}&limit=10"
+        with urllib.request.urlopen(url, timeout=30) as r:
+            return json.loads(r.read())
+
+    try:
+        probe = upstream_runs(registry[0]["id"])
+    except Exception as e:                                  # noqa: BLE001 - service, not code
+        pytest.skip(f"eval-history unreachable ({type(e).__name__}); store agreement unchecked")
+    if not probe and not any(series.get(m["id"]) for m in registry):
+        pytest.skip("neither store has any runs yet")
+
+    compared, mismatches = 0, []
+    for m in registry:
+        pts = series.get(m["id"]) or []
+        if not pts:
+            continue
+        try:
+            runs = upstream_runs(m["id"])
+        except Exception:                                   # noqa: BLE001
+            continue
+        day = str(pts[-1].get("t"))[:10]
+        up = next((r for r in runs if str(r.get("created_at"))[:10] == day), None)
+        if up is None:
+            continue
+        compared += 1
+        local, remote = round(pts[-1]["acc"], 4), round(up["faithfulness"], 4)
+        if local != remote:
+            mismatches.append(
+                f"{m['id']} on {day}: committed {local} vs eval-history {remote}")
+
+    assert compared, "no model could be compared; the agreement check did not actually run"
+    assert not mismatches, (
+        "the two stores disagree on the newest run:\n  " + "\n  ".join(mismatches))
 
 
 def test_committed_narrative_rederives_from_the_committed_rows():
