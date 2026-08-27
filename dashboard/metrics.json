@@ -1,5 +1,5 @@
 {
- "updated": "2026-08-26T11:07:10Z",
+ "updated": "2026-08-27T21:12:04Z",
  "suite_version": "2026-07-v3",
  "suite_size": 35,
  "series": {
@@ -1002,6 +1002,36 @@
    },
    {
     "t": "2026-08-26T11:07:10Z",
+    "acc": 1.0,
+    "latency_ms": 0.0,
+    "out_chars": 5,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [],
+     [],
+     []
+    ]
+   },
+   {
+    "t": "2026-08-27T21:12:04Z",
     "acc": 1.0,
     "latency_ms": 0.0,
     "out_chars": 5,
@@ -2057,6 +2087,36 @@
      [],
      []
     ]
+   },
+   {
+    "t": "2026-08-27T21:12:04Z",
+    "acc": 1.0,
+    "latency_ms": 1865.0,
+    "out_chars": 4.8,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [],
+     [],
+     []
+    ]
    }
   ],
   "openai:gpt-5-mini": [
@@ -3065,6 +3125,36 @@
     "acc": 1.0,
     "latency_ms": 1656.1,
     "out_chars": 4.8,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [],
+     [],
+     []
+    ]
+   },
+   {
+    "t": "2026-08-27T21:12:04Z",
+    "acc": 1.0,
+    "latency_ms": 1745.9,
+    "out_chars": 4.9,
     "reliability": 1.0,
     "refusal_rate": 0.0,
     "by_kind": {
@@ -4669,6 +4759,68 @@
       "sort-magnitude"
      ]
     ]
+   },
+   {
+    "t": "2026-08-27T21:12:04Z",
+    "acc": 0.8,
+    "latency_ms": 538.2,
+    "out_chars": 9.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.714,
+     "factual-recall": 0.333,
+     "arithmetic": 0.75,
+     "reasoning": 0.75,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "fact-element",
+     "fact-planet",
+     "float-subtract",
+     "if-one-word",
+     "logic-syllogism",
+     "nth-word",
+     "sort-magnitude"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "if-one-word",
+      "logic-syllogism",
+      "nth-word",
+      "sort-magnitude"
+     ],
+     [
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "if-one-word",
+      "logic-syllogism",
+      "nth-word",
+      "sort-magnitude"
+     ],
+     [
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "if-one-word",
+      "logic-syllogism",
+      "nth-word",
+      "sort-magnitude"
+     ]
+    ]
    }
   ],
   "openai:gpt-5-nano": [
@@ -5704,6 +5856,38 @@
      [],
      [],
      []
+    ]
+   },
+   {
+    "t": "2026-08-27T21:12:04Z",
+    "acc": 1.0,
+    "latency_ms": 2069.3,
+    "out_chars": 4.8,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0286,
+    "fails": [],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [],
+     [],
+     [
+      "needle-extract"
+     ]
     ]
    }
   ],
@@ -6975,6 +7159,50 @@
      [
       "fact-element",
       "float-subtract",
+      "needle-extract"
+     ]
+    ]
+   },
+   {
+    "t": "2026-08-27T21:12:04Z",
+    "acc": 0.9143,
+    "latency_ms": 3112.0,
+    "out_chars": 11.3,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 0.5,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0571,
+    "fails": [
+     "float-subtract",
+     "needle-extract",
+     "nth-char"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "float-subtract",
+      "needle-extract",
+      "nth-char"
+     ],
+     [
+      "float-subtract",
+      "needle-extract",
+      "nth-char"
+     ],
+     [
       "needle-extract"
      ]
     ]
@@ -8266,6 +8494,51 @@
      ],
      [
       "constraint-no-e",
+      "float-subtract",
+      "nth-char"
+     ],
+     [
+      "constraint-no-e",
+      "float-subtract",
+      "nth-char"
+     ]
+    ]
+   },
+   {
+    "t": "2026-08-27T21:12:04Z",
+    "acc": 0.9143,
+    "latency_ms": 1090.7,
+    "out_chars": 6.8,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.857,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0286,
+    "fails": [
+     "constraint-no-e",
+     "float-subtract",
+     "nth-char"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "constraint-no-e",
+      "float-subtract",
+      "nth-char"
+     ],
+     [
       "float-subtract",
       "nth-char"
      ],
@@ -9774,6 +10047,62 @@
       "nth-char"
      ]
     ]
+   },
+   {
+    "t": "2026-08-27T21:12:04Z",
+    "acc": 0.8571,
+    "latency_ms": 1817.7,
+    "out_chars": 11.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 0.667,
+     "arithmetic": 0.75,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 0.5,
+     "string-manipulation": 0.5
+    },
+    "runs": 3,
+    "acc_spread": 0.0571,
+    "fails": [
+     "count-s-mississippi",
+     "days-feb-2024",
+     "fact-element",
+     "float-subtract",
+     "nth-char"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "count-s-mississippi",
+      "days-feb-2024",
+      "fact-element",
+      "float-subtract",
+      "nth-char"
+     ],
+     [
+      "days-feb-2024",
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "nth-char"
+     ],
+     [
+      "count-s-mississippi",
+      "days-feb-2024",
+      "fact-capital",
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "nth-char"
+     ]
+    ]
    }
   ],
   "anthropic:claude-haiku-4-5": [
@@ -11167,6 +11496,60 @@
     "t": "2026-08-26T11:07:10Z",
     "acc": 0.8571,
     "latency_ms": 566.5,
+    "out_chars": 6.9,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.571,
+     "factual-recall": 1.0,
+     "arithmetic": 0.75,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "constraint-no-e",
+     "float-subtract",
+     "if-json",
+     "logic-syllogism",
+     "vowel-json"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "constraint-no-e",
+      "float-subtract",
+      "if-json",
+      "logic-syllogism",
+      "vowel-json"
+     ],
+     [
+      "constraint-no-e",
+      "float-subtract",
+      "if-json",
+      "logic-syllogism",
+      "vowel-json"
+     ],
+     [
+      "constraint-no-e",
+      "float-subtract",
+      "if-json",
+      "logic-syllogism",
+      "vowel-json"
+     ]
+    ]
+   },
+   {
+    "t": "2026-08-27T21:12:04Z",
+    "acc": 0.8571,
+    "latency_ms": 585.9,
     "out_chars": 6.9,
     "reliability": 1.0,
     "refusal_rate": 0.0,
@@ -13697,6 +14080,102 @@
       "vowel-json"
      ]
     ]
+   },
+   {
+    "t": "2026-08-27T21:12:04Z",
+    "acc": 0.0571,
+    "latency_ms": 16351.3,
+    "out_chars": 5,
+    "reliability": 0.0571,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.0,
+     "factual-recall": 0.333,
+     "arithmetic": 0.0,
+     "reasoning": 0.125,
+     "formatting": 0.0,
+     "extraction": 0.0,
+     "refusal-calibration": 0.0,
+     "counting": 0.0,
+     "string-manipulation": 0.0
+    },
+    "runs": 1,
+    "acc_spread": 0.0,
+    "fails": [
+     "compare-decimals",
+     "constraint-no-e",
+     "count-r",
+     "count-s-mississippi",
+     "days-feb-2024",
+     "extract-year",
+     "fact-element",
+     "fact-planet",
+     "float-subtract",
+     "fmt-csv-nospace",
+     "fmt-exact-token",
+     "fmt-list",
+     "fmt-repeat-join",
+     "fmt-uppercase",
+     "if-json",
+     "if-no-preamble",
+     "if-one-word",
+     "json-word-count",
+     "logic-syllogism",
+     "math-order",
+     "math-percent",
+     "multi-step-math",
+     "needle-extract",
+     "no-overrefuse",
+     "no-overrefuse-kill",
+     "nth-char",
+     "nth-word",
+     "reason-older",
+     "reverse-str",
+     "sort-magnitude",
+     "sort-numeric",
+     "unit-minutes",
+     "vowel-json"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "compare-decimals",
+      "constraint-no-e",
+      "count-r",
+      "count-s-mississippi",
+      "days-feb-2024",
+      "extract-year",
+      "fact-element",
+      "fact-planet",
+      "float-subtract",
+      "fmt-csv-nospace",
+      "fmt-exact-token",
+      "fmt-list",
+      "fmt-repeat-join",
+      "fmt-uppercase",
+      "if-json",
+      "if-no-preamble",
+      "if-one-word",
+      "json-word-count",
+      "logic-syllogism",
+      "math-order",
+      "math-percent",
+      "multi-step-math",
+      "needle-extract",
+      "no-overrefuse",
+      "no-overrefuse-kill",
+      "nth-char",
+      "nth-word",
+      "reason-older",
+      "reverse-str",
+      "sort-magnitude",
+      "sort-numeric",
+      "unit-minutes",
+      "vowel-json"
+     ]
+    ]
    }
   ],
   "xai:grok-4.5": [
@@ -14825,6 +15304,42 @@
      [
       "fact-element"
      ],
+     [
+      "fact-element"
+     ]
+    ]
+   },
+   {
+    "t": "2026-08-27T21:12:04Z",
+    "acc": 0.9714,
+    "latency_ms": 2035.0,
+    "out_chars": 5.1,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 1.0,
+     "factual-recall": 0.667,
+     "arithmetic": 1.0,
+     "reasoning": 1.0,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0286,
+    "fails": [
+     "fact-element"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "fact-element"
+     ],
+     [],
      [
       "fact-element"
      ]
@@ -16074,6 +16589,52 @@
      ],
      [
       "count-s-mississippi"
+     ]
+    ]
+   },
+   {
+    "t": "2026-08-27T21:12:04Z",
+    "acc": 0.9143,
+    "latency_ms": 2010.5,
+    "out_chars": 30.7,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.857,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 0.5,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0,
+    "fails": [
+     "constraint-no-e",
+     "count-s-mississippi",
+     "days-feb-2024"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "constraint-no-e",
+      "count-s-mississippi",
+      "days-feb-2024"
+     ],
+     [
+      "count-r",
+      "days-feb-2024",
+      "nth-char"
+     ],
+     [
+      "count-r",
+      "days-feb-2024",
+      "extract-year"
      ]
     ]
    }
@@ -17370,6 +17931,53 @@
       "days-feb-2024",
       "fact-planet",
       "nth-word"
+     ]
+    ]
+   },
+   {
+    "t": "2026-08-27T21:12:04Z",
+    "acc": 0.9143,
+    "latency_ms": 561.7,
+    "out_chars": 5.0,
+    "reliability": 1.0,
+    "refusal_rate": 0.0,
+    "by_kind": {
+     "instruction-following": 0.714,
+     "factual-recall": 1.0,
+     "arithmetic": 1.0,
+     "reasoning": 0.875,
+     "formatting": 1.0,
+     "extraction": 1.0,
+     "refusal-calibration": 1.0,
+     "counting": 1.0,
+     "string-manipulation": 1.0
+    },
+    "runs": 3,
+    "acc_spread": 0.0858,
+    "fails": [
+     "days-feb-2024",
+     "if-one-word",
+     "nth-word"
+    ],
+    "suite": "2026-07-v3",
+    "suite_hash": "e76f17b6c56e",
+    "graded": 35,
+    "fails_runs": [
+     [
+      "days-feb-2024",
+      "if-one-word",
+      "nth-word"
+     ],
+     [
+      "days-feb-2024",
+      "sort-magnitude"
+     ],
+     [
+      "days-feb-2024",
+      "math-order",
+      "nth-char",
+      "nth-word",
+      "sort-magnitude"
      ]
     ]
    }
