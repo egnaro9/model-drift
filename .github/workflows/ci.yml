@@ -77,6 +77,15 @@ jobs:
         run: |
           stamp=$(python3 -c "import json; print(json.load(open('vac/vac.json'))['protocol']['issuer_commit'])")
           git worktree add "$RUNNER_TEMP/at-stamp" "$stamp"
+          # vac/ is pure output: the emitter reads dashboard/ and writes only here.
+          # Clear it before re-emitting, because the stamp names the CODE commit and
+          # the bundle lands one commit later, so the stamped tree still holds the
+          # PREVIOUS bundle. When an artifact is renamed, the emitter's closed-bundle
+          # guard then refuses the leftover and this job fails on a bundle that is
+          # correct. The closed-bundle property is not lost: `diff -r` below fails on
+          # any file the emitter would not write, and it reads the PUBLISHED tree,
+          # which is the one the claim is actually made about.
+          rm -rf "$RUNNER_TEMP/at-stamp/vac"
           ( cd "$RUNNER_TEMP/at-stamp" && python3 emit_vac.py )
           diff -r "$RUNNER_TEMP/at-stamp/vac" vac
       - name: The committed narrative re-derives from the committed rows at HEAD
