@@ -20,7 +20,7 @@ Model providers ship silent updates. A [peer-reviewed study](https://arxiv.org/a
 | **Reliability** | Share of calls that succeeded. Flaky? | " |
 | **Refusals** | Share of benign prompts refused. Over-refusing? | " |
 
-The last four are byproducts of calls already made (near-zero extra cost) and live in a repo-committed `metrics.json` the dashboard reads from raw GitHub. Accuracy is the one that fires the automatic regression alert.
+The last four are byproducts of calls already made (near-zero extra cost) and live in a repo-committed `drift_board.json` the dashboard reads from raw GitHub. Accuracy is the one that fires the automatic regression alert.
 
 ```
 frozen suite ──►  live model APIs  ──►  deterministic grader  ──►  eval-history  ──►  chart + "▼ regressed"
@@ -118,7 +118,7 @@ What it refuses to do, because each one is a way this kind of tool lies:
 | **Break a tie silently** | "The slowest model" is false when two tie. Superlatives return *every* row at the extreme, so the renderer has to say so. |
 | **Print one number beside several models** | It caught this in its own first output: Flash and Flash-Lite are at 100% and 95%, and the template said both were at 100%. Scores are per-model now. |
 | **Round a percentage up** | 99.6% shown as "100%" is a perfect score a model didn't get, in the figure a reader checks hardest. Truncation can only understate. |
-| **Date the prose by a file write** | `metrics.json`'s `updated` is stamped on *every* write, including a mock-only CI run. The date comes from the newest real measurement. |
+| **Date the prose by a file write** | `drift_board.json`'s `updated` is stamped on *every* write, including a mock-only CI run. The date comes from the newest real measurement. |
 | **Let a throttled model win a superlative** | A partial provider failure still records a point, with a depressed score and a latency measured over whatever calls got through. Those rows stay on the chart but out of the comparisons. And the paragraph says how many were left out before it compares anything. |
 | **Generalise past its own predicate** | A cheap tier beating *its own lab's* flagship says nothing about cheap tiers generally. On this board, Meta's and OpenAI's cost plenty. |
 

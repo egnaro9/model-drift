@@ -27,6 +27,8 @@ import urllib.request
 from dataclasses import dataclass
 from typing import List, Optional
 
+from .policy import REL_FLOOR
+
 from .providers import load_registry
 from .suite import SUITE_VERSION
 
@@ -40,6 +42,23 @@ class ModelStatus:
     verdict: str                 # regressed | improved | unchanged | baseline | no-data
     when: Optional[str]
     graded: Optional[int] = None  # calls actually graded in the latest run; sets the floor
+
+    # THE LATEST RAW OBSERVATION, qualifying or not. The fields above are the
+    # floored view: `latest` is the newest accuracy that CLEARED REL_FLOOR, so
+    # on an outage they deliberately report a stale-but-honest number. That is
+    # the fix for publishing a provider's bad morning as a regression.
+    #
+    # Reporting only that view has the opposite failure: the collapse becomes
+    # invisible, and a reader cannot tell a stable model from an unreachable
+    # one. So the raw point travels alongside its floored standing, and
+    # `observed_qualified` says which of the two the reader is looking at.
+    # Populated ONLY by board.statuses_from_series, the one function that sees
+    # the series before and after the floor.
+    observed_when: Optional[str] = None
+    observed_acc: Optional[float] = None
+    observed_reliability: Optional[float] = None
+    observed_spread: Optional[float] = None
+    observed_qualified: Optional[bool] = None
 
 
 def _get(url: str):
@@ -136,6 +155,10 @@ def results_md(statuses: List[ModelStatus]) -> str:
         "Accuracy is scored over graded calls only — a truncated call leaves the denominator "
         "rather than counting as wrong — so the floor is not a constant, and a delta beneath "
         "it is the denominator moving, not the model.\n\n"
+        f"**Reliability floor** is {REL_FLOOR}: accuracy from runs below it "
+        "is not scored, because a rate limit or outage makes a call absent "
+        "rather than wrong. The disqualified run stays visible as a "
+        "reliability event.\n\n"
         "| Model | Accuracy | Δ vs previous | Min detectable | Status |\n"
         "| --- | --- | --- | --- | --- |\n"
         + "\n".join(rows) + "\n"
@@ -221,7 +244,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--api", default="https://eval-history.onrender.com")
     p.add_argument("--results", default="RESULTS.md")
-    p.add_argument("--metrics", default="dashboard/metrics.json",
+    p.add_argument("--metrics", default="dashboard/drift_board.json",
                    help="committed time-series file; supplies the graded-call "
                         "denominator the Min-detectable column needs")
     p.add_argument("--alert", default=None, help="write issue title+body here if any regression")

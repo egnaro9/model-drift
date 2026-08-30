@@ -2,6 +2,7 @@
  "updated": "2026-08-29T15:50:38Z",
  "suite_version": "2026-07-v3",
  "suite_size": 35,
+ "rel_floor": 0.5,
  "series": {
   "mock:stable": [
    {

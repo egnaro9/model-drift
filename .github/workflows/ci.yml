@@ -81,7 +81,7 @@ jobs:
           diff -r "$RUNNER_TEMP/at-stamp/vac" vac
       - name: The committed narrative re-derives from the committed rows at HEAD
         run: |
-          python3 -m modeldrift.narrative --metrics dashboard/metrics.json --out "$RUNNER_TEMP/narrative.json"
+          python3 -m modeldrift.narrative --metrics dashboard/drift_board.json --out "$RUNNER_TEMP/narrative.json"
           cmp "$RUNNER_TEMP/narrative.json" dashboard/narrative.json
       - name: The committed standings re-render from the committed rows at HEAD
         run: |
@@ -89,11 +89,11 @@ jobs:
           import json, pathlib, sys
           sys.path.insert(0, ".")
           from modeldrift.board import results_md_offline
-          series = json.loads(pathlib.Path("dashboard/metrics.json").read_text())["series"]
+          series = json.loads(pathlib.Path("dashboard/drift_board.json").read_text())["series"]
           registry = json.loads(pathlib.Path("modeldrift/models.json").read_text())
           committed = pathlib.Path("RESULTS.md").read_text()
           if results_md_offline(series, registry) != committed:
-              sys.exit("RESULTS.md no longer re-renders from dashboard/metrics.json "
+              sys.exit("RESULTS.md no longer re-renders from dashboard/drift_board.json "
                        "— the board's two stores (eval-history and the committed "
                        "rows) have diverged; diagnose which one is lying")
           EOF

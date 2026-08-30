@@ -3,7 +3,7 @@
 `report.py` writes RESULTS.md from the live eval-history API, which means the
 generator itself cannot be replayed by a stranger: the API is a mutable store on
 someone else's disk. But every number it publishes is *also* derivable from the
-repo-committed rows in `dashboard/metrics.json` — the last two stored points of
+repo-committed rows in `dashboard/drift_board.json` — the last two stored points of
 a series are exactly the "latest vs previous" comparison the API answers. This
 module is that derivation: the same standings, recomputed as a pure function of
 the committed file, so the published table can be re-earned offline.
@@ -25,26 +25,10 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Sequence
 
+from .policy import REL_FLOOR  # re-exported: callers and tests use board.REL_FLOOR
 from .report import ModelStatus, min_detectable_change, results_md
 
 
-REL_FLOOR = 0.5
-"""Accuracy points from runs below this aggregate reliability are not scored.
-
-A rate limit, timeout or provider outage makes a call *absent*, not *wrong*.
-Scoring it 0 publishes the provider's bad morning as the model getting dumber.
-The Reliability metric keeps these points, because reliability genuinely did
-drop and that is the true signal. Keyed on aggregate reliability, never on
-"a call failed": a blanket drop-on-failure would inflate accuracy on exactly
-the hardest tasks. See docs/a-rate-limit-not-a-regression.md.
-
-This constant is the single source of truth. dashboard/index.html carries the
-same 0.5 for its client-side charts; tests/test_reliability_floor.py pins the
-two together so they cannot drift apart again. They did drift once: the floor
-lived only in the dashboard JS, so RESULTS.md published a Google outage as
-three Gemini regressions (-37.1 and -94.3 pts) while the chart above it
-correctly showed nothing.
-"""
 
 
 def trusted_points(pts: Sequence[dict]) -> List[dict]:
@@ -68,9 +52,24 @@ def statuses_from_series(series: Dict[str, List[dict]],
     out = []
     for m in registry:
         label = m.get("label") or m["id"]
-        pts = trusted_points(series.get(m["id"]) or [])
+        raw = series.get(m["id"]) or []
+        pts = trusted_points(raw)
+        # The latest RAW point, carried whether or not it qualified. This is
+        # the only place both views exist, so it is the only place that may
+        # decide what "observed" means; standings_rows serializes it and
+        # applies no eligibility of its own.
+        obs = raw[-1] if raw else None
+        seen = {} if obs is None else {
+            "observed_when": (obs.get("t") or "")[:10] or None,
+            "observed_acc": obs.get("acc"),
+            "observed_reliability": obs.get("reliability"),
+            "observed_spread": obs.get("acc_spread"),
+            "observed_qualified": (obs.get("reliability") is None
+                                   or obs.get("reliability") >= REL_FLOOR),
+        }
         if not pts:
-            out.append(ModelStatus(m["id"], label, None, None, "no-data", None, None))
+            out.append(ModelStatus(m["id"], label, None, None, "no-data",
+                                   None, None, **seen))
             continue
         last = pts[-1]
         g = last.get("graded")
@@ -78,12 +77,13 @@ def statuses_from_series(series: Dict[str, List[dict]],
         when = (last.get("t") or "")[:10] or None
         if len(pts) < 2:
             out.append(ModelStatus(m["id"], label, last["acc"], None, "baseline",
-                                   when, graded))
+                                   when, graded, **seen))
             continue
         delta = round(last["acc"] - pts[-2]["acc"], 4)
         verdict = ("regressed" if delta < -1e-9
                    else "improved" if delta > 1e-9 else "unchanged")
-        out.append(ModelStatus(m["id"], label, last["acc"], delta, verdict, when, graded))
+        out.append(ModelStatus(m["id"], label, last["acc"], delta, verdict,
+                               when, graded, **seen))
     return out
 
 
@@ -102,6 +102,16 @@ def standings_rows(statuses: Sequence[ModelStatus]) -> List[dict]:
             "min_detectable_pts": round(floor, 3) if floor is not None else None,
             "below_floor": (floor is not None and s.delta is not None
                             and 1e-9 < abs(s.delta * 100) < floor),
+            # Serialized, not decided. Eligibility was settled in
+            # statuses_from_series; this function must not re-apply it, or
+            # the bundle's view could drift from the canonical status.
+            "latest_observed": None if s.observed_when is None else {
+                "when": s.observed_when,
+                "acc": s.observed_acc,
+                "reliability": s.observed_reliability,
+                "acc_spread": s.observed_spread,
+                "qualified": s.observed_qualified,
+            },
         })
     return rows
 

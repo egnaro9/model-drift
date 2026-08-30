@@ -73,7 +73,7 @@ def test_declared_numbers_are_recomputed_not_read(bundle_inputs):
     man = json.loads((ROOT / "vac/vac.json").read_text(encoding="utf-8"))
     expect = man["results"]["checks"][0]["expect"]
     standings = json.loads((ROOT / "vac/standings.json").read_text(encoding="utf-8"))
-    series = json.loads(bundle_inputs["metrics.json"])["series"]
+    series = json.loads(bundle_inputs["drift_board.json"])["series"]
     fp = json.loads((ROOT / "vac/suite-fingerprint.json").read_text(encoding="utf-8"))
     nar = json.loads(bundle_inputs["narrative.json"])
     assert expect["rows"] == len(standings["rows"])
@@ -96,13 +96,13 @@ def test_tampered_old_row_changes_the_bundle(bundle_inputs):
     the standings (both read only the newest points) but not to the flip
     analysis or the sha256 pins: the re-emitted bundle must differ, so the
     CI diff gate fires on the cooked file."""
-    metrics = json.loads(bundle_inputs["metrics.json"])
+    metrics = json.loads(bundle_inputs["drift_board.json"])
     victim = next(mid for mid, pts in metrics["series"].items()
                   if not mid.startswith("mock:") and len(pts) >= 3
                   and "if-json" not in (pts[0].get("fails") or []))
     metrics["series"][victim][0].setdefault("fails", []).append("if-json")
     tampered = {**bundle_inputs,
-                "metrics.json": (json.dumps(metrics, indent=1)).encode()}
+                "drift_board.json": (json.dumps(metrics, indent=1)).encode()}
     honest = emit_vac.build_bundle(bundle_inputs, "abc1234")
     cooked = emit_vac.build_bundle(tampered, "abc1234")
     assert cooked["flips.json"] != honest["flips.json"]
@@ -125,18 +125,18 @@ def test_cooked_standings_are_refused(bundle_inputs):
 
 
 def test_incoherent_rows_are_refused(bundle_inputs):
-    metrics = json.loads(bundle_inputs["metrics.json"])
+    metrics = json.loads(bundle_inputs["drift_board.json"])
     mid = next(m for m in metrics["series"] if not m.startswith("mock:"))
     metrics["series"][mid][-1]["acc"] = 1.5
-    cooked = {**bundle_inputs, "metrics.json": json.dumps(metrics).encode()}
+    cooked = {**bundle_inputs, "drift_board.json": json.dumps(metrics).encode()}
     with pytest.raises(RuntimeError, match="incoherent"):
         emit_vac.build_bundle(cooked, "abc1234")
 
 
 def test_a_moved_null_control_is_refused(bundle_inputs):
-    metrics = json.loads(bundle_inputs["metrics.json"])
+    metrics = json.loads(bundle_inputs["drift_board.json"])
     metrics["series"]["mock:stable"][0]["acc"] = 0.97
-    cooked = {**bundle_inputs, "metrics.json": json.dumps(metrics).encode()}
+    cooked = {**bundle_inputs, "drift_board.json": json.dumps(metrics).encode()}
     with pytest.raises(RuntimeError, match="control moved"):
         emit_vac.build_bundle(cooked, "abc1234")
 
@@ -163,7 +163,7 @@ def toy_repo(tmp_path):
     (repo / "modeldrift").mkdir(parents=True)
     (repo / "modeldrift" / "core.py").write_text("x = 1\n")
     (repo / "dashboard").mkdir()
-    (repo / "dashboard" / "metrics.json").write_text("{}\n")
+    (repo / "dashboard" / "drift_board.json").write_text("{}\n")
     _git(repo, "init", "-q")
     _git(repo, "add", ".")
     _git(repo, "commit", "-qm", "code+data")
@@ -190,7 +190,7 @@ def test_stamp_ignores_bundle_dirt_and_follows_inputs(toy_repo):
     # a data commit MUST move it — the daily standings commit changes the
     # rows the claim is about, so a bundle is always a snapshot of one
     # standings commit (this is where the emitter differs from evalmut's)
-    (toy_repo / "dashboard" / "metrics.json").write_text('{"updated": "x"}\n')
+    (toy_repo / "dashboard" / "drift_board.json").write_text('{"updated": "x"}\n')
     _git(toy_repo, "add", ".")
     _git(toy_repo, "commit", "-qm", "data")
     assert emit_vac.stamp_code_commit(toy_repo) != stamp

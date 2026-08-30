@@ -3,7 +3,7 @@
 A task that flips on one model on one day is inside the instrument's resolution
 and means nothing. The same task flipping on five providers on the same day is
 not five simultaneous regressions — it is the harness. This is a pure read of
-dashboard/metrics.json: no API calls, nothing written.
+dashboard/drift_board.json: no API calls, nothing written.
 """
 
 import json
@@ -13,7 +13,7 @@ import textwrap
 from demos._ansi import dim, fail, ident, muted, ok, text, warn
 from modeldrift.flips import analyze, summarize
 
-series = json.load(open("dashboard/metrics.json"))["series"]
+series = json.load(open("dashboard/drift_board.json"))["series"]
 
 for raw in summarize(analyze(series)).splitlines():
     indent = re.match(r"\s*", raw).group()
@@ -37,4 +37,4 @@ for raw in summarize(analyze(series)).splitlines():
         print(indent + ("  " if i else "") + paint(line))
 
 print()
-print("  " + muted("read-only · dashboard/metrics.json · no API calls"))
+print("  " + muted("read-only · dashboard/drift_board.json · no API calls"))

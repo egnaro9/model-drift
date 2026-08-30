@@ -93,7 +93,7 @@ FP = (SUITE_VERSION, suite_hash(), [t.id for t in SUITE])
 
 
 def test_committed_rows_are_coherent():
-    metrics = json.loads((ROOT / "dashboard/metrics.json").read_text(encoding="utf-8"))
+    metrics = json.loads((ROOT / "dashboard/drift_board.json").read_text(encoding="utf-8"))
     assert coherence(metrics, *FP) == []
 
 
@@ -122,7 +122,7 @@ def test_coherence_fires_on_each_violation():
 # ── lockstep with the published artifacts, on the real committed data ──────
 
 def _committed():
-    metrics = json.loads((ROOT / "dashboard/metrics.json").read_text(encoding="utf-8"))
+    metrics = json.loads((ROOT / "dashboard/drift_board.json").read_text(encoding="utf-8"))
     registry = json.loads((ROOT / "modeldrift/models.json").read_text(encoding="utf-8"))
     return metrics, registry
 
@@ -149,7 +149,7 @@ def test_eval_history_agrees_with_the_committed_series():
     """The upstream evaluation record and the committed rows describe the same runs.
 
     The real invariant behind the old Markdown comparison. run.py posts each probe to
-    eval-history and writes the same numbers into dashboard/metrics.json; if those two
+    eval-history and writes the same numbers into dashboard/drift_board.json; if those two
     stores disagree, one of them is lying and every published figure is suspect.
 
     Handling, stated rather than implied:

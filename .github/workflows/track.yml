@@ -68,7 +68,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add RESULTS.md dashboard/metrics.json dashboard/narrative.json dashboard/notes.json
+          git add RESULTS.md dashboard/drift_board.json dashboard/narrative.json dashboard/notes.json
           git diff --cached --quiet && { echo "nothing changed"; exit 0; }
           git commit -m "chore: update drift standings [skip ci]"
           # A push landing on main while the probe was running used to lose the

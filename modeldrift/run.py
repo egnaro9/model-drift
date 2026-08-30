@@ -18,6 +18,8 @@ import statistics
 import time
 import urllib.error
 import urllib.request
+
+from .policy import REL_FLOOR
 from collections import defaultdict
 from typing import Dict, List, Optional
 
@@ -271,6 +273,13 @@ def update_metrics_file(path: str, results: List[dict], stamp: str, cap: int = 1
                 "updated": stamp,
                 "suite_version": SUITE_VERSION,
                 "suite_size": len(SUITE),
+                # The floor the dashboard's own charts filter by, written from
+                # the one authority rather than restated. Three surfaces have
+                # to agree for a 0.2 bundle to verify, and the reason this is
+                # generated instead of typed is that the value lived in only
+                # one of them once, and RESULTS.md published an outage as
+                # three regressions for three weeks.
+                "rel_floor": REL_FLOOR,
                 "series": series,
             },
             indent=1,
@@ -287,7 +296,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument("--api", default="https://eval-history.onrender.com")
     p.add_argument("--registry", default=None)
     p.add_argument("--out", default=None, help="also write results as JSON")
-    p.add_argument("--metrics", default="dashboard/metrics.json",
+    p.add_argument("--metrics", default="dashboard/drift_board.json",
                    help="time-series file for latency/verbosity the dashboard reads")
     p.add_argument("--runs", type=int, default=3,
                    help="probe each model this many times and record the median "

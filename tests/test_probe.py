@@ -97,7 +97,7 @@ def test_metrics_file_accumulates_and_skips_total_failures(tmp_path):
     import json
     from modeldrift.run import update_metrics_file
     r = probe(STABLE)
-    f = tmp_path / "metrics.json"
+    f = tmp_path / "drift_board.json"
     update_metrics_file(str(f), [r], "2026-07-18T00:00:00Z")
     d = json.loads(f.read_text())
     point = d["series"]["mock:stable"][0]

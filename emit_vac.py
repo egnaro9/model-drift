@@ -8,7 +8,7 @@ aggregation replay over stored artifacts, never reproduction of the live model
 responses (those are nondeterministic by construction and stay historical).
 
 Unlike evalmut's emitter this one runs no battery. The inputs are the repo's own
-committed artifacts — dashboard/metrics.json (the stored rows), models.json (the
+committed artifacts — dashboard/drift_board.json (the stored rows), models.json (the
 registry), dashboard/narrative.json and RESULTS.md (the two published derived
 views) — and everything else is DERIVED from them by issuer code before anything
 is written:
@@ -46,6 +46,7 @@ ROOT = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
 from modeldrift import board  # noqa: E402
+from modeldrift.policy import REL_FLOOR  # noqa: E402
 from modeldrift.flips import analyze  # noqa: E402
 from modeldrift.narrative import narrate  # noqa: E402
 from modeldrift.suite import SUITE, SUITE_VERSION, suite_hash  # noqa: E402
@@ -54,8 +55,15 @@ ISSUER = "egnaro9/model-drift"
 
 # Committed inputs the derivations read: bundle basename -> repo home. The
 # bundle copies each under its basename, so basenames must stay unique.
+# The board artifact, and the scope 2.5.1 derives from its filename.
+# Renamed from metrics.json so the published path is a claim domain
+# rather than an implementation-generic label: at 0.2 the filename
+# IS the public identity every number is cited under.
+_BOARD = "drift_board.json"
+_SCOPE = _BOARD.split(".")[0]
+
 INPUTS = {
-    "metrics.json": "dashboard/metrics.json",
+    _BOARD: "dashboard/drift_board.json",
     "models.json": "modeldrift/models.json",
     "narrative.json": "dashboard/narrative.json",
     "RESULTS.md": "RESULTS.md",
@@ -66,10 +74,10 @@ INPUTS = {
 # stamp (the fleet discipline — the bundle lands in a follow-up commit touching
 # only vac/, and CI re-runs the emitter at the stamp expecting byte-identity,
 # stamp included). NOTE the difference from evalmut: the daily standings commit
-# touches metrics.json, which IS an input here — so data commits move the
+# touches drift_board.json, which IS an input here — so data commits move the
 # stamp, and a bundle is always a frozen snapshot of one standings commit.
 CODE_PATHS = ("modeldrift", "pyproject.toml", "emit_vac.py",
-              "dashboard/metrics.json", "dashboard/narrative.json", "RESULTS.md")
+              "dashboard/drift_board.json", "dashboard/narrative.json", "RESULTS.md")
 
 # The only paths allowed to be dirty when stamping: the emitter's own output.
 OUTPUT_PATHS = ("vac/",)
@@ -109,7 +117,7 @@ def derive(inputs: dict[str, bytes]) -> tuple[dict[str, bytes], dict]:
     a published aggregate, so the manifest can never declare what a verifier
     would not re-earn. Raises rather than emits when the inputs are incoherent
     or the committed derived views are not what the code re-derives."""
-    metrics = json.loads(inputs["metrics.json"])
+    metrics = json.loads(inputs["drift_board.json"])
     registry = json.loads(inputs["models.json"])
     series = metrics.get("series") or {}
 
@@ -140,7 +148,7 @@ def derive(inputs: dict[str, bytes]) -> tuple[dict[str, bytes], dict]:
         raise RuntimeError(
             "RESULTS.md does not re-render from the committed rows — either it "
             "went stale, or eval-history (its live source) and "
-            "dashboard/metrics.json have diverged. Diagnose before bundling; "
+            "dashboard/drift_board.json have diverged. Diagnose before bundling; "
             "a bundle must never notarize a board whose two stores disagree")
 
     rows = board.standings_rows(board.statuses_from_series(series, registry))
@@ -180,12 +188,12 @@ def build_manifest(files: dict[str, bytes], numbers: dict, commit: str) -> str:
     """The vac.json text — a pure function of the artifact bytes and the
     stamped commit."""
     n = numbers
-    metrics = json.loads(files["metrics.json"])
+    metrics = json.loads(files["drift_board.json"])
     # newest stored row's stamp — data-derived; no clock is read anywhere here
     snapshot = max((p.get("t") or "" for pts in (metrics.get("series") or {}).values()
                     for p in pts), default="")
     manifest = {
-        "vac_version": "0.1",
+        "vac_version": "0.2",
         "claim": {
             "capability": (
                 "the public drift board's derivation layer recomputes "
@@ -200,7 +208,7 @@ def build_manifest(files: dict[str, bytes], numbers: dict, commit: str) -> str:
                 f"({n['tasks']} tasks, mechanical graders only, no LLM judge)"),
             "scope": (
                 "exactly the committed artifacts at the stamped commit: "
-                f"dashboard/metrics.json ({n['series']} series, {n['points']} "
+                f"dashboard/drift_board.json ({n['series']} series, {n['points']} "
                 "stored rows) joined to modeldrift/models.json under suite "
                 f"{SUITE_VERSION}; grading/aggregation replay over stored "
                 "artifacts only — offline, stdlib-only, no network, no model "
@@ -248,7 +256,7 @@ def build_manifest(files: dict[str, bytes], numbers: dict, commit: str) -> str:
         "subject": {
             "kind": "suite-archetype",
             "id": "model-drift public board — the derivation layer over "
-                  "dashboard/metrics.json",
+                  "dashboard/drift_board.json",
             "version": {"suite_version": SUITE_VERSION,
                         "suite_hash": suite_hash(),
                         "board_commit": commit},
@@ -261,7 +269,7 @@ def build_manifest(files: dict[str, bytes], numbers: dict, commit: str) -> str:
                     "committed per-run rows",
             "hashes": {
                 "suite_hash": suite_hash(),
-                "metrics_sha256": hashlib.sha256(files["metrics.json"]).hexdigest(),
+                "metrics_sha256": hashlib.sha256(files["drift_board.json"]).hexdigest(),
                 "registry_sha256": hashlib.sha256(files["models.json"]).hexdigest(),
             },
             "grading": (
@@ -288,22 +296,50 @@ def build_manifest(files: dict[str, bytes], numbers: dict, commit: str) -> str:
             for name, data in sorted(files.items()) if name != "vac.json"
         ],
         "results": {
-            "summary": {
-                "standings": {k: n[k] for k in
-                              ("rows", "regressed", "improved", "unchanged",
-                               "baseline", "no_data")},
-                "stored_rows": {"series": n["series"], "points": n["points"]},
-                "suite": {"tasks": n["tasks"],
-                          "min_detectable_pts_full_grade":
-                              n["min_detectable_pts_full_grade"]},
-                "flips": {k: n[k] for k in
-                          ("probe_alarms", "repeat_offenders", "one_offs",
-                           "models_with_enough_history")},
-                "narrative": {"claims_fired": n["claims_fired"]},
-            },
+            # VAC 2.5.1 at 0.2: a summary number binds on its FULL path
+            # beneath `summary.`, against a pool keyed <scope>.<field>, and
+            # the verifier DERIVES the scope from this check's primary
+            # evidence filename. So there is exactly ONE top key here and it
+            # IS that filename's stem.
+            #
+            # The old shape grouped these under standings/stored_rows/suite/
+            # flips/narrative. Those were readable but invented: no check
+            # recomputes a key called "flips", so at 0.2 every number under
+            # them bound to nothing. Splitting them into separate checks
+            # would have been worse, manufacturing five ownership boundaries
+            # over ONE evidence source, which lets one artifact satisfy
+            # claims that look independent.
+            #
+            # Group meaning is kept in the field names rather than a
+            # namespace the verifier cannot see.
+            "summary": {_SCOPE: {
+                "rows": n["rows"],
+                "regressed": n["regressed"],
+                "improved": n["improved"],
+                "unchanged": n["unchanged"],
+                "baseline": n["baseline"],
+                "no_data": n["no_data"],
+                "series": n["series"],
+                "points": n["points"],
+                "tasks": n["tasks"],
+                "min_detectable_pts_full_grade":
+                    n["min_detectable_pts_full_grade"],
+                "probe_alarms": n["probe_alarms"],
+                "repeat_offenders": n["repeat_offenders"],
+                "one_offs": n["one_offs"],
+                "models_with_enough_history": n["models_with_enough_history"],
+                "claims_fired": n["claims_fired"],
+            }},
             "checks": [
                 {"profile": "modeldrift-board-v1",
-                 "metrics": "metrics.json",
+                 # VAC 3.5 at 0.2: the bundle DECLARES the floor its standings
+                 # were derived under, so a stranger reapplies it to the
+                 # committed per-point reliability rather than trusting it was
+                 # applied. Inherited from the one authority, never restated:
+                 # this value lived in a single surface once and RESULTS.md
+                 # published a provider outage as three regressions.
+                 "rel_floor": REL_FLOOR,
+                 "metrics": _BOARD,
                  "registry": "models.json",
                  "standings": "standings.json",
                  "flips": "flips.json",
@@ -319,7 +355,7 @@ def build_manifest(files: dict[str, bytes], numbers: dict, commit: str) -> str:
                 f"git clone https://github.com/{ISSUER} issuer",
                 f"git -C issuer checkout {commit}",
                 "( cd issuer && python3 emit_vac.py )",
-                "for f in RESULTS.md flips.json metrics.json models.json "
+                "for f in RESULTS.md flips.json drift_board.json models.json "
                 "narrative.json standings.json suite-fingerprint.json "
                 "vac.json; do cmp issuer/vac/$f $f || exit 1; done",
                 "python3 -m venv v && v/bin/pip install -q -e 'issuer[dev]' "
@@ -343,7 +379,7 @@ def build_manifest(files: dict[str, bytes], numbers: dict, commit: str) -> str:
             "snapshot": snapshot,
             "freshness_gate": (
                 "a registry entry seeded from this bundle MUST fail red — "
-                "never skip — when it cannot fetch dashboard/metrics.json "
+                "never skip — when it cannot fetch dashboard/drift_board.json "
                 "from the issuer's main, or when the newest stored row is "
                 "older than 3x the cadence; 'checked and fresh' and 'never "
                 "checked' must be distinguishable outcomes (this repo has "

@@ -3,7 +3,7 @@
 *24 July 2026 — model-drift*
 
 > The numbers below are from the runs of 20–24 July 2026 and are reproducible from
-> `dashboard/metrics.json` at the commits of those dates. Later runs will move them;
+> `dashboard/drift_board.json` at the commits of those dates. Later runs will move them;
 > the arithmetic won't.
 
 This board probes 16 LLMs on a frozen 35-task suite, once a day, and keeps every score. When a model drops against its previous run, it opens a GitHub issue by itself and writes a draft post.

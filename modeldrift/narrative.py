@@ -407,7 +407,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     import argparse
     from pathlib import Path
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--metrics", default="dashboard/metrics.json")
+    p.add_argument("--metrics", default="dashboard/drift_board.json")
     p.add_argument("--registry", default=None)
     p.add_argument("--out", default="dashboard/narrative.json")
     args = p.parse_args(argv)

@@ -224,7 +224,7 @@
 
   <div class="card">
     <h2>How it works</h2>
-    <!-- Task count is written into metrics.json as suite_size and injected below,
+    <!-- Task count is written into drift_board.json as suite_size and injected below,
          so it cannot drift from len(SUITE). It previously said 22 while the suite
          held 35 — the page contradicting its own data. -->
     <p class="note">A fixed suite of <strong><span id="suite-size">35</span> unambiguous tasks</strong> (instruction-following,
@@ -281,11 +281,11 @@ const esc = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"
 // the way — raw.githubusercontent caches for minutes, which is long enough to
 // show an emptied board after a wipe. The raw URL stays as a fallback for anyone
 // opening this file outside the deploy.
-const METRICS_URL = "./metrics.json";
-const METRICS_FALLBACK = "https://raw.githubusercontent.com/egnaro9/model-drift/main/dashboard/metrics.json";
+const METRICS_URL = "./drift_board.json";
+const METRICS_FALLBACK = "https://raw.githubusercontent.com/egnaro9/model-drift/main/dashboard/drift_board.json";
 
 // The five tracked metrics. Accuracy comes from eval-history; speed + verbosity
-// from metrics.json. betterUp says which direction is "good" (latency: lower).
+// from drift_board.json. betterUp says which direction is "good" (latency: lower).
 const METRICS = {   // eps = the delta below which a change counts as "stable" (fractions: tiny; counts: 0.5)
   accuracy:  { label:"Accuracy", betterUp:true, eps:1e-9, frac:true,
                fmt:v=>(v*100).toFixed(1)+"%", tick:v=>(v*100).toFixed(0)+"%",
@@ -335,7 +335,7 @@ async function fetchAll() {
   // Every metric comes from the one repo-local time series, accuracy included.
   // It used to be fetched per-model from eval-history, so the chart drew on two
   // stores that could disagree - and did: clearing the provider-wiring runs out
-  // of metrics.json left them still plotted, because the accuracy line never read
+  // of drift_board.json left them still plotted, because the accuracy line never read
   // that file. eval-history is still the archive and still what the regression
   // alert compares; it just isn't a second source of truth for this chart. Also
   // one static fetch instead of sixteen calls to a service that sleeps.

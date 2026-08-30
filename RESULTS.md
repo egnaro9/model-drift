@@ -4,6 +4,8 @@ _Auto-generated after each scheduled probe. Live chart: [egnaro9.github.io/model
 
 **Min detectable** is the smallest movement a run could show: `100 / graded calls`. Accuracy is scored over graded calls only — a truncated call leaves the denominator rather than counting as wrong — so the floor is not a constant, and a delta beneath it is the denominator moving, not the model.
 
+**Reliability floor** is 0.5: accuracy from runs below it is not scored, because a rate limit or outage makes a call absent rather than wrong. The disqualified run stays visible as a reliability event.
+
 | Model | Accuracy | Δ vs previous | Min detectable | Status |
 | --- | --- | --- | --- | --- |
 | Mock (stable) | 100.0% | +0.0 pts | ±2.9 | ⚪ unchanged |
