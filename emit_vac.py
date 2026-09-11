@@ -354,6 +354,15 @@ def build_manifest(files: dict[str, bytes], numbers: dict, commit: str) -> str:
             "commands": [
                 f"git clone https://github.com/{ISSUER} issuer",
                 f"git -C issuer checkout {commit}",
+                # The stamp names the CODE commit, and the emitter refuses a
+                # dirty tree, so code lands one commit before its artifacts and
+                # the stamped tree still holds the PREVIOUS bundle. While only
+                # file CONTENTS changed that was harmless; on the first rename
+                # (metrics.json -> drift_board.json) the closed-bundle guard
+                # refused the leftover and failed a bundle that was correct.
+                # Clearing gives up nothing: the cmp below reads the DOWNLOADED
+                # bundle, so any file the emitter would not write still fails.
+                "rm -rf issuer/vac",
                 "( cd issuer && python3 emit_vac.py )",
                 "for f in RESULTS.md flips.json drift_board.json models.json "
                 "narrative.json standings.json suite-fingerprint.json "
