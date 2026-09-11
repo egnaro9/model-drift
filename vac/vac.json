@@ -1,8 +1,8 @@
 {
  "vac_version": "0.2",
  "claim": {
-  "capability": "the public drift board's derivation layer recomputes deterministically and byte-identically offline from the repo-committed per-run rows: the standings table (17 rows \u2014 accuracy, delta vs previous run, verdict, and the min-detectable-regression floor 100/graded-calls), the generated narrative paragraph (3 claims fired), and the per-task flip / probe-alarm analysis (90 repeat offenders, 197 probe alarms), under frozen suite 2026-07-v3 (35 tasks, mechanical graders only, no LLM judge)",
-  "scope": "exactly the committed artifacts at the stamped commit: dashboard/drift_board.json (17 series, 702 stored rows) joined to modeldrift/models.json under suite 2026-07-v3; grading/aggregation replay over stored artifacts only \u2014 offline, stdlib-only, no network, no model calls, no clock",
+  "capability": "the public drift board's derivation layer recomputes deterministically and byte-identically offline from the repo-committed per-run rows: the standings table (17 rows \u2014 accuracy, delta vs previous run, verdict, and the min-detectable-regression floor 100/graded-calls), the generated narrative paragraph (3 claims fired), and the per-task flip / probe-alarm analysis (102 repeat offenders, 250 probe alarms), under frozen suite 2026-07-v3 (35 tasks, mechanical graders only, no LLM judge)",
+  "scope": "exactly the committed artifacts at the stamped commit: dashboard/drift_board.json (17 series, 865 stored rows) joined to modeldrift/models.json under suite 2026-07-v3; grading/aggregation replay over stored artifacts only \u2014 offline, stdlib-only, no network, no model calls, no clock",
   "limitations": [
    "the model responses are HISTORICAL: replay re-earns every derivation (standings, narrative, flips, floors) from the stored rows, never the measurements \u2014 the rows were written by the same scheduled job that made the model calls, and the live probes are nondeterministic by construction (no tracked model accepts temperature=0; a documented 9-point spread across 3 identical runs), so no part of this claim covers reproducing a model's answers",
    "the eval-history database (full per-task prompts and answers) is a mutable external store outside this bundle: corroborating, never load-bearing \u2014 no bundled number depends on it",
@@ -19,16 +19,16 @@
   "version": {
    "suite_version": "2026-07-v3",
    "suite_hash": "e76f17b6c56e",
-   "board_commit": "9ee59e3"
+   "board_commit": "8db51ca"
   }
  },
  "protocol": {
   "issuer": "egnaro9/model-drift",
-  "issuer_commit": "9ee59e3",
+  "issuer_commit": "8db51ca",
   "task": "drift standings board over the frozen probe suite: standings, narrative, and flip analysis derived from the committed per-run rows",
   "hashes": {
    "suite_hash": "e76f17b6c56e",
-   "metrics_sha256": "f8a834f67079c1eab4b4677f704689f2478a9fab94d3149918ec7be3653dbcdc",
+   "metrics_sha256": "79711e62659c6b5210145e73868df2bb2a474b774cd55df9c6357f4ed9bcb4ac",
    "registry_sha256": "00792e5b1c54543b40e657729c6b94ea251c59b4d19ff94eaf5733d17d6a1116"
   },
   "grading": "deterministic end to end: the stored rows were graded by the frozen suite's mechanical graders (exact / substring / regex / numeric compare \u2014 no LLM judge), and every bundled number is a pure, clock-free function of those committed rows \u2014 standings from the last two stored points per series (verdict thresholds at \u00b11e-9, delta rounded to 4 places), min-detectable floor = 100/graded, flip analysis from the stored per-task failure identities, narrative from the claims generator; byte-identical on re-emission",
@@ -37,15 +37,15 @@
  "evidence": [
   {
    "path": "RESULTS.md",
-   "sha256": "d58e465cf7e95c296e674479cabe7c6098aa34a7bbee7df0820e6913a071632c"
+   "sha256": "1e08de43794939ec0a6dcb3cec813907f65cd0a96b3ff6201457784d237faa0c"
   },
   {
    "path": "drift_board.json",
-   "sha256": "f8a834f67079c1eab4b4677f704689f2478a9fab94d3149918ec7be3653dbcdc"
+   "sha256": "79711e62659c6b5210145e73868df2bb2a474b774cd55df9c6357f4ed9bcb4ac"
   },
   {
    "path": "flips.json",
-   "sha256": "daf673ec071dd9dfd7304ef68a01da3e7260ce9da8532db8e1a833d3b21617e0"
+   "sha256": "51a5984a1203092d5233560bfa782270a14d42e5056f6e547210627776985615"
   },
   {
    "path": "models.json",
@@ -53,11 +53,11 @@
   },
   {
    "path": "narrative.json",
-   "sha256": "9eaaba966e4c7e37aa20312db6bbf743a4e3062edc766797634d76b4086fd861"
+   "sha256": "817fb1322ba6786a1b2cb92a2f49cea3e383e1bf69c469c90860c7b0d7439697"
   },
   {
    "path": "standings.json",
-   "sha256": "b2bf6dcddb0de99774611f7a533362a1cb577ba3a2595a3e803aace80307f22d"
+   "sha256": "6333da202cab6d5c11cee5cb9bf580e23a1842d8a3a5c734798d50d71dd6f5ac"
   },
   {
    "path": "suite-fingerprint.json",
@@ -69,17 +69,17 @@
    "drift_board": {
     "rows": 17,
     "regressed": 3,
-    "improved": 3,
-    "unchanged": 11,
+    "improved": 1,
+    "unchanged": 13,
     "baseline": 0,
     "no_data": 0,
     "series": 17,
-    "points": 702,
+    "points": 865,
     "tasks": 35,
     "min_detectable_pts_full_grade": 2.857,
-    "probe_alarms": 197,
-    "repeat_offenders": 90,
-    "one_offs": 55,
+    "probe_alarms": 250,
+    "repeat_offenders": 102,
+    "one_offs": 56,
     "models_with_enough_history": 17,
     "claims_fired": 3
    }
@@ -98,17 +98,17 @@
     "expect": {
      "rows": 17,
      "regressed": 3,
-     "improved": 3,
-     "unchanged": 11,
+     "improved": 1,
+     "unchanged": 13,
      "baseline": 0,
      "no_data": 0,
      "series": 17,
-     "points": 702,
+     "points": 865,
      "tasks": 35,
      "min_detectable_pts_full_grade": 2.857,
-     "probe_alarms": 197,
-     "repeat_offenders": 90,
-     "one_offs": 55,
+     "probe_alarms": 250,
+     "repeat_offenders": 102,
+     "one_offs": 56,
      "models_with_enough_history": 17,
      "claims_fired": 3
     }
@@ -116,10 +116,11 @@
   ]
  },
  "replay": {
-  "issuer_commit": "9ee59e3",
+  "issuer_commit": "8db51ca",
   "commands": [
    "git clone https://github.com/egnaro9/model-drift issuer",
-   "git -C issuer checkout 9ee59e3",
+   "git -C issuer checkout 8db51ca",
+   "rm -rf issuer/vac",
    "( cd issuer && python3 emit_vac.py )",
    "for f in RESULTS.md flips.json drift_board.json models.json narrative.json standings.json suite-fingerprint.json vac.json; do cmp issuer/vac/$f $f || exit 1; done",
    "python3 -m venv v && v/bin/pip install -q -e 'issuer[dev]' && v/bin/pytest -q issuer"
@@ -128,7 +129,7 @@
  },
  "monitor": {
   "cadence": "daily \u2014 track.yml cron '17 8 * * *'",
-  "snapshot": "2026-08-29T15:50:38Z",
+  "snapshot": "2026-09-11T15:03:13Z",
   "freshness_gate": "a registry entry seeded from this bundle MUST fail red \u2014 never skip \u2014 when it cannot fetch dashboard/drift_board.json from the issuer's main, or when the newest stored row is older than 3x the cadence; 'checked and fresh' and 'never checked' must be distinguishable outcomes (this repo has already shipped three distinct stale-publish mechanisms)",
   "supersession": "each refresh cuts a NEW closed bundle at the new standings commit and supersedes this entry \u2014 the monitored claim is a chain of frozen snapshots, never an edited one"
  }
