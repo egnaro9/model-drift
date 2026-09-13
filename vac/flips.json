@@ -318,24 +318,6 @@
    "latest": "broke on 2026-08-14",
    "model": "google:gemini-3.1-flash-lite",
    "task": "vowel-json"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-09-11",
-   "model": "xai:grok-4.3",
-   "task": "if-json"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-09-11",
-   "model": "xai:grok-4-fast",
-   "task": "fmt-csv-nospace"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-09-11",
-   "model": "xai:grok-4-fast",
-   "task": "multi-step-math"
   }
  ],
  "probe_alarms": [
@@ -2930,32 +2912,68 @@
     "xai"
    ],
    "task": "fact-element"
+  },
+  {
+   "day": "2026-09-12",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-element"
+  },
+  {
+   "day": "2026-09-12",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-planet"
+  },
+  {
+   "day": "2026-09-12",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "logic-syllogism"
   }
  ],
  "repeat_offenders": [
   {
-   "flips": 30,
-   "latest": "recovered on 2026-09-11",
+   "flips": 31,
+   "latest": "broke on 2026-09-12",
    "model": "xai:grok-4-fast",
    "task": "nth-char"
   },
   {
-   "flips": 25,
-   "latest": "broke on 2026-09-11",
+   "flips": 26,
+   "latest": "recovered on 2026-09-12",
    "model": "xai:grok-4.3",
    "task": "days-feb-2024"
   },
   {
-   "flips": 24,
-   "latest": "recovered on 2026-09-11",
+   "flips": 25,
+   "latest": "broke on 2026-09-12",
    "model": "xai:grok-4.3",
    "task": "extract-year"
   },
   {
-   "flips": 22,
-   "latest": "recovered on 2026-09-11",
+   "flips": 23,
+   "latest": "broke on 2026-09-12",
    "model": "xai:grok-4-fast",
    "task": "logic-syllogism"
+  },
+  {
+   "flips": 22,
+   "latest": "recovered on 2026-09-12",
+   "model": "anthropic:claude-sonnet-5",
+   "task": "count-s-mississippi"
   },
   {
    "flips": 22,
@@ -2964,9 +2982,15 @@
    "task": "count-r"
   },
   {
-   "flips": 21,
-   "latest": "broke on 2026-09-06",
-   "model": "anthropic:claude-sonnet-5",
+   "flips": 20,
+   "latest": "broke on 2026-09-12",
+   "model": "xai:grok-4.3",
+   "task": "constraint-no-e"
+  },
+  {
+   "flips": 20,
+   "latest": "recovered on 2026-09-12",
+   "model": "xai:grok-4.3",
    "task": "count-s-mississippi"
   },
   {
@@ -2982,27 +3006,21 @@
    "task": "nth-word"
   },
   {
-   "flips": 19,
-   "latest": "recovered on 2026-09-10",
-   "model": "xai:grok-4.3",
-   "task": "constraint-no-e"
-  },
-  {
-   "flips": 19,
-   "latest": "broke on 2026-09-11",
-   "model": "xai:grok-4.3",
-   "task": "count-s-mississippi"
-  },
-  {
    "flips": 16,
    "latest": "broke on 2026-09-11",
    "model": "anthropic:claude-fable-5",
    "task": "float-subtract"
   },
   {
-   "flips": 15,
-   "latest": "recovered on 2026-09-09",
+   "flips": 16,
+   "latest": "broke on 2026-09-12",
    "model": "xai:grok-4-fast",
+   "task": "fact-planet"
+  },
+  {
+   "flips": 14,
+   "latest": "broke on 2026-09-12",
+   "model": "anthropic:claude-sonnet-5",
    "task": "fact-planet"
   },
   {
@@ -3018,12 +3036,6 @@
    "task": "count-r"
   },
   {
-   "flips": 13,
-   "latest": "recovered on 2026-09-09",
-   "model": "anthropic:claude-sonnet-5",
-   "task": "fact-planet"
-  },
-  {
    "flips": 10,
    "latest": "recovered on 2026-09-01",
    "model": "anthropic:claude-sonnet-5",
@@ -3036,8 +3048,8 @@
    "task": "sort-magnitude"
   },
   {
-   "flips": 8,
-   "latest": "broke on 2026-08-22",
+   "flips": 9,
+   "latest": "recovered on 2026-09-12",
    "model": "anthropic:claude-opus-4-8",
    "task": "constraint-no-e"
   },
@@ -3082,6 +3094,12 @@
    "latest": "recovered on 2026-08-12",
    "model": "xai:grok-4.3",
    "task": "fact-element"
+  },
+  {
+   "flips": 6,
+   "latest": "recovered on 2026-09-12",
+   "model": "xai:grok-4.3",
+   "task": "fmt-list"
   },
   {
    "flips": 6,
@@ -3144,12 +3162,6 @@
    "task": "sort-numeric"
   },
   {
-   "flips": 5,
-   "latest": "broke on 2026-09-11",
-   "model": "xai:grok-4.3",
-   "task": "fmt-list"
-  },
-  {
    "flips": 4,
    "latest": "broke on 2026-08-20",
    "model": "google:gemini-3.5-flash",
@@ -3160,6 +3172,12 @@
    "latest": "recovered on 2026-09-04",
    "model": "xai:grok-4.5",
    "task": "if-no-preamble"
+  },
+  {
+   "flips": 3,
+   "latest": "broke on 2026-09-12",
+   "model": "anthropic:claude-sonnet-5",
+   "task": "sort-magnitude"
   },
   {
    "flips": 3,
@@ -3439,12 +3457,6 @@
   },
   {
    "flips": 2,
-   "latest": "recovered on 2026-08-25",
-   "model": "anthropic:claude-sonnet-5",
-   "task": "sort-magnitude"
-  },
-  {
-   "flips": 2,
    "latest": "recovered on 2026-09-05",
    "model": "google:gemini-3.1-flash-lite",
    "task": "fact-planet"
@@ -3469,6 +3481,12 @@
   },
   {
    "flips": 2,
+   "latest": "recovered on 2026-09-12",
+   "model": "xai:grok-4-fast",
+   "task": "fmt-csv-nospace"
+  },
+  {
+   "flips": 2,
    "latest": "recovered on 2026-09-11",
    "model": "xai:grok-4-fast",
    "task": "fmt-exact-token"
@@ -3481,6 +3499,12 @@
   },
   {
    "flips": 2,
+   "latest": "recovered on 2026-09-12",
+   "model": "xai:grok-4-fast",
+   "task": "multi-step-math"
+  },
+  {
+   "flips": 2,
    "latest": "recovered on 2026-08-24",
    "model": "xai:grok-4-fast",
    "task": "vowel-json"
@@ -3490,6 +3514,12 @@
    "latest": "recovered on 2026-09-11",
    "model": "xai:grok-4.3",
    "task": "float-subtract"
+  },
+  {
+   "flips": 2,
+   "latest": "recovered on 2026-09-12",
+   "model": "xai:grok-4.3",
+   "task": "if-json"
   },
   {
    "flips": 2,
