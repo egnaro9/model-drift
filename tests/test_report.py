@@ -121,3 +121,33 @@ def test_results_md_tolerates_runs_predating_graded_total():
     md = results_md([old])
     assert "below floor" not in md
     assert "Old Run" in md
+
+
+def test_a_frozen_regression_is_not_relogged_on_later_days(tmp_path):
+    """The same regression on a later day is not a new event.
+
+    When a model stops producing runs that clear the reliability floor, its
+    floored standing freezes on the last qualifying comparison. report.py then
+    re-derived that same regression every day, and the guard above only refused
+    a second note on the SAME day, so one event was logged daily. Gemini 3.1 Pro
+    -17.2 pts was published as a Field Note 19 times. A regression is identified
+    by the runs it compares, not by the calendar.
+    """
+    f = tmp_path / "notes.json"
+    regs = regressions(BAD_WEEK)
+    assert append_stub_note(str(f), regs, "2026-07-20") is True
+    assert append_stub_note(str(f), regs, "2026-07-21") is False     # frozen, not new
+    assert append_stub_note(str(f), regs, "2026-07-22") is False
+    assert len(json.loads(f.read_text())) == 1
+
+
+def test_a_genuinely_new_regression_is_still_logged(tmp_path):
+    """Refusing the frozen case must not swallow a real one: a regression drawn
+    from a newer run is a new event and gets its own note."""
+    import dataclasses
+    f = tmp_path / "notes.json"
+    regs = regressions(BAD_WEEK)
+    assert append_stub_note(str(f), regs, "2026-07-20") is True
+    newer = [dataclasses.replace(s, when="2026-07-27T08:17:00Z") for s in regs]
+    assert append_stub_note(str(f), newer, "2026-07-27") is True
+    assert len(json.loads(f.read_text())) == 2

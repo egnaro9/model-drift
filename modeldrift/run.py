@@ -80,10 +80,17 @@ def probe(model: Model) -> dict:
                 passed = bool(t.grade(out))
                 note = t.kind
         except ProviderError as e:
-            out, passed, note = "", False, f"{t.kind} · provider error: {str(e)[:220]}"
+            # A refused call is a DELIVERY failure, not a wrong answer: the model
+            # never saw the prompt. Same reasoning as truncation above, and it
+            # rides on reliability the same way. This used to be passed=False and
+            # stayed in graded_total, so every refusal scored as a miss. When the
+            # Gemini project ran out of prepaid credit (2026-08-10), a run with 7
+            # of 35 calls refused cleared the 0.5 floor at reliability 0.8 and
+            # published as a 17 point regression that was really billing.
+            out, passed, note = "", None, f"{t.kind} · provider error: {str(e)[:220]}"
             errors += 1
             first_error = first_error or str(e)
-        if not truncated:
+        if passed is not None:
             graded_total += 1
             graded_pass += 1 if passed else 0
         cases.append({

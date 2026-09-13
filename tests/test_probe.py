@@ -245,3 +245,52 @@ def test_truncation_rides_on_reliability_not_accuracy(monkeypatch):
     assert r["metrics"]["faithfulness"] == 1.0            # accuracy unaffected
     truncated = [c for c in r["cases"] if "truncated" in c["note"]]
     assert len(truncated) == 1 and truncated[0]["flagged"] is False
+
+
+def test_a_provider_error_rides_on_reliability_not_accuracy(monkeypatch):
+    """A call the provider refused is a delivery failure, not a wrong answer.
+
+    Same reasoning as truncation, and the same shape as the test above. It was
+    NOT applied to provider errors: a ProviderError set passed=False and stayed
+    in graded_total, so a refused call scored as a miss. When the Gemini project
+    ran out of prepaid credit on 2026-08-10, every 429 counted against accuracy.
+    A run with 7 of 35 calls refused cleared the 0.5 reliability floor at 0.8,
+    and published as a 17 point regression that was really a billing failure.
+    """
+    from modeldrift import run as runmod
+    from modeldrift import providers
+
+    refused = {"fact-capital", "fact-element", "math-order"}
+
+    def fake_call_meta(model, prompt, task_id=""):
+        if task_id in refused:
+            raise providers.ProviderError("429: prepayment credits are depleted")
+        return providers.call_meta(model, prompt, task_id=task_id)
+
+    monkeypatch.setattr(runmod, "call_meta", fake_call_meta)
+    r = probe(STABLE)
+    n = int(r["metrics"]["n_cases"])
+
+    assert r["_errors"] == len(refused)
+    assert r["_reliability"] == round((n - len(refused)) / n, 4)  # refusals pull reliability
+    assert r["metrics"]["faithfulness"] == 1.0                    # accuracy unaffected
+    assert r["metrics"]["graded_total"] == float(n - len(refused))
+    errored = [c for c in r["cases"] if "provider error" in c["note"]]
+    assert len(errored) == len(refused)
+    assert all(c["flagged"] is False for c in errored)            # not an accuracy fail
+
+
+def test_every_call_refused_grades_nothing(monkeypatch):
+    """With every call refused there is nothing to grade. accuracy must not read
+    as 0.0 as though the model answered everything wrong; reliability is 0 and
+    the floor keeps the run off the accuracy line."""
+    from modeldrift import run as runmod
+    from modeldrift import providers
+
+    def refuse_all(model, prompt, task_id=""):
+        raise providers.ProviderError("429: prepayment credits are depleted")
+
+    monkeypatch.setattr(runmod, "call_meta", refuse_all)
+    r = probe(STABLE)
+    assert r["metrics"]["graded_total"] == 0.0
+    assert r["_reliability"] == 0.0

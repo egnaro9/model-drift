@@ -210,8 +210,14 @@ def append_stub_note(path: str, regs: List[ModelStatus], today: str) -> bool:
     story. Returns True if a new note was written (False if today's already logged)."""
     from pathlib import Path
     worst = min(regs, key=lambda s: s.delta if s.delta is not None else 0.0)
+    # WHICH runs this regression compares. A model whose newer runs all fail the
+    # reliability floor keeps the same floored standing, so the same comparison
+    # re-derives every day. The calendar is not the identity of the event; the
+    # runs are. Gemini 3.1 Pro -17.2 pts was logged 19 times before this.
+    run_key = sorted(f"{s.id}@{s.when}" for s in regs)
     stub = {
         "date": today,
+        "run_key": run_key,
         "title": f"Regression: {worst.label} {worst.delta * 100:+.1f} pts",
         "metric": "accuracy",
         "models": [s.id for s in regs],
@@ -233,6 +239,8 @@ def append_stub_note(path: str, regs: List[ModelStatus], today: str) -> bool:
         notes = []
     if notes and notes[0].get("stub") and notes[0].get("date") == today:
         return False   # newest-first; don't double-log the same day
+    if any(n.get("stub") and n.get("run_key") == run_key for n in notes):
+        return False   # same runs compared: a frozen standing, not a new event
     notes.insert(0, stub)
     p.write_text(json.dumps(notes, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return True
