@@ -1,5 +1,33 @@
 [
   {
+    "date": "2026-09-13",
+    "run_key": [
+      "anthropic:claude-opus-4-8@2026-09-13",
+      "anthropic:claude-sonnet-5@2026-09-13",
+      "google:gemini-3.1-flash-lite@2026-08-09",
+      "google:gemini-3.1-pro@2026-08-08",
+      "meta:llama-3.3-70b@2026-08-16",
+      "xai:grok-4-fast@2026-09-12"
+    ],
+    "title": "Regression: Gemini 3.1 Pro -17.2 pts",
+    "metric": "accuracy",
+    "models": [
+      "anthropic:claude-opus-4-8",
+      "anthropic:claude-sonnet-5",
+      "google:gemini-3.1-pro",
+      "google:gemini-3.1-flash-lite",
+      "xai:grok-4-fast",
+      "meta:llama-3.3-70b"
+    ],
+    "summary": "6 model(s) regressed against the previous run; worst was Gemini 3.1 Pro at -17.2 pts. Auto-logged — confirm it's real before writing it up.",
+    "body": [
+      {
+        "p": "Auto-logged when the scheduled probe flagged a run-over-run regression. Before this becomes a post, check the run log and the Reliability metric — a rate limit or provider outage can look exactly like a regression. If it holds up, the written explanation goes here."
+      }
+    ],
+    "stub": true
+  },
+  {
     "date": "2026-09-12",
     "title": "Regression: Gemini 3.1 Pro -17.2 pts",
     "metric": "accuracy",
