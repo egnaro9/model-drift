@@ -13,8 +13,8 @@ _Auto-generated after each scheduled probe. Live chart: [egnaro9.github.io/model
 | GPT-5 mini | 100.0% | +0.0 pts | ±2.9 | ⚪ unchanged |
 | GPT-4o mini | 80.0% | +0.0 pts | ±2.9 | ⚪ unchanged |
 | GPT-5 nano | 100.0% | +0.0 pts | ±2.9 | ⚪ unchanged |
-| Claude Fable 5 | 94.3% | +0.0 pts | ±2.9 | ⚪ unchanged |
-| Claude Opus 4.8 | 94.3% | +0.0 pts | ±2.9 | ⚪ unchanged |
+| Claude Fable 5 | 97.1% | +2.9 pts | ±2.9 ⚠ below floor | 🟢 improved |
+| Claude Opus 4.8 | 91.4% | -2.9 pts | ±2.9 | 🔴 regressed |
 | Claude Sonnet 5 | 85.7% | +0.0 pts | ±2.9 | ⚪ unchanged |
 | Claude Haiku 4.5 | 85.7% | +0.0 pts | ±2.9 | ⚪ unchanged |
 | Gemini 3.1 Pro | 77.1% | -17.2 pts | — | 🔴 regressed |
