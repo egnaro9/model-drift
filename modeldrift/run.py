@@ -300,7 +300,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     from datetime import datetime, timezone
     from pathlib import Path
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--api", default="https://eval-history.onrender.com")
+    p.add_argument("--api", default=os.environ.get("EVAL_HISTORY_API", ""),
+                   help="eval-history base URL to record runs in (or $EVAL_HISTORY_API). "
+                        "The old eval-history.onrender.com instance is retired, so this is "
+                        "empty by default and probing simply records nothing.")
     p.add_argument("--registry", default=None)
     p.add_argument("--out", default=None, help="also write results as JSON")
     p.add_argument("--metrics", default="dashboard/drift_board.json",
@@ -355,6 +358,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         # don't record it, or the chart shows a fake crash. Partial runs still count.
         if key and result["_errors"] >= len(SUITE):
             print("      (every call failed — not recorded; fix the key/quota, not the model)")
+        elif key and not args.api.strip():
+            print("      (no --api / $EVAL_HISTORY_API — probed but not recorded)")
+        elif key and ("/eval-history" in args.api or args.api.rstrip("/").endswith(".json")):
+            print("      (--api is the read-only archive — probed but not recorded)")
         elif key:
             _post(args.api, key, result)
     if not key:

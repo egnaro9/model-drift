@@ -169,16 +169,25 @@ def test_eval_history_agrees_with_the_committed_series():
     """
     import urllib.error
     import urllib.request
-    from urllib.parse import quote
 
-    api = "https://eval-history.onrender.com"
+    # eval-history's hosted instance is retired; the upstream store is now its
+    # static archive, which has no query string, so filter runs.json here.
+    api = "https://erikhill.dev/eval-history"
     metrics, registry = _committed()
     series = metrics["series"]
 
-    def upstream_runs(model_id):
-        url = f"{api}/runs?name={quote(model_id)}&limit=10"
-        with urllib.request.urlopen(url, timeout=30) as r:
+    def _all_upstream():
+        with urllib.request.urlopen(f"{api}/runs.json", timeout=30) as r:
             return json.loads(r.read())
+
+    _cache = {}
+
+    def upstream_runs(model_id):
+        if "rows" not in _cache:
+            _cache["rows"] = _all_upstream()
+        rows = [x for x in _cache["rows"] if x.get("name") == model_id]
+        rows.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+        return rows[:10]
 
     try:
         probe = upstream_runs(registry[0]["id"])

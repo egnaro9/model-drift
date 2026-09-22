@@ -69,6 +69,34 @@ def _get(url: str):
         return None
 
 
+def is_archive(api: str) -> bool:
+    """eval-history's hosted instance is retired; its reads live as static files.
+
+    The archive mirrors the API paths with a `.json` suffix and has no query
+    string, so `/runs?name=...` has to become a filter over `runs.json` here.
+    """
+    u = api.rstrip("/")
+    return u.endswith(".json") or "/eval-history" in u
+
+
+_ARCHIVE_RUNS: dict = {}
+
+
+def runs_for(api: str, name: str, limit: int = 2):
+    """Newest-first runs for one suite, from a live deployment or the archive."""
+    from urllib.parse import quote
+    if not is_archive(api):
+        return _get(f"{api.rstrip('/')}/runs?name={quote(name)}&limit={limit}") or []
+    base = api.rstrip("/")
+    if base.endswith("/runs.json"):
+        base = base[: -len("/runs.json")]
+    if base not in _ARCHIVE_RUNS:
+        _ARCHIVE_RUNS[base] = _get(f"{base}/runs.json") or []
+    rows = [r for r in _ARCHIVE_RUNS[base] if r.get("name") == name]
+    rows.sort(key=lambda r: r.get("created_at", ""), reverse=True)
+    return rows[:limit]
+
+
 def min_detectable_change(graded: Optional[int]) -> Optional[float]:
     """Smallest movement this run could possibly show, in points.
 
@@ -85,8 +113,7 @@ def min_detectable_change(graded: Optional[int]) -> Optional[float]:
 
 
 def status_for(api: str, model) -> ModelStatus:
-    from urllib.parse import quote
-    runs = _get(f"{api.rstrip('/')}/runs?name={quote(model.id)}&limit=2") or []
+    runs = runs_for(api, model.id, limit=2)
     if not runs:
         return ModelStatus(model.id, model.label, None, None, "no-data", None, None)
     latest = runs[0]
@@ -250,7 +277,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     import argparse
     import os
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--api", default="https://eval-history.onrender.com")
+    p.add_argument("--api", default=os.environ.get("EVAL_HISTORY_API", "https://erikhill.dev/eval-history"),
+                   help="eval-history base URL, or its static archive (the default). "
+                        "The old eval-history.onrender.com instance is retired.")
     p.add_argument("--results", default="RESULTS.md")
     p.add_argument("--metrics", default="dashboard/drift_board.json",
                    help="committed time-series file; supplies the graded-call "
