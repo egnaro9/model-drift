@@ -1,13 +1,13 @@
 {
  "sentences": [
-  "<strong>OpenAI's cheaper tier match its own flagship</strong> \u2014 GPT-5 mini at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy.",
-  "<strong>Claude Sonnet 5 answers with 3.1x the characters of the tersest model</strong>, at 82%.",
-  "<strong>Claude Haiku 4.5 leads on speed</strong> at 536 ms and 85% accuracy."
+  "<strong>Claude Sonnet 5 answers with 2x the characters of the tersest model</strong>, at 85%.",
+  "<strong>Claude Haiku 4.5 leads on speed</strong> at 468 ms and 85% accuracy.",
+  "<strong>Nothing reached 100%</strong> \u2014 Claude Fable 5 leads at 94%."
  ],
- "html": "A frozen, deterministically-graded suite against <strong>7 models across 2 labs</strong>. 9 of the 16 tracked models did not return a clean run and are left out of the comparisons below. <strong>OpenAI's cheaper tier match its own flagship</strong> \u2014 GPT-5 mini at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy. <strong>Claude Sonnet 5 answers with 3.1x the characters of the tersest model</strong>, at 82%. <strong>Claude Haiku 4.5 leads on speed</strong> at 536 ms and 85% accuracy. <em>Generated from the run of 21 Sep 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.</em>",
- "text": "A frozen, deterministically-graded suite against 7 models across 2 labs. 9 of the 16 tracked models did not return a clean run and are left out of the comparisons below. OpenAI's cheaper tier match its own flagship \u2014 GPT-5 mini at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy. Claude Sonnet 5 answers with 3.1x the characters of the tersest model, at 82%. Claude Haiku 4.5 leads on speed at 536 ms and 85% accuracy. Generated from the run of 21 Sep 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.",
+ "html": "A frozen, deterministically-graded suite against <strong>4 models across 1 labs</strong>. 12 of the 16 tracked models did not return a clean run and are left out of the comparisons below. <strong>Claude Sonnet 5 answers with 2x the characters of the tersest model</strong>, at 85%. <strong>Claude Haiku 4.5 leads on speed</strong> at 468 ms and 85% accuracy. <strong>Nothing reached 100%</strong> \u2014 Claude Fable 5 leads at 94%. <em>Generated from the run of 22 Sep 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.</em>",
+ "text": "A frozen, deterministically-graded suite against 4 models across 1 labs. 12 of the 16 tracked models did not return a clean run and are left out of the comparisons below. Claude Sonnet 5 answers with 2x the characters of the tersest model, at 85%. Claude Haiku 4.5 leads on speed at 468 ms and 85% accuracy. Nothing reached 100% \u2014 Claude Fable 5 leads at 94%. Generated from the run of 22 Sep 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.",
  "models": 16,
- "clean": 7,
- "updated": "2026-09-21T15:58:53Z",
+ "clean": 4,
+ "updated": "2026-09-22T15:33:27Z",
  "claims_fired": 3
 }
