@@ -46,7 +46,8 @@ jobs:
           python - <<'PY'
           from modeldrift.providers import call_meta, load_registry
           from modeldrift.suite import SUITE
-          want = {"fact-element", "fact-capital", "fact-planet"}
+          want = {"fact-element", "fact-capital", "fact-planet",
+                  "float-subtract", "math-order", "math-percent", "unit-minutes"}
           tasks = [t for t in SUITE if t.id in want]
           ids = {"anthropic:claude-sonnet-5", "openai:gpt-4o-mini", "anthropic:claude-opus-4-8"}
           for m in load_registry():
