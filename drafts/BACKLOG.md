@@ -1,0 +1,135 @@
+# Findings backlog at ledger seed
+
+Seeded 2026-09-22. These existed before the pipeline started and are
+marked as seen so weekly runs report only new events. They are NOT
+dismissed; several are the strongest findings on the board. Write any
+of them up by hand and delete the line.
+
+- [ ] `harness` **probe-alarm** — Task constraint-no-e fails across providers at once, on 17 separate day(s)
+- [ ] `harness` **probe-alarm** — Task count-r fails across providers at once, on 9 separate day(s)
+- [ ] `harness` **probe-alarm** — Task count-s-mississippi fails across providers at once, on 5 separate day(s)
+- [ ] `harness` **probe-alarm** — Task days-feb-2024 fails across providers at once, on 16 separate day(s)
+- [ ] `harness` **probe-alarm** — Task fact-element fails across providers at once, on 46 separate day(s)
+- [ ] `harness` **probe-alarm** — Task fact-planet fails across providers at once, on 33 separate day(s)
+- [ ] `harness` **probe-alarm** — Task float-subtract fails across providers at once, on 36 separate day(s)
+- [ ] `harness` **probe-alarm** — Task if-json fails across providers at once, on 1 separate day(s)
+- [ ] `harness` **probe-alarm** — Task if-one-word fails across providers at once, on 6 separate day(s)
+- [ ] `harness` **probe-alarm** — Task logic-syllogism fails across providers at once, on 42 separate day(s)
+- [ ] `harness` **probe-alarm** — Task nth-char fails across providers at once, on 15 separate day(s)
+- [ ] `harness` **probe-alarm** — Task nth-word fails across providers at once, on 17 separate day(s)
+- [ ] `harness` **probe-alarm** — Task sort-magnitude fails across providers at once, on 7 separate day(s)
+- [ ] `harness` **probe-alarm** — Task vowel-json fails across providers at once, on 5 separate day(s)
+- [ ] `models` **regression** — Gemini 3.1 Flash-Lite -8.6 pts to 85.7%
+- [ ] `models` **regression** — Gemini 3.1 Pro -17.2 pts to 77.1%
+- [ ] `models` **regression** — Grok 4 Fast -2.9 pts to 88.6%
+- [ ] `models` **repeat-flip** — count-r flipped 2x on anthropic:claude-fable-5
+- [ ] `models` **repeat-flip** — days-feb-2024 flipped 2x on anthropic:claude-fable-5
+- [ ] `models` **repeat-flip** — extract-year flipped 2x on anthropic:claude-fable-5
+- [ ] `models` **repeat-flip** — fact-element flipped 4x on anthropic:claude-fable-5
+- [ ] `models` **repeat-flip** — float-subtract flipped 20x on anthropic:claude-fable-5
+- [ ] `models` **repeat-flip** — multi-step-math flipped 2x on anthropic:claude-fable-5
+- [ ] `models` **repeat-flip** — no-overrefuse flipped 2x on anthropic:claude-fable-5
+- [ ] `models` **repeat-flip** — nth-char flipped 23x on anthropic:claude-fable-5
+- [ ] `models` **repeat-flip** — sort-numeric flipped 2x on anthropic:claude-fable-5
+- [ ] `models` **repeat-flip** — unit-minutes flipped 2x on anthropic:claude-fable-5
+- [ ] `models` **repeat-flip** — constraint-no-e flipped 12x on anthropic:claude-opus-4-8
+- [ ] `models` **repeat-flip** — fact-element flipped 2x on anthropic:claude-opus-4-8
+- [ ] `models` **repeat-flip** — constraint-no-e flipped 2x on anthropic:claude-sonnet-5
+- [ ] `models` **repeat-flip** — count-r flipped 13x on anthropic:claude-sonnet-5
+- [ ] `models` **repeat-flip** — count-s-mississippi flipped 26x on anthropic:claude-sonnet-5
+- [ ] `models` **repeat-flip** — fact-capital flipped 12x on anthropic:claude-sonnet-5
+- [ ] `models` **repeat-flip** — fact-planet flipped 20x on anthropic:claude-sonnet-5
+- [ ] `models` **repeat-flip** — json-word-count flipped 2x on anthropic:claude-sonnet-5
+- [ ] `models` **repeat-flip** — sort-magnitude flipped 4x on anthropic:claude-sonnet-5
+- [ ] `models` **repeat-flip** — compare-negatives flipped 3x on google:gemini-3.1-flash-lite
+- [ ] `models` **repeat-flip** — constraint-no-e flipped 3x on google:gemini-3.1-flash-lite
+- [ ] `models` **repeat-flip** — fact-capital flipped 3x on google:gemini-3.1-flash-lite
+- [ ] `models` **repeat-flip** — fact-planet flipped 2x on google:gemini-3.1-flash-lite
+- [ ] `models` **repeat-flip** — if-no-preamble flipped 3x on google:gemini-3.1-flash-lite
+- [ ] `models` **repeat-flip** — math-percent flipped 3x on google:gemini-3.1-flash-lite
+- [ ] `models` **repeat-flip** — nth-word flipped 3x on google:gemini-3.1-flash-lite
+- [ ] `models` **repeat-flip** — compare-negatives flipped 3x on google:gemini-3.1-pro
+- [ ] `models` **repeat-flip** — constraint-no-e flipped 3x on google:gemini-3.1-pro
+- [ ] `models` **repeat-flip** — count-s-mississippi flipped 5x on google:gemini-3.1-pro
+- [ ] `models` **repeat-flip** — fact-capital flipped 3x on google:gemini-3.1-pro
+- [ ] `models` **repeat-flip** — fact-planet flipped 3x on google:gemini-3.1-pro
+- [ ] `models` **repeat-flip** — float-subtract flipped 5x on google:gemini-3.1-pro
+- [ ] `models` **repeat-flip** — fmt-exact-token flipped 3x on google:gemini-3.1-pro
+- [ ] `models` **repeat-flip** — fmt-repeat-join flipped 3x on google:gemini-3.1-pro
+- [ ] `models` **repeat-flip** — fmt-uppercase flipped 3x on google:gemini-3.1-pro
+- [ ] `models` **repeat-flip** — json-word-count flipped 5x on google:gemini-3.1-pro
+- [ ] `models` **repeat-flip** — needle-extract flipped 3x on google:gemini-3.1-pro
+- [ ] `models` **repeat-flip** — no-overrefuse-kill flipped 5x on google:gemini-3.1-pro
+- [ ] `models` **repeat-flip** — reverse-str flipped 2x on google:gemini-3.1-pro
+- [ ] `models` **repeat-flip** — sort-magnitude flipped 3x on google:gemini-3.1-pro
+- [ ] `models` **repeat-flip** — compare-decimals flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — constraint-no-e flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — count-r flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — count-s-mississippi flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — days-feb-2024 flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — extract-year flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — fact-capital flipped 5x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — fact-element flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — fact-planet flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — float-subtract flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — fmt-csv-nospace flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — fmt-exact-token flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — fmt-list flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — fmt-repeat-join flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — fmt-uppercase flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — if-json flipped 5x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — if-no-preamble flipped 7x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — if-one-word flipped 6x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — logic-syllogism flipped 4x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — math-order flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — math-percent flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — multi-step-math flipped 5x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — no-overrefuse flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — nth-word flipped 5x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — reason-older flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — reverse-str flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — sort-numeric flipped 5x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — unit-minutes flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — vowel-json flipped 3x on google:gemini-3.5-flash
+- [ ] `models` **repeat-flip** — sort-magnitude flipped 8x on meta:llama-3.3-70b
+- [ ] `models` **repeat-flip** — needle-extract flipped 6x on openai:gpt-5-nano
+- [ ] `models` **repeat-flip** — compare-decimals flipped 2x on xai:grok-4-fast
+- [ ] `models` **repeat-flip** — days-feb-2024 flipped 2x on xai:grok-4-fast
+- [ ] `models` **repeat-flip** — fact-planet flipped 16x on xai:grok-4-fast
+- [ ] `models` **repeat-flip** — fmt-csv-nospace flipped 2x on xai:grok-4-fast
+- [ ] `models` **repeat-flip** — fmt-exact-token flipped 2x on xai:grok-4-fast
+- [ ] `models` **repeat-flip** — if-one-word flipped 2x on xai:grok-4-fast
+- [ ] `models` **repeat-flip** — logic-syllogism flipped 23x on xai:grok-4-fast
+- [ ] `models` **repeat-flip** — math-order flipped 8x on xai:grok-4-fast
+- [ ] `models` **repeat-flip** — multi-step-math flipped 2x on xai:grok-4-fast
+- [ ] `models` **repeat-flip** — nth-char flipped 31x on xai:grok-4-fast
+- [ ] `models` **repeat-flip** — nth-word flipped 19x on xai:grok-4-fast
+- [ ] `models` **repeat-flip** — sort-magnitude flipped 10x on xai:grok-4-fast
+- [ ] `models` **repeat-flip** — vowel-json flipped 2x on xai:grok-4-fast
+- [ ] `models` **repeat-flip** — constraint-no-e flipped 21x on xai:grok-4.3
+- [ ] `models` **repeat-flip** — count-r flipped 22x on xai:grok-4.3
+- [ ] `models` **repeat-flip** — count-s-mississippi flipped 20x on xai:grok-4.3
+- [ ] `models` **repeat-flip** — days-feb-2024 flipped 26x on xai:grok-4.3
+- [ ] `models` **repeat-flip** — extract-year flipped 25x on xai:grok-4.3
+- [ ] `models` **repeat-flip** — fact-element flipped 6x on xai:grok-4.3
+- [ ] `models` **repeat-flip** — fact-planet flipped 15x on xai:grok-4.3
+- [ ] `models` **repeat-flip** — float-subtract flipped 2x on xai:grok-4.3
+- [ ] `models` **repeat-flip** — fmt-list flipped 6x on xai:grok-4.3
+- [ ] `models` **repeat-flip** — if-json flipped 2x on xai:grok-4.3
+- [ ] `models` **repeat-flip** — logic-syllogism flipped 3x on xai:grok-4.3
+- [ ] `models` **repeat-flip** — nth-char flipped 6x on xai:grok-4.3
+- [ ] `models` **repeat-flip** — vowel-json flipped 2x on xai:grok-4.3
+- [ ] `models` **repeat-flip** — count-s-mississippi flipped 2x on xai:grok-4.5
+- [ ] `models` **repeat-flip** — fact-capital flipped 2x on xai:grok-4.5
+- [ ] `models` **repeat-flip** — fact-element flipped 8x on xai:grok-4.5
+- [ ] `models` **repeat-flip** — if-json flipped 2x on xai:grok-4.5
+- [ ] `models` **repeat-flip** — if-no-preamble flipped 4x on xai:grok-4.5
+- [ ] `models` **repeat-flip** — if-one-word flipped 2x on xai:grok-4.5
+- [ ] `models` **repeat-flip** — multi-step-math flipped 2x on xai:grok-4.5
+- [ ] `models` **repeat-flip** — sort-numeric flipped 2x on xai:grok-4.5
+- [ ] `models` **repeat-flip** — vowel-json flipped 2x on xai:grok-4.5
+- [ ] `models` **recovery** — Grok 4.5 +2.9 pts to 100.0%
+- [ ] `infrastructure` **provider-dark** — Gemini 3.1 Flash-Lite did not return a scoreable run
+- [ ] `infrastructure` **provider-dark** — Gemini 3.1 Pro did not return a scoreable run
+- [ ] `infrastructure` **provider-dark** — Gemini 3.5 Flash did not return a scoreable run
+- [ ] `infrastructure` **provider-dark** — GPT-5 nano did not return a scoreable run
