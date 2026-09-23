@@ -65,8 +65,11 @@ jobs:
             echo "**To publish:** fill in *What I might have wrong* (a post with"
             echo "nothing to argue with does not open a thread), change"
             echo "\`status: draft\` to \`status: published\`, and merge. To discard,"
-            echo "close this PR; the finding is already recorded as seen and will"
-            echo "not be offered again."
+            echo "close this PR AND delete the branch; the ledger entry marking this"
+            echo "finding as seen rides in the same commit as the draft, so it only"
+            echo "reaches main if you merge. An unmerged draft will be offered again,"
+            echo "which is the intended behaviour: a draft nobody merged is a finding"
+            echo "nobody recorded."
             echo
             echo "---"
             echo

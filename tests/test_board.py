@@ -222,7 +222,10 @@ def test_eval_history_agrees_with_the_committed_series():
         # committed date is newer than every upstream one, every model skips,
         # and the guard below fires on every run.
         #
-        # It fired for 24 days. A test that CANNOT pass produces the same red
+        # It never got the chance to fire. The check first asked the retired
+        # host whether it was there, got a 404, and skipped: 57 green runs over
+        # 24 days, each printing "207 passed, 1 skipped". A test that CANNOT
+        # pass produces the same red
         # as one that just broke and generates none of the urgency, and daily
         # red is how a real failure gets ignored later. The frozen case skips
         # with its reason stated; the guard stays for the ordinary case where

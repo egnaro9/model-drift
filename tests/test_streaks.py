@@ -1,9 +1,15 @@
 """How long a check has been saying the same thing.
 
-The number that matters is not the colour, it is the streak. model-drift's CI
-was red from 2026-08-30 to 2026-09-23 on a test that could not pass, and the
-only reason it was noticed is that one of the twenty-four emails got read.
-A permanent true alert and a new one look identical in an inbox.
+The number that matters is not the colour, it is the streak. A permanent true
+alert and a new one look identical in an inbox.
+
+Note what this does NOT cover, measured on the case that prompted it:
+model-drift's agreement check spent 2026-08-30 to 2026-09-23 SKIPPING, because
+the store it queried had been retired and an unreachable store is not a
+disagreeing one. 57 CI runs passed while it compared nothing. This tool reads
+workflow conclusions, and a skipping test is green, so it would not have caught
+that. It answers "how long has this been red"; that case needed "how long has
+this been reporting on nothing".
 """
 from __future__ import annotations
 

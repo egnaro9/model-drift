@@ -1,10 +1,16 @@
 """How long has each check been saying the same thing?
 
 A red build is a signal with a half-life. Red since this morning demands
-action; red every day for twenty-four days is furniture, and the two look
-identical in a notification email. model-drift's CI was red from 2026-08-30 to
-2026-09-23 on a test that could not pass, and the only reason it was noticed is
-that Erik happened to read one of the emails.
+action; red every day for a fortnight is furniture, and the two look identical
+in a notification email.
+
+Be clear about the limit, because the case that prompted this is one this tool
+would have missed. model-drift's agreement check spent 2026-08-30 to 2026-09-23
+SKIPPING rather than failing: the store it queried had been retired, and an
+unreachable store is not a disagreeing one. 57 CI runs passed, each printing
+"207 passed, 1 skipped". Conclusions are all this reads, and a skipping test is
+green. It answers "how long has this been red". That case needed "how long has
+this been reporting on nothing", which is a different probe.
 
 So this does not ask whether a workflow is red. It asks how long it has been
 red, which is the number that separates a new failure from an accepted one.

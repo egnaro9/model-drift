@@ -56,29 +56,41 @@ whatever it said and whenever it was written, so a file reviewed once was exempt
 from review forever. Four days, and six tests did not catch it. Mutation testing
 did.
 
-## And the fifth, which has no sibling to blame
+## And the fifth, which reported green
 
-The same night, a notification email turned out to be the twenty-fourth in a
-row. A test that compares my board against a second store had been failing
-since the day that store's write path was retired. It compares by run date, the
-second store froze, the board kept advancing, so every model skipped and the
-test hit its own guard:
+The same night, a failure email turned out to be about a test that had not run
+in twenty-four days.
+
+That test compares my board against a second store, by run date. The store's
+write path was retired in August, its archive froze on 2026-08-30, the board
+kept advancing, so every model would have been incomparable and the test would
+have hit its own guard:
 
     assert compared, "no model could be compared; the agreement check did not
     actually run"
 
 That assertion is the test being right. It refuses to report success having
-compared nothing. Every red was true.
+compared nothing.
 
-There was no missing guard here. The guard was perfect. What was missing is
-that nothing watched whether it could ever pass again, and a true alert that
-repeats daily decays into furniture faster than a false one, because a false
-alarm at least gets investigated once. Twenty-four emails, and the only reason
-the twenty-fourth got read is chance.
+It never reached that line. The check first asks the store whether it is there.
+The old host had been retired and answers 404, and an unreachable store is not
+the same fact as a disagreeing one, so the check skipped instead. **For
+twenty-four days CI was green: fifty-seven passing runs, each printing
+`207 passed, 1 skipped`.** The skip is the one.
+
+It only turned red after I repointed it at the archive that was still
+reachable, and then only once that day's probe pushed the board past the
+archive's last row. Three red runs across seven and a half hours, and I fixed
+it the same evening.
+
+So there was no missing guard here either. The guard was written, correct, and
+unreached, and the thing standing in front of it returned the most plausible
+value available: green. **A skip is a pass.** Nothing counted how long a check
+had been passing without running.
 
 So the pattern is wider than a call site. **A rule that lives in one place and
-is not counted anywhere will be quietly opted out of**, and that includes being
-opted out of by time.
+is not counted anywhere will be quietly opted out of**, and a check can opt
+itself out by becoming unable to run.
 
 ## The evidence
 
@@ -90,7 +102,7 @@ opted out of by time.
 | the thread counter was wrong by a factor of three | curl on all six permalinks: two returned 200, four returned 404 |
 | six tests missed the gate defect and mutation found it | the seventh test's docstring names the surviving mutant; re-running it gives 6 passed, 1 failed |
 | the rule has more consumers than you would guess | the reliability floor is imported by five files in one package |
-| the store-agreement check was red for 24 consecutive days | its last green run was 2026-08-30; the frozen archive's newest row is the same date |
+| the agreement check reported green for 24 days without running | its old host returns 404, so the check skipped; 57 green ci runs between 2026-08-30 and 2026-09-23 each print `207 passed, 1 skipped`; the frozen archive's newest row is 2026-08-30 |
 
 ## Why none of them went red
 
@@ -119,12 +131,17 @@ opts out" into "a new reader fails the build until it opts in".
 It is not elegant and it does not prove anything about correctness. It changes
 the default from silence to noise, which is the only property that matters here.
 
-For the fifth I built the other half: a probe that reports, for every scheduled
-check, how many consecutive runs and how many days it has held its current
-verdict, and when it was last green. Not whether it is red. How long it has
-been red, because that is the number that separates a failure from a decision
-nobody made. It also reports "never green in the window", which is the
-signature of a check that was born unable to pass.
+For the fifth I built a probe that reports, for every scheduled check, how many
+consecutive runs and how many days it has held its verdict, and when it was
+last green. Not whether it is red. How long, because that is the number that
+separates a failure from a decision nobody made. It also reports "never green
+in the window", the signature of a check born unable to pass.
+
+It would not have caught this one, and I want to be plain about that. The probe
+reads workflow conclusions, and a skipping test makes the workflow green. It
+answers "how long has this been red" and the fifth instance needed "how long
+has this been reporting on nothing." Those are different questions and I have
+only built the first.
 
 ## What I might have wrong
 

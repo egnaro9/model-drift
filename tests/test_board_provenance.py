@@ -10,10 +10,11 @@ from the same in-memory values in the same run, so they could only disagree if
 something altered one afterwards. That is a tamper check wearing the costume of
 an independence check.
 
-And the hosted half died. Its host was retired in August 2026, the archive
-froze, and the comparison could no longer run at all. CI was red for 24
-consecutive days on a test that could not pass, and the same fact had left a
-present-tense sentence on the portfolio saying the service was live.
+And the hosted half died. Its host was retired in August 2026 and the archive
+froze. The comparison did not go red: it asked the retired host, got a 404, and
+SKIPPED. 57 CI runs passed over 24 days, each printing "207 passed, 1 skipped",
+while the check compared nothing. The same fact had left a present-tense
+sentence on the portfolio saying the service was live.
 
 Git answers the real question for free: has the board been altered outside the
 run that produced it? Every change is a commit with an author and a message. No
