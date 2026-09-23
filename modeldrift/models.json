@@ -162,25 +162,25 @@
   "color": "#f060a0"
  },
  {
-  "id": "meta:llama-3.3-70b",
-  "label": "Llama 3.3 70B",
+  "id": "groq:gpt-oss-120b",
+  "label": "GPT-OSS 120B",
   "provider": "openai-compatible",
-  "model": "llama-3.3-70b-versatile",
+  "model": "openai/gpt-oss-120b",
   "key_env": "GROQ_API_KEY",
   "base_url": "https://api.groq.com/openai/v1",
-  "group": "Meta",
-  "tier": "flagship",
-  "color": "#9458cc"
+  "group": "OpenAI (Groq)",
+  "tier": "heavy",
+  "color": "#6d8b1f"
  },
  {
-  "id": "meta:llama-3.1-8b",
-  "label": "Llama 3.1 8B",
+  "id": "groq:gpt-oss-20b",
+  "label": "GPT-OSS 20B",
   "provider": "openai-compatible",
-  "model": "llama-3.1-8b-instant",
+  "model": "openai/gpt-oss-20b",
   "key_env": "GROQ_API_KEY",
   "base_url": "https://api.groq.com/openai/v1",
-  "group": "Meta",
+  "group": "OpenAI (Groq)",
   "tier": "mini",
-  "color": "#b67af1"
+  "color": "#96b544"
  }
 ]

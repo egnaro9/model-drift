@@ -23,5 +23,5 @@ _Auto-generated after each scheduled probe. Live chart: [egnaro9.github.io/model
 | Grok 4.5 | 100.0% | +2.9 pts | ±2.9 | 🟢 improved |
 | Grok 4.3 | 95.7% | +1.4 pts | ±2.9 ⚠ below floor | 🟢 improved |
 | Grok 4 Fast | 88.6% | -2.9 pts | ±2.9 | 🔴 regressed |
-| Llama 3.3 70B | 77.1% | -2.9 pts | ±2.9 | 🔴 regressed |
-| Llama 3.1 8B | 57.1% | +0.0 pts | ±2.9 | ⚪ unchanged |
+| GPT-OSS 120B | — | — | — | ⚫ no runs yet |
+| GPT-OSS 20B | — | — | — | ⚫ no runs yet |
