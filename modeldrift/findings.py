@@ -168,8 +168,8 @@ def harness_alarms(series: Dict[str, List[dict]]) -> List[Finding]:
             kind="probe-alarm",
             about=ABOUT_HARNESS,
             subject=task,
-            headline=(f"Task {task} fails across providers at once, "
-                      f"on {len(days)} separate day(s)"),
+            headline=(f"Task {task} fails across providers at once, on "
+                      f"{len(days)} separate day" + ("" if len(days) == 1 else "s")),
             # Identity is the TASK, not the day. A task that keeps tripping is
             # the same open finding; re-reporting it every week is the
             # 19-duplicate-logs bug wearing a different hat.
@@ -293,7 +293,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--window-days", type=int, default=14,
                     help="how recent a model finding's run must be to count as news")
-    ap.add_argument("--max", type=int, default=3,
+    # One. Two posts in a day is the lowest-yield move in the measured record:
+    # the 2026-08-14 double launch got under 25 views each and zero comments,
+    # while the same topic alone five days earlier got 48 views and 5 comments.
+    ap.add_argument("--max", type=int, default=1,
                     help="most drafts to write in one run; the rest are named, never dropped silently")
     ap.add_argument("--seed-ledger", action="store_true",
                     help="record every current finding as already-seen without writing "

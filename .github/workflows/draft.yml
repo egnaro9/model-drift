@@ -1,0 +1,87 @@
+name: draft
+# Findings, not schedule. This runs after the daily probe and does nothing at
+# all on a quiet week, which is the common and correct outcome. When it does
+# fire it opens a pull request and stops: the publish button stays human.
+on:
+  workflow_run:
+    workflows: ["track"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: draft
+  cancel-in-progress: false
+
+jobs:
+  draft:
+    # Only off a probe that actually recorded something. Drafting from a failed
+    # run would write a post about numbers that were never stored.
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -e .
+
+      - name: Is there anything worth writing up?
+        id: find
+        run: python -m modeldrift.findings --out posts --ledger posts/.drafted.json
+
+      - name: Regenerate the published index
+        if: steps.find.outputs.count != ''
+        run: python -m modeldrift.publish --posts posts --out posts/index.json
+
+      # A draft is worthless if it cannot be read on a phone, and a PR body is
+      # where it will be read. The whole post goes in the body, not just a link.
+      - name: Open a pull request with the draft
+        if: steps.find.outputs.count != '' && steps.find.outputs.count != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          branch="draft/$(date -u +%Y-%m-%d)-$GITHUB_RUN_ID"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add posts
+          git commit -m "draft: ${{ steps.find.outputs.headline }}"
+          git push origin "$branch"
+
+          {
+            echo "The daily probe found something. This is a **draft**: its front"
+            echo "matter says \`status: draft\`, so it is not on the site and will"
+            echo "not be indexed."
+            echo
+            echo "**To publish:** fill in *What I might have wrong* (a post with"
+            echo "nothing to argue with does not open a thread), change"
+            echo "\`status: draft\` to \`status: published\`, and merge. To discard,"
+            echo "close this PR; the finding is already recorded as seen and will"
+            echo "not be offered again."
+            echo
+            echo "---"
+            echo
+            cat ${{ steps.find.outputs.drafts }}
+          } > "$RUNNER_TEMP/body.md"
+
+          gh pr create \
+            --title "Draft: ${{ steps.find.outputs.headline }}" \
+            --body-file "$RUNNER_TEMP/body.md" \
+            --base main --head "$branch"
+
+      - name: Say so when there was nothing to say
+        if: steps.find.outputs.count == '' || steps.find.outputs.count == '0'
+        run: |
+          echo "### Nothing to write up" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "No new finding cleared the resolution floor and the staleness" >> "$GITHUB_STEP_SUMMARY"
+          echo "window. A quiet week is a result, not a gap." >> "$GITHUB_STEP_SUMMARY"

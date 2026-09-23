@@ -16,6 +16,15 @@ from typing import Dict, List, Optional, Sequence
 from .findings import ABOUT_HARNESS, ABOUT_INFRA, Finding
 from .report import ModelStatus, min_detectable_change
 
+# The one line that closes an owned post. Erik is job searching and was letting
+# every post end without saying so; the post already proves the competence, the
+# line tells the reader what to do with it. Owned posts only, never a reply,
+# a pull request, or an outreach message.
+AVAILABILITY = ("I build deterministic evaluation and verification tooling for LLM "
+                "systems, and I am looking for my first full-time role in AI "
+                "evaluation or QA engineering. Remote US Eastern, or Charleston SC. "
+                "https://erikhill.dev")
+
 HOME = "https://erikhill.dev"
 BOARD = "https://egnaro9.github.io/model-drift/"
 REPO = "https://github.com/egnaro9/model-drift"
@@ -88,11 +97,15 @@ def render(finding: Finding, statuses: Sequence[ModelStatus],
     if framing:
         lines += [f"**{framing}**", ""]
 
+    # Rule 7 of the post playbook, measured rather than chosen: open with a
+    # first-person incident and a number, never a maxim. The breakout post did
+    # this; the launch posts that got zero comments opened with a claim.
     lines += [
-        "## The finding",
+        "## What happened",
         "",
-        f"{finding.headline}, on a frozen suite ({suite_version}) run "
-        f"{run_date}. Same questions, same graders, temperature 0.",
+        f"On {run_date} my drift tracker ran its frozen suite ({suite_version}) "
+        f"against the live models, same questions, same graders, temperature 0. "
+        f"{finding.headline}.",
         "",
         "## The evidence",
         "",
@@ -147,7 +160,20 @@ def render(finding: Finding, statuses: Sequence[ModelStatus],
 
     lines += [
         "",
+        "## What I might have wrong",
+        "",
+        "<!-- REQUIRED before this can be published. The playbook rule is",
+        "     measured, not stylistic: a post with nothing to argue with does",
+        "     not open a thread, and the thread is the product. Name the",
+        "     weakest link in the evidence above, or the reading you cannot",
+        "     rule out. If you cannot find one, that is a reason not to",
+        "     publish this. -->",
+        "",
+        "TODO",
+        "",
         "---",
+        "",
+        AVAILABILITY,
         "",
         f"Live board: {BOARD}",
         f"Suite, graders and runner: {REPO}",

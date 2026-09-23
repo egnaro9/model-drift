@@ -227,3 +227,51 @@ def test_the_slug_does_not_cut_a_word_in_half():
 
 def f_reg(status):
     return regressions_and_recoveries([status])[0]
+
+
+# ── the post playbook, which is measured rather than stylistic ────────────
+
+def test_a_draft_opens_with_an_incident_and_a_number_not_a_maxim():
+    """Playbook rule 7, from Erik's own dev.to data: the breakout post opened
+    with a first-person incident; the zero-comment launches opened with a claim."""
+    f = f_reg(_status("openai:x", "X", 0.80, -0.10, "regressed"))
+    first = render(f, [], "2026-09-22", "v", REGISTRY).split("## What happened")[1]
+    first = first.split("##")[0]
+    assert "my drift tracker" in first
+    assert "2026-09-22" in first
+
+
+def test_a_draft_cannot_be_published_without_something_to_argue_with():
+    """Rule 1: publish to open a thread, never to announce. The section is
+    emitted with a TODO precisely so an unedited draft cannot pass as finished."""
+    f = f_reg(_status("openai:x", "X", 0.80, -0.10, "regressed"))
+    body = render(f, [], "2026-09-22", "v", REGISTRY)
+    assert "## What I might have wrong" in body
+    assert "TODO" in body.split("## What I might have wrong")[1]
+
+
+def test_an_owned_post_closes_with_exactly_one_availability_line():
+    """Rule 8, and the half that matters is that it is ONE line, not a plea."""
+    f = f_reg(_status("openai:x", "X", 0.80, -0.10, "regressed"))
+    body = render(f, [], "2026-09-22", "v", REGISTRY)
+    assert body.count("looking for my first full-time role") == 1
+    assert "open to opportunities" not in body
+
+
+def test_the_backlog_worklist_is_not_counted_as_an_unpublished_post(tmp_path):
+    """posts/ holds BACKLOG.md, which is a to-do list, not a note waiting to
+    go out. It has no front matter, which is what makes it not a post."""
+    from modeldrift.publish import build_index, is_post
+    (tmp_path / "BACKLOG.md").write_text("# Findings backlog\n\n- [ ] a thing\n")
+    (tmp_path / "2026-09-22-real.md").write_text(
+        '---\ntitle: "Real"\ndate: 2026-09-22\nstatus: published\n---\n\nBody here.\n')
+    assert not is_post(tmp_path / "BACKLOG.md")
+    idx = build_index(str(tmp_path))
+    assert [p["slug"] for p in idx] == ["2026-09-22-real"]
+
+
+def test_a_draft_never_reaches_the_published_index(tmp_path):
+    from modeldrift.publish import build_index
+    (tmp_path / "2026-09-22-draft.md").write_text(
+        '---\ntitle: "Draft"\ndate: 2026-09-22\nstatus: draft\n---\n\nBody.\n')
+    assert build_index(str(tmp_path)) == []
