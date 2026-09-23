@@ -9,7 +9,7 @@ of them up by hand and delete the line.
 - [ ] `harness` **probe-alarm** — Task count-r fails across providers at once, on 9 separate day(s)
 - [ ] `harness` **probe-alarm** — Task count-s-mississippi fails across providers at once, on 5 separate day(s)
 - [ ] `harness` **probe-alarm** — Task days-feb-2024 fails across providers at once, on 16 separate day(s)
-- [ ] `harness` **probe-alarm** — Task fact-element fails across providers at once, on 46 separate day(s)
+- [x] `harness` **probe-alarm** — fact-element: written up 2026-09-22 as 'My factual-recall tasks were scoring format, not facts'
 - [ ] `harness` **probe-alarm** — Task fact-planet fails across providers at once, on 33 separate day(s)
 - [ ] `harness` **probe-alarm** — Task float-subtract fails across providers at once, on 36 separate day(s)
 - [ ] `harness` **probe-alarm** — Task if-json fails across providers at once, on 1 separate day(s)
