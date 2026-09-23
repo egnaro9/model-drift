@@ -1,0 +1,7 @@
+The hook's own header states the residual and I am not going to soften it: `git commit --no-verify` skips every client-side hook, so no local hook is a complete policy boundary. This gate stops an accident. It does not stop a decision.
+
+If you have run mutation testing against your *guard* code rather than your product code, I would like to know what it killed that you were sure was fine.
+
+I might be wrong about this one. If you have run the same check and got a different answer, I want to hear it.
+
+I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC.

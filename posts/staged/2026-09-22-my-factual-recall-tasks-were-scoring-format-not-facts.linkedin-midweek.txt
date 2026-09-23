@@ -1,0 +1,7 @@
+The part I am least sure of is the explanation, not the measurement. The numbers are solid and the live answers are quoted verbatim, but "models treat *answer with only X* as a constraint and *X only* as a hint" is one story that fits nine calls. I have not tested it. The honest version is that I know the format differs and I am guessing at why.
+
+If you maintain an eval suite with exact-match graders on short answers: check what your passing models actually return, not just whether they passed. The board I built recorded *which* tasks failed for three months and never once recorded *what the model said*, which is why this took a live call to see. That gap is the more embarrassing half of this post.
+
+I might be wrong about this one. If you have run the same check and got a different answer, I want to hear it.
+
+I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC.

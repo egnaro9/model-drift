@@ -1,0 +1,7 @@
+Portability is argued, not proven. The source-text fingerprint should be interpreter independent, but only one Python is installed on my machine. The CI matrix is the proof and it fails on whichever leg disagrees, which is the right design and is not the same as me having verified it.
+
+If you publish a score from a harness that wraps someone else's library: ask what would still be true if the library were never called. If the answer is "the score", your harness is answering for it.
+
+I might be wrong about this one. If you have run the same check and got a different answer, I want to hear it.
+
+I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC.

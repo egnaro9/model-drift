@@ -1,0 +1,7 @@
+The weakest link is that this is one suite and two models. Haiku 4.5 beating Sonnet 4.6 here is a claim about a suite made of trap questions, not a capability ranking. A suite built to catch specific slips measures susceptibility to those slips, and I would not carry that sentence anywhere else.
+
+If you maintain an eval suite with a stability or flakiness filter: count what it discards, and count it again after you add data. If the discard count rises faster than your informative count, your filter is spending your sample size, and the direction of that trade is not obvious from the code.
+
+I might be wrong about this one. If you have run the same check and got a different answer, I want to hear it.
+
+I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC.

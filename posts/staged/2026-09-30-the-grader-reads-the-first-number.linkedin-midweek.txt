@@ -1,0 +1,7 @@
+The experiment is three models and one task. It demonstrates that the wording controls the restatement here; it does not establish how far that generalises, and I would not carry the claim to a model family I have not called.
+
+If you grade numeric answers with a regex: check which end of the string you are reading, and check it against an output that restates the question. Mine had been reading the question back to itself for months, and the board recorded the result as an arithmetic failure.
+
+I might be wrong about this one. If you have run the same check and got a different answer, I want to hear it.
+
+I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC.

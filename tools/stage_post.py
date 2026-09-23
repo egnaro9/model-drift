@@ -115,6 +115,44 @@ def kicker(secs: Dict[str, str]) -> str:
     return ""
 
 
+def uncertainty(secs: Dict[str, str]) -> str:
+    """The FIRST paragraph of what the author is least sure of.
+
+    Deliberately a different section from the launch post, which uses the hook
+    and the closing instruction. Two posts from one note must not be the same
+    post twice, and the uncertainty is the half people argue with.
+    """
+    for name in ("What I might have wrong", "So I ran the experiment"):
+        if name in secs:
+            ps = _paras(secs[name])
+            if ps:
+                return ps[0]
+    return ""
+
+
+def midweek(fm: Dict[str, str], body: str, url: str) -> str:
+    """A standalone claim, posted a few days after the edition.
+
+    NO LINK on purpose. The edition already has its own feed post; a second
+    one carrying the same link is the same information twice and reads as
+    promotion. A claim with no link is something to argue with, and the
+    measured record says the argument is the product: the one breakout was 68
+    comments on 510 views, and he wrote 47 percent of the thread.
+    """
+    secs = sections(body)
+    u = uncertainty(secs)
+    k = kicker(secs)
+    parts = []
+    if u:
+        parts += [u, ""]
+    if k and k != u:
+        parts += [k, ""]
+    parts += ["I might be wrong about this one. If you have run the same check "
+              "and got a different answer, I want to hear it.", "",
+              AVAILABILITY]
+    return "\n".join(parts)
+
+
 def devto(fm: Dict[str, str], body: str, url: str, tags: List[str],
           cover: Optional[str]) -> str:
     """A pointer plus the opening, never the whole post.
@@ -189,6 +227,7 @@ def stage(path: Path, out_dir: Path, cover: Optional[str]) -> List[Path]:
         (".devto.md", devto(fm, body, url, tags, cover)),
         (".linkedin.txt", linkedin(fm, body, url)),
         (".x.txt", "\n\n---\n\n".join(x_thread(fm, body, url))),
+        (".linkedin-midweek.txt", midweek(fm, body, url)),
     ):
         p = out_dir / f"{path.stem}{suffix}"
         p.write_text(content, encoding="utf-8")
