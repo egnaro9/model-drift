@@ -60,6 +60,48 @@ def strays_in(entries: list[tuple[str, str, str]]) -> list[str]:
     return out
 
 
+def unusable_history(is_shallow: str, commits: int) -> str:
+    """Why this clone cannot answer the question, or "" if it can.
+
+    This exists because of how the check first failed. CI checked out with the
+    default depth of 1. A shallow clone does not make `git log -- <path>`
+    fail, and does not make it empty. The single fetched commit has no parent,
+    so git reports it as having created every file in the repository: the
+    board's 26-commit history came back as ONE commit, authored by whoever
+    pushed last, with a subject about something else entirely. The check then
+    correctly reported that commit as an unexplained board edit.
+
+    So the answer was not an error and not a blank. It was a confident, wrong,
+    plausible answer, which is the only kind a provenance check cannot
+    survive. The vacuity guard that was here before asked "is this empty?" and
+    the honest answer was no.
+
+    Returns a reason instead of raising so it can be handed the shallow case
+    directly. A real clone cannot be made shallow inside a test run.
+    """
+    if is_shallow.strip() == "true":
+        return ("shallow clone, so board history here is fabricated: git "
+                "reports the one fetched commit as having created every file. "
+                "The workflow needs actions/checkout with fetch-depth: 0.")
+    if commits == 0:
+        return "no commit in this clone touches the board; this check did not run"
+    return ""
+
+
+def _raw(*args: str) -> str:
+    p = subprocess.run(["git", "-C", str(ROOT), *args],
+                       capture_output=True, text=True, timeout=60)
+    return p.stdout.strip()
+
+
+def _board_log(fmt: str) -> list[str]:
+    """Board history, or a hard failure explaining why there is none to read."""
+    lines = _log("log", f"--format={fmt}", "--", BOARD)
+    why = unusable_history(_raw("rev-parse", "--is-shallow-repository"), len(lines))
+    assert not why, why
+    return lines
+
+
 def _log(*args: str) -> list[str]:
     p = subprocess.run(["git", "-C", str(ROOT), *args],
                        capture_output=True, text=True, timeout=60)
@@ -75,8 +117,7 @@ def test_every_board_commit_is_the_probe_or_says_it_is_not():
     announce itself is indistinguishable from the probe's own output, and the
     board is what every published figure is derived from.
     """
-    subjects = _log("log", "--format=%H%x09%an%x09%s", "--", BOARD)
-    assert subjects, "no history for the board; this check did not actually run"
+    subjects = _board_log("%H%x09%an%x09%s")
 
     strays = strays_in([tuple(l.split("\t", 2)) for l in subjects])
     assert not strays, (
@@ -90,7 +131,7 @@ def test_the_probe_is_still_the_main_author_of_the_board():
     """A drifting ratio is the early signal. If hand edits start outnumbering
     probe runs, the board has quietly become a document rather than a record,
     and no single commit would have looked wrong."""
-    lines = _log("log", "--format=%s", "--", BOARD)
+    lines = _board_log("%s")
     probe = sum(1 for s in lines if s.startswith(PROBE_SUBJECT))
     human = sum(1 for s in lines if s.startswith(HUMAN_PREFIX))
     assert probe > human, (
@@ -137,3 +178,34 @@ def test_a_subject_that_merely_mentions_the_probe_is_still_a_stray():
     """startswith, not 'in'. A commit describing the probe is not the probe."""
     rows = [("eeee5555", "egnaro9", f"revert the {PROBE_SUBJECT} commit")]
     assert len(strays_in(rows)) == 1
+
+
+# ── the clone this check is standing on ───────────────────────────────────
+
+def test_a_shallow_clone_is_refused_even_though_it_answers():
+    """The case that actually happened, and the reason the old guard missed it.
+
+    commits=1 is a PASSING vacuity check. The history is still a fabrication.
+    """
+    why = unusable_history("true", 1)
+    assert "shallow" in why and "fetch-depth: 0" in why
+
+
+def test_a_shallow_clone_is_refused_however_many_commits_it_shows():
+    for n in (0, 1, 26, 1000):
+        assert unusable_history("true", n), f"shallow accepted at {n} commits"
+
+
+def test_an_empty_board_history_is_refused():
+    assert "did not run" in unusable_history("false", 0)
+
+
+def test_a_real_clone_with_history_is_accepted():
+    assert unusable_history("false", 26) == ""
+
+
+def test_the_shallow_flag_is_read_strictly():
+    """git prints 'true' or 'false'. Anything else is not a licence to proceed
+    quietly, but 'false' with history is the only accepting case."""
+    assert unusable_history("false\n", 26) == ""
+    assert unusable_history(" true ", 26) != ""

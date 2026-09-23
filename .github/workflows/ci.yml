@@ -34,6 +34,14 @@ jobs:
           # current tip instead, as pages.yml does. Empty string keeps the default
           # for push and pull_request, so PR runs still validate the PR merge ref.
           ref: ${{ github.event_name == 'workflow_run' && 'main' || '' }}
+          # test_board_provenance reads the board's git history. A shallow
+          # clone does not fail that check, it LIES to it: the single fetched
+          # commit has no parent, so git reports it as having created every
+          # file, so the board's 26-commit history becomes one commit by
+          # whoever pushed last. The check detects this itself now; this line
+          # is what lets it actually run. The vac-bundle job below already had
+          # it, for a different reason, which is why this was easy to miss.
+          fetch-depth: 0
       - name: What is being validated, and why
         run: |
           echo "event            : ${{ github.event_name }}"
