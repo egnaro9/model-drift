@@ -73,10 +73,31 @@ jobs:
             cat ${{ steps.find.outputs.drafts }}
           } > "$RUNNER_TEMP/body.md"
 
-          gh pr create \
-            --title "Draft: ${{ steps.find.outputs.headline }}" \
-            --body-file "$RUNNER_TEMP/body.md" \
-            --base main --head "$branch"
+          # A repo can forbid Actions from opening pull requests, and this one
+          # does: "GitHub Actions is not permitted to create or approve pull
+          # requests". The branch is already pushed at that point, so the
+          # finding is safe either way and the PR is a convenience. Falling
+          # back to a compare link keeps the job green and keeps the draft
+          # one click from review.
+          if gh pr create \
+              --title "Draft: ${{ steps.find.outputs.headline }}" \
+              --body-file "$RUNNER_TEMP/body.md" \
+              --base main --head "$branch"; then
+            echo "opened a pull request"
+          else
+            echo "::warning::Actions cannot open PRs here; the branch is pushed."
+            {
+              echo "### Draft ready, open the PR yourself"
+              echo
+              echo "Branch \`$branch\` is pushed. Actions is not permitted to open"
+              echo "pull requests in this repository, which is a setting under"
+              echo "Settings, Actions, General."
+              echo
+              echo "[Open the pull request]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/compare/main...$branch?expand=1)"
+              echo
+              cat "$RUNNER_TEMP/body.md"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Say so when there was nothing to say
         if: steps.find.outputs.count == '' || steps.find.outputs.count == '0'
