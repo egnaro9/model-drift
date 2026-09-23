@@ -215,6 +215,28 @@ def test_eval_history_agrees_with_the_committed_series():
             mismatches.append(
                 f"{m['id']} on {day}: committed {local} vs eval-history {remote}")
 
+    if not compared:
+        # Distinguish "nothing lined up today" from "this can never line up
+        # again". eval-history's write path was retired with Render, so the
+        # archive is frozen while the committed board advances daily. Every
+        # committed date is newer than every upstream one, every model skips,
+        # and the guard below fires on every run.
+        #
+        # It fired for 24 days. A test that CANNOT pass produces the same red
+        # as one that just broke and generates none of the urgency, and daily
+        # red is how a real failure gets ignored later. The frozen case skips
+        # with its reason stated; the guard stays for the ordinary case where
+        # a live store simply had no matching row.
+        newest_up = max((str(r.get("created_at"))[:10] for r in _cache.get("rows", [])),
+                        default="")
+        newest_local = max((str(pts[-1].get("t"))[:10]
+                            for pts in series.values() if pts), default="")
+        if newest_up and newest_local and newest_up < newest_local:
+            pytest.skip(
+                f"eval-history is a frozen archive: newest upstream run {newest_up}, "
+                f"committed board reaches {newest_local}. The write path was retired "
+                f"with Render, so there is no second store to agree with. This check "
+                f"resumes if a live store is restored.")
     assert compared, "no model could be compared; the agreement check did not actually run"
     assert not mismatches, (
         "the two stores disagree on the newest run:\n  " + "\n  ".join(mismatches))
