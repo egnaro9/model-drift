@@ -16,3 +16,21 @@ jobs:
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: python -m modeldrift.run --list-models
+      - name: Does Groq serve a model its listing omits?
+        # The listing endpoint is not the endpoint we call. Groq documents
+        # llama-3.3-70b-versatile as NOT deprecated while omitting it from this
+        # key's /models response, so ask the chat endpoint directly. Bearer auth
+        # and a status-only read: no key can reach the log.
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          for m in llama-3.3-70b-versatile llama-3.1-8b-instant \
+                   meta-llama/llama-4-scout-17b-16e-instruct \
+                   openai/gpt-oss-120b qwen/qwen3.8-27b; do
+            code=$(curl -s -o /tmp/body.json -w '%{http_code}' \
+              https://api.groq.com/openai/v1/chat/completions \
+              -H "Authorization: Bearer $GROQ_API_KEY" \
+              -H 'Content-Type: application/json' \
+              -d "{\"model\":\"$m\",\"max_tokens\":1,\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}]}")
+            echo "PROBE $code  $m  $(head -c 200 /tmp/body.json | tr -d '\n')"
+          done
