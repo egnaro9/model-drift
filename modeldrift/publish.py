@@ -51,7 +51,13 @@ def summarize(body: str, limit: int = 240) -> str:
             continue
         if block.startswith("**") and block.endswith("**"):
             continue
+        # The card renders this as plain escaped text, so markdown syntax would
+        # show as literal backticks and asterisks. Strip the markers, keep the
+        # words.
         flat = " ".join(block.split())
+        flat = re.sub(r"`([^`]+)`", r"\1", flat)
+        flat = re.sub(r"\*\*([^*]+)\*\*", r"\1", flat)
+        flat = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", flat)
         return flat if len(flat) <= limit else flat[:limit].rsplit(" ", 1)[0] + "…"
     return ""
 

@@ -275,3 +275,16 @@ def test_a_draft_never_reaches_the_published_index(tmp_path):
     (tmp_path / "2026-09-22-draft.md").write_text(
         '---\ntitle: "Draft"\ndate: 2026-09-22\nstatus: draft\n---\n\nBody.\n')
     assert build_index(str(tmp_path)) == []
+
+
+def test_a_card_summary_carries_no_markdown_syntax(tmp_path):
+    """The index card renders escaped plain text, so a backtick in the summary
+    shows up as a backtick on the page."""
+    from modeldrift.publish import build_index
+    (tmp_path / "2026-09-22-x.md").write_text(
+        '---\ntitle: "X"\ndate: 2026-09-22\nstatus: published\n---\n\n'
+        'One task, `fact-element`, failed **60 times** see [the board](https://x.dev).\n',
+        encoding="utf-8")
+    s = build_index(str(tmp_path))[0]["summary"]
+    assert "`" not in s and "**" not in s and "](" not in s, s
+    assert "fact-element" in s and "60 times" in s and "the board" in s
