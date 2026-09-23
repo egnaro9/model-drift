@@ -239,3 +239,33 @@ def test_the_rerender_gate_can_fail():
     series[victim][-1]["acc"] = round(1.0 - series[victim][-1]["acc"], 4) or 0.5
     assert results_md_offline(series, registry) != \
         results_md_offline(metrics["series"], registry)
+
+
+def test_rederive_is_a_pure_function_of_the_board(tmp_path):
+    """The conflict resolution in track.yml depends on this: RESULTS.md and
+    narrative.json must be reproducible from drift_board.json plus the
+    registry, with no other input. If that ever stops being true, resolving a
+    merge conflict by regenerating would silently drop whatever the extra
+    input was."""
+    import shutil
+    from modeldrift.rederive import rederive
+    for name in ("RESULTS.md",):
+        shutil.copy(ROOT / name, tmp_path / name)
+    (tmp_path / "dashboard").mkdir()
+    for name in ("dashboard/drift_board.json", "dashboard/narrative.json"):
+        shutil.copy(ROOT / name, tmp_path / name)
+
+    args = (str(tmp_path / "dashboard/drift_board.json"),
+            str(ROOT / "modeldrift/models.json"),
+            str(tmp_path / "RESULTS.md"),
+            str(tmp_path / "dashboard/narrative.json"))
+    assert rederive(*args) == [], "committed derived files do not match the board"
+
+    # Corrupt both renderings the way a bad text merge would, and prove a
+    # regeneration restores them exactly.
+    (tmp_path / "RESULTS.md").write_text("<<<<<<< HEAD\ngarbage\n", encoding="utf-8")
+    (tmp_path / "dashboard/narrative.json").write_text("{}\n", encoding="utf-8")
+    assert len(rederive(*args)) == 2
+    assert (tmp_path / "RESULTS.md").read_text() == (ROOT / "RESULTS.md").read_text()
+    assert ((tmp_path / "dashboard/narrative.json").read_text()
+            == (ROOT / "dashboard/narrative.json").read_text())

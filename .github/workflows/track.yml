@@ -78,7 +78,31 @@ jobs:
           for attempt in 1 2 3; do
             if git push; then echo "pushed on attempt $attempt"; exit 0; fi
             echo "push rejected - rebasing onto origin/main and retrying"
-            git pull --rebase origin main || exit 1
+            if ! git pull --rebase origin main; then
+              # A content conflict, not a non-fast-forward. The only files that
+              # can conflict here are RESULTS.md and narrative.json, which are
+              # pure functions of the board, and drift_board.json merges cleanly
+              # because each run appends its own points. Text-merging a derived
+              # file is the wrong operation: take the merged inputs and derive
+              # it again. This lost a 47-minute run once, on 2026-09-22.
+              conflicts=$(git diff --name-only --diff-filter=U)
+              echo "conflicts: $conflicts"
+              for f in $conflicts; do
+                case "$f" in
+                  RESULTS.md|dashboard/narrative.json) ;;
+                  *) echo "::error::unexpected conflict in $f, which is not a derived file"
+                     git rebase --abort; exit 1 ;;
+                esac
+              done
+              # Resolve to either side so the tree is consistent, then overwrite
+              # both from the board that just merged.
+              git checkout --theirs $conflicts 2>/dev/null || true
+              git add $conflicts
+              GIT_EDITOR=true git rebase --continue || exit 1
+              python -m modeldrift.rederive
+              git add RESULTS.md dashboard/narrative.json
+              git diff --cached --quiet || git commit --amend --no-edit
+            fi
           done
           echo "::error::could not push this run's results after 3 attempts"
           exit 1
