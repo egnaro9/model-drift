@@ -1,13 +1,13 @@
 {
  "sentences": [
-  "<strong>Claude Sonnet 5 answers with 2x the characters of the tersest model</strong>, at 85%.",
-  "<strong>Claude Haiku 4.5 leads on speed</strong> at 468 ms and 85% accuracy.",
-  "<strong>Nothing reached 100%</strong> \u2014 Claude Fable 5 leads at 94%."
+  "<strong>OpenAI's cheaper tiers match its own flagship</strong> \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy.",
+  "<strong>Grok 4.3 answers with 5.3x the characters of the tersest model</strong>, at 91%.",
+  "<strong>Claude Haiku 4.5 leads on speed</strong> at 538 ms and 85% accuracy."
  ],
- "html": "A frozen, deterministically-graded suite against <strong>4 models across 1 lab</strong>. 13 of the 17 tracked models did not return a clean run and are left out of the comparisons below. <strong>Claude Sonnet 5 answers with 2x the characters of the tersest model</strong>, at 85%. <strong>Claude Haiku 4.5 leads on speed</strong> at 468 ms and 85% accuracy. <strong>Nothing reached 100%</strong> \u2014 Claude Fable 5 leads at 94%. <em>Generated from the run of 22 Sep 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.</em>",
- "text": "A frozen, deterministically-graded suite against 4 models across 1 lab. 13 of the 17 tracked models did not return a clean run and are left out of the comparisons below. Claude Sonnet 5 answers with 2x the characters of the tersest model, at 85%. Claude Haiku 4.5 leads on speed at 468 ms and 85% accuracy. Nothing reached 100% \u2014 Claude Fable 5 leads at 94%. Generated from the run of 22 Sep 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.",
- "models": 16,
- "clean": 4,
- "updated": "2026-09-22T15:33:27Z",
+ "html": "A frozen, deterministically-graded suite against <strong>16 models across 6 labs</strong>. 1 of the 17 tracked models did not return a clean run and is left out of the comparisons below. <strong>OpenAI's cheaper tiers match its own flagship</strong> \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy. <strong>Grok 4.3 answers with 5.3x the characters of the tersest model</strong>, at 91%. <strong>Claude Haiku 4.5 leads on speed</strong> at 538 ms and 85% accuracy. <em>Generated from the run of 23 Sep 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.</em>",
+ "text": "A frozen, deterministically-graded suite against 16 models across 6 labs. 1 of the 17 tracked models did not return a clean run and is left out of the comparisons below. OpenAI's cheaper tiers match its own flagship \u2014 GPT-5 mini at 100% and GPT-5 nano at 100%, against GPT-5 at 100% \u2014 so within that lab, on this suite, paying more buys no accuracy. Grok 4.3 answers with 5.3x the characters of the tersest model, at 91%. Claude Haiku 4.5 leads on speed at 538 ms and 85% accuracy. Generated from the run of 23 Sep 2026 \u2014 this paragraph is rebuilt from the board's own numbers, never hand-written.",
+ "models": 19,
+ "clean": 16,
+ "updated": "2026-09-23T14:41:14Z",
  "claims_fired": 3
 }
