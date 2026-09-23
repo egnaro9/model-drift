@@ -298,6 +298,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     # while the same topic alone five days earlier got 48 views and 5 comments.
     ap.add_argument("--max", type=int, default=1,
                     help="most drafts to write in one run; the rest are named, never dropped silently")
+    ap.add_argument("--sources", default="posts/sources.json",
+                    help="other instruments that emit findings.json; missing file means local only")
     ap.add_argument("--seed-ledger", action="store_true",
                     help="record every current finding as already-seen without writing "
                          "drafts, to establish a baseline against historical backlog")
@@ -310,7 +312,19 @@ def main(argv: Optional[List[str]] = None) -> int:
     stamp = _run_date(build_rows(board, registry)) or ""
     day = (stamp or "")[:10] or "undated"
 
-    all_found = detect(series, statuses)
+    # Findings from the other instruments in the estate. Fetched, validated
+    # strictly, and merged into the same ledger and draft format: one archive
+    # rather than one per repo.
+    from .external import collect, load_sources
+    external, problems = collect(load_sources(a.sources))
+    for p_ in problems:
+        # A source that is failing is itself news about the estate, so it is
+        # printed rather than swallowed. It does not stop the local detector.
+        print(f"  SOURCE PROBLEM: {p_}")
+    if external:
+        print(f"  {len(external)} finding(s) from other instruments")
+
+    all_found = detect(series, statuses) + external
     found = current(all_found, day, a.window_days)
     stale = len(all_found) - len(found)
     fresh = unseen(found, a.ledger)

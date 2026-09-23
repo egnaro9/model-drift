@@ -1,0 +1,9 @@
+{
+  "comment": "Instruments that emit notes/findings.json on their own main. Read raw, validated strictly by modeldrift.external, and merged into this archive. A source that 404s is reported, never treated as 'no findings'.",
+  "sources": [
+    {"source": "evalmut",
+     "url": "https://raw.githubusercontent.com/egnaro9/evalmut/main/notes/findings.json"},
+    {"source": "vac-protocol",
+     "url": "https://raw.githubusercontent.com/egnaro9/vac-protocol/main/notes/findings.json"}
+  ]
+}
