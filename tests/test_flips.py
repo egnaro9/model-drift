@@ -79,3 +79,72 @@ def test_no_data_is_not_reported_as_no_flips():
 
     real = {"openai:gpt-5": [pt(23, []), pt(24, [])]}
     assert "No task flipped" in summarize(analyze(real))
+
+
+# ── a fail recorded during an outage is not a flip ────────────────────────
+
+def _run(day, fails, reliability=1.0, acc=0.9):
+    return {"t": f"{day}T00:00:00Z", "fails": list(fails),
+            "reliability": reliability, "acc": acc}
+
+
+def test_a_degraded_run_cannot_manufacture_a_probe_alarm():
+    """Rows written before the refusal fix scored absent calls as wrong
+    answers, so their `fails` arrays carry fabricated task failures. Reading
+    those republishes a provider outage as a cross-provider harness alarm,
+    which is the exact error this project exists to debunk.
+
+    Measured on the live board 2026-09-23: unfiltered, 255 alarm task-days
+    across 14 tasks; filtered, 159 across 9. Five tasks were outage entirely.
+    """
+    series = {
+        f"{lab}:m": [_run("2026-09-01", [], 1.0),
+                     # every call failed, so every task "failed"
+                     _run("2026-09-02", ["math-order", "fact-capital"], 0.03, 0.03)]
+        for lab in ("openai", "anthropic", "google")
+    }
+    assert analyze(series)["probe_alarms"] == [], \
+        "three providers degraded on the same day is an outage, not a probe alarm"
+
+
+def test_a_clean_run_still_raises_the_alarm():
+    """The mirror: the filter must not also suppress the real thing."""
+    series = {
+        f"{lab}:m": [_run("2026-09-01", [], 1.0),
+                     _run("2026-09-02", ["math-order"], 1.0)]
+        for lab in ("openai", "anthropic", "google")
+    }
+    alarms = analyze(series)["probe_alarms"]
+    assert len(alarms) == 1 and alarms[0]["task"] == "math-order"
+
+
+def test_a_flip_into_or_out_of_a_degraded_run_is_not_counted():
+    """A task that 'failed' only because the provider was down, then 'passed'
+    when it came back, is two fabricated flips on one model."""
+    series = {"openai:m": [_run("2026-09-01", [], 1.0),
+                           _run("2026-09-02", ["math-order"], 0.1, 0.1),
+                           _run("2026-09-03", [], 1.0),
+                           _run("2026-09-04", ["math-order"], 0.1, 0.1),
+                           _run("2026-09-05", [], 1.0)]}
+    assert analyze(series)["repeat_offenders"] == []
+
+
+def test_partial_degradation_is_also_excluded():
+    """Reliability 0.97 means one call never landed. Any absent call in a run
+    can fabricate a fail, so flips need every call, not merely most of them.
+
+    Built so it can actually go red: three providers, so a probe alarm WOULD
+    fire, and alternating fails, so repeat offenders WOULD fire. Only the
+    0.97 keeps both empty. A REL_FLOOR-style 0.5 bar would let all of it
+    through, which is why the bar here is 1.0.
+    """
+    series = {
+        f"{lab}:m": [_run("2026-09-01", [], 1.0),
+                     _run("2026-09-02", ["math-order"], 0.97, 0.88),
+                     _run("2026-09-03", [], 0.97, 0.88),
+                     _run("2026-09-04", ["math-order"], 0.97, 0.88)]
+        for lab in ("openai", "anthropic", "google")
+    }
+    r = analyze(series)
+    assert r["probe_alarms"] == [], r["probe_alarms"]
+    assert r["repeat_offenders"] == [], r["repeat_offenders"]

@@ -39,6 +39,26 @@ def _day(stamp: str) -> str:
     return (stamp or "")[:10]
 
 
+def scoreable(points: list[dict]) -> list[dict]:
+    """Runs where every call landed, which is the only kind a flip can be read from.
+
+    board.trusted_points applies REL_FLOOR to the accuracy path; this file
+    applied nothing, and that gap is what let an outage become a finding.
+    The bar here is stricter than REL_FLOOR on purpose: accuracy divides by the
+    calls that were graded, so a run can lose a few and still say something
+    true, but a flip is a per-task pass/fail CHANGE, and any single absent call
+    can manufacture one. Rows written before the refusal fix scored absent
+    calls as wrong answers outright, so their `fails` arrays carry fabricated
+    task failures.
+
+    Measured on the live board 2026-09-23: without this, 255 probe-alarm
+    task-days across 14 tasks and 106 repeat offenders. With it, 159 across 9,
+    and 39. Five alarm tasks were outage in their entirety.
+    """
+    return [p for p in points
+            if p.get("reliability") is None or p["reliability"] >= 1.0]
+
+
 def flips_for_model(points: list[dict]) -> list[dict]:
     """Per-task flips between consecutive runs of one model, newest last.
 
@@ -76,7 +96,7 @@ def analyze(series: dict[str, list[dict]],
     for model_id, points in series.items():
         if model_id.startswith("mock:"):
             continue
-        for row in flips_for_model(points):
+        for row in flips_for_model(scoreable(points)):
             entry = {"model": model_id, **row}
             (repeat if row["flips"] > 1 else once).append(entry)
 
@@ -86,7 +106,7 @@ def analyze(series: dict[str, list[dict]],
         if model_id.startswith("mock:"):
             continue
         prov = _provider(model_id)
-        for p in points:
+        for p in scoreable(points):
             if "fails" not in p:
                 continue
             for task in (p.get("fails") or []):
@@ -104,7 +124,7 @@ def analyze(series: dict[str, list[dict]],
     # for some model there is nothing to compare, and "nothing flipped" would be a
     # lie of omission — the same false reassurance this module exists to prevent.
     comparable = sum(1 for pts in series.values()
-                     if sum(1 for p in pts if "fails" in p) >= 2)
+                     if sum(1 for p in scoreable(pts) if "fails" in p) >= 2)
 
     return {
         "repeat_offenders": sorted(repeat, key=lambda r: (-r["flips"], r["model"])),
