@@ -342,6 +342,7 @@ def main(argv: Optional[List[str]] = None) -> int:
           f"{len(skipped)} skipped for lack of an API key\n")
 
     results = []
+    dark: List[Model] = []      # every call failed: infra, not a score
     for m in models:
         result = probe_repeated(m, args.runs)
         results.append(result)
@@ -356,6 +357,8 @@ def main(argv: Optional[List[str]] = None) -> int:
             print(f"      ↳ {result['_errors']}/{len(SUITE)} failed — first error: {result['_first_error']}")
         # A probe that entirely failed is an infra/key problem, not a 0% score —
         # don't record it, or the chart shows a fake crash. Partial runs still count.
+        if result["_errors"] >= len(SUITE):
+            dark.append(m)
         if key and result["_errors"] >= len(SUITE):
             print("      (every call failed — not recorded; fix the key/quota, not the model)")
         elif key and not args.api.strip():
@@ -407,6 +410,29 @@ def main(argv: Optional[List[str]] = None) -> int:
     if args.out:
         with open(args.out, "w", encoding="utf-8") as fh:
             json.dump([{k: v for k, v in r.items() if not k.startswith("_")} for r in results], fh, indent=2)
+
+    # A provider that recorded NOTHING is an outage, and it has to be able to turn this
+    # job red. Declining to write a failed call as a 0% is correct: a billing lapse is not
+    # a model regression. But the run then exited 0, so the board went on reporting
+    # success while three labs sat dark for 9 to 37 days and nothing said a word.
+    # Not recording it and not mentioning it are different decisions; this is the second.
+    # Grouped by key_env, NOT by provider. xai and groq are both `openai-compatible`,
+    # so grouping on provider would merge two unrelated accounts and only fire when BOTH
+    # went down. The credential is the thing that actually fails, so it is the unit.
+    by_cred: Dict[str, List[Model]] = {}
+    for m in models:
+        by_cred.setdefault(m.key_env, []).append(m)
+    dark_ids = {id(m) for m in dark}
+    out_cold = [cred for cred, ms in by_cred.items() if all(id(m) in dark_ids for m in ms)]
+    if out_cold:
+        print("\n  PROVIDERS DARK — every call failed, nothing recorded:")
+        for cred in sorted(out_cold):
+            ms = by_cred[cred]
+            labels = ", ".join(m.label for m in ms)
+            print(f"    {cred} ({ms[0].provider}): {labels}")
+        print("  This is an infra failure (key, quota, billing, or a retired model id),")
+        print("  not a model result. Fix it upstream; the board has no data for these.")
+        return 1
     return 0
 
 

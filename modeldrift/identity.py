@@ -143,7 +143,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         try:
             ident = attest(m)
         except ProviderError as e:
-            print(f"  {m.label:26} — call failed (reliability, not identity): {str(e)[:110]}")
+            # 400 chars, not 110. At 110 the url ate the budget and the provider's own
+            # message — the only actionable part — was cut off exactly where it started.
+            # Three providers sat dark for weeks partly because this line could not say why.
+            print(f"  {m.label:26} — call failed (reliability, not identity): {str(e)[:400]}")
             continue
         if ident.status == "MISMATCH":
             mismatches += 1

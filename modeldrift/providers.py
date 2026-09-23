@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 import urllib.error
 import urllib.request
@@ -56,6 +57,16 @@ class Model:
 
 class ProviderError(RuntimeError):
     pass
+
+
+def _safe(url: str) -> str:
+    """A url with the secret taken out, for messages that end up in public logs.
+
+    Second line of defence. Keys belong in headers (see _gemini_raw), but a url is
+    interpolated into every ProviderError below, and this repo's Actions logs are public,
+    so one careless `?key=` anywhere would publish a live credential on every failure.
+    """
+    return re.sub(r"([?&](?:key|api_key|access_token|token)=)[^&\s]+", r"\1REDACTED", url)
 
 
 MAX_RETRIES = 4
@@ -112,9 +123,9 @@ def _post(url: str, headers: Dict[str, str], body: dict, *, retries: int = MAX_R
             if e.code in _RETRYABLE and attempt < retries:
                 time.sleep(_retry_after(e, attempt))
                 continue
-            raise ProviderError(f"{url} -> {e.code}: {text}")
+            raise ProviderError(f"{e.code}: {text} [{_safe(url)}]")
         except urllib.error.URLError as e:
-            raise ProviderError(f"{url} unreachable: {e.reason}")
+            raise ProviderError(f"unreachable: {e.reason} [{_safe(url)}]")
         except (TimeoutError, json.JSONDecodeError) as e:
             # A socket read timeout raises a bare TimeoutError, which is NOT a
             # URLError - so it escaped every handler here, sailed past probe()'s
@@ -122,8 +133,8 @@ def _post(url: str, headers: Dict[str, str], body: dict, *, retries: int = MAX_R
             # from one provider discarded eleven models that had already been
             # measured. Everything that can go wrong on the wire has to arrive as a
             # ProviderError, or a run is only as reliable as its flakiest endpoint.
-            raise ProviderError(f"{url}: {type(e).__name__}: {e}")
-    raise ProviderError(f"{url}: exhausted {retries} retries")  # unreachable; for type-checkers
+            raise ProviderError(f"{type(e).__name__}: {e} [{_safe(url)}]")
+    raise ProviderError(f"exhausted {retries} retries [{_safe(url)}]")  # unreachable; for type-checkers
 
 
 # ── pure request-body builders (tested directly, no network) ──
@@ -174,9 +185,14 @@ def _anthropic(m: Model, prompt: str) -> str:
 
 
 def _gemini_raw(m: Model, prompt: str) -> dict:
+    # The key goes in a HEADER, never the query string. Every ProviderError carries the
+    # url it failed on, and this repo's Actions logs are public, so a `?key=` here put a
+    # live credential into a world-readable log on every failure. Google accepts
+    # x-goog-api-key for exactly this reason.
     key = os.environ[m.key_env].strip()
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{m.model}:generateContent?key={key}"
-    return _post(url, {"Content-Type": "application/json"}, gemini_body(m, prompt))
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{m.model}:generateContent"
+    headers = {"Content-Type": "application/json", "x-goog-api-key": key}
+    return _post(url, headers, gemini_body(m, prompt))
 
 
 def _gemini(m: Model, prompt: str) -> str:
@@ -327,7 +343,8 @@ def list_models(m: Model) -> List[str]:
                  {"x-api-key": key, "anthropic-version": "2023-06-01"})
         return [x["id"] for x in d.get("data", [])]
     if m.provider == "gemini":
-        d = _get(f"https://generativelanguage.googleapis.com/v1beta/models?key={key}&pageSize=200", {})
+        d = _get("https://generativelanguage.googleapis.com/v1beta/models?pageSize=200",
+                 {"x-goog-api-key": key})
         return [x["name"].removeprefix("models/") for x in d.get("models", [])]
     base = (m.base_url or "https://api.openai.com/v1").rstrip("/")
     d = _get(f"{base}/models", {"Authorization": f"Bearer {key}"})
