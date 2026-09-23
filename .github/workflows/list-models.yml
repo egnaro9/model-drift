@@ -34,3 +34,28 @@ jobs:
               -d "{\"model\":\"$m\",\"max_tokens\":1,\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}]}")
             echo "PROBE $code  $m  $(head -c 200 /tmp/body.json | tr -d '\n')"
           done
+      - name: What do the models actually answer on the factual-recall tasks?
+        # The board records WHICH tasks failed, never what the model said, so a
+        # systematic grading failure cannot be diagnosed from the record. Nine
+        # calls through the probe's own call path, printing repr() so trailing
+        # punctuation, markdown and whitespace are visible rather than implied.
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python - <<'PY'
+          from modeldrift.providers import call_meta, load_registry
+          from modeldrift.suite import SUITE
+          want = {"fact-element", "fact-capital", "fact-planet"}
+          tasks = [t for t in SUITE if t.id in want]
+          ids = {"anthropic:claude-sonnet-5", "openai:gpt-4o-mini", "anthropic:claude-opus-4-8"}
+          for m in load_registry():
+              if m.id not in ids or not m.available:
+                  continue
+              for t in tasks:
+                  try:
+                      out, finish = call_meta(m, t.prompt, task_id=t.id)
+                      print(f"ANSWER {m.id:28} {t.id:14} graded={t.grade(out)!s:5} {out!r}")
+                  except Exception as e:
+                      print(f"ANSWER {m.id:28} {t.id:14} ERROR {type(e).__name__}: {str(e)[:120]}")
+          PY
