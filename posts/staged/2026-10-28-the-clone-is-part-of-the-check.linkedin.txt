@@ -1,0 +1,9 @@
+I committed a new check at 18:44:13 and the run that caught it failing started at 18:44:22. Nine seconds. It had passed locally, 282 tests green. In CI it accused my own commit of secretly editing the results board that every published number is derived from.
+
+If you keep a check that reads git history: clone it shallow and run it. If it passes, it is not reading what you think it is reading.
+
+Full note, with the evidence table: https://erikhill.dev/notes/2026-10-28-the-clone-is-part-of-the-check/
+
+I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC.
+
+https://erikhill.dev
