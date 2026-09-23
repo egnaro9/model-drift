@@ -1,13 +1,12 @@
 ---
 title: "The guard was applied once. Its sibling read the same data without it."
-date: 2026-10-21
-kind: defect-class
-about: harness
-subject: estate/guard-siblings
-fingerprint: defect-class:estate/guard-siblings:2026-09-22
-destination: https://erikhill.dev/notes/2026-10-21-the-guard-and-its-sibling/
-status: draft
+published: false
+description: "In one session across three repositories I fixed five separate defects. They looked unrelated while I was fixing them. Four are the same bug, and the fifth is the version of it tha"
+tags: showdev, testing, ai
+canonical_url: https://erikhill.dev/notes/2026-10-21-the-guard-and-its-sibling/
 ---
+
+*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-10-21-the-guard-and-its-sibling/). The numbers below are checked against the repository they come from.*
 
 # The guard was applied once. Its sibling read the same data without it.
 

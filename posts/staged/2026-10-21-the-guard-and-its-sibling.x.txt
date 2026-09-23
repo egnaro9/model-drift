@@ -1,0 +1,13 @@
+In one session across three repositories I fixed five separate defects. They looked unrelated while I was fixing them. Four are the same bug, and the fifth is the version of it that has no code in it at all. 1/4
+
+---
+
+If you keep a rule like this, a floor, a filter, a validity check: grep for its name and count the files. Then ask, for each one, whether that file applies it or merely mentions it. The gap between those two numbers is the one I keep finding. 2/4
+
+---
+
+I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC. 3/4
+
+---
+
+Full note, with the evidence: https://erikhill.dev/notes/2026-10-21-the-guard-and-its-sibling/ 4/4
