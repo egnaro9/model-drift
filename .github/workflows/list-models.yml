@@ -60,3 +60,35 @@ jobs:
                   except Exception as e:
                       print(f"ANSWER {m.id:28} {t.id:14} ERROR {type(e).__name__}: {str(e)[:120]}")
           PY
+      - name: Does the instruction wording cause the restatement?
+        # The 2026-09-30 note claims an output-shape instruction gets a bare
+        # token while a description of the answer gets a sentence. That is a
+        # pattern observed twice, not a mechanism demonstrated. This is the A/B:
+        # same arithmetic, three instruction wordings, same three models.
+        # The frozen suite is NOT touched; its hash is part of published claims.
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python - <<'PY'
+          import re
+          from modeldrift.providers import call_meta, load_registry
+          VARIANTS = {
+            "as-shipped   (format of the value)": "What is 0.3 minus 0.1? Give the number to one decimal place.",
+            "output-shape (give only)":           "What is 0.3 minus 0.1? Give only the number.",
+            "output-shape (number only)":         "What is 0.3 minus 0.1? Number only.",
+          }
+          first = lambda o: (re.search(r"-?\d+(?:\.\d+)?", o.replace(",", "")) or [None])[0]
+          ids = {"anthropic:claude-sonnet-5", "openai:gpt-4o-mini", "anthropic:claude-opus-4-8"}
+          for m in load_registry():
+              if m.id not in ids or not m.available:
+                  continue
+              for label, prompt in VARIANTS.items():
+                  try:
+                      out, _ = call_meta(m, prompt, task_id="ab-float-subtract")
+                      f = first(out)
+                      verdict = "PASS" if f and abs(float(f) - 0.2) <= 0.001 else "FAIL"
+                      print(f"AB {m.id:26} {label:36} {verdict}  first={f!s:6} {out[:70]!r}")
+                  except Exception as e:
+                      print(f"AB {m.id:26} {label:36} ERROR {type(e).__name__}: {str(e)[:90]}")
+          PY
