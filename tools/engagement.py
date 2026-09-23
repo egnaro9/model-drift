@@ -71,20 +71,50 @@ def _strip(html: str) -> str:
     return " ".join(text.split())
 
 
-def threads_needing_reply(tree: List[dict], me: str) -> List[dict]:
-    """A thread needs a reply when the DEEPEST-LAST speaker is not the author.
+def threads_needing_reply(tree: List[dict], me: str,
+                          article_url: str = "", check_live: bool = True) -> List[dict]:
+    """A thread needs a reply when the DEEPEST-LAST speaker is not the author
+    AND the thread still exists AND it is not spam.
 
     Walking to the leaf matters: a thread the author started and someone else
     ended looks, from the root, exactly like one he ended himself.
+
+    The liveness check matters more, and this function shipped without it. The
+    index listed six threads owed on 2026-09-23 and only two resolved: one was
+    a crypto recovery scam dev.to had already removed, and three had authors
+    who were removed or suspended. That number gates whether he publishes at
+    all in a given week, so an inflated one tells him to hold a post for
+    threads nobody can read. The index lies; the permalink is the fact.
     """
     out = []
     for root in tree:
         nodes = list(_walk(root))
         leaves = [n for n, _, leaf in nodes if leaf]
         last = leaves[-1] if leaves else root
-        if _user(last) != me:
-            out.append(last)
+        if _user(last) == me:
+            continue
+        body = _strip(last.get("body_html", ""))
+        if is_spam(body):
+            continue
+        if check_live and article_url:
+            url = permalink(article_url, last.get("id_code", ""))
+            if url and not resolves(url):
+                continue
+        out.append(last)
     return out
+
+
+# Recovery-scam comments are the dominant spam shape on these threads. Matching
+# on the pitch rather than on a keyword: a real comment can mention crypto, but
+# it does not also carry a WhatsApp number and a recovery-wizard handle.
+SPAM_MARKERS = ("recovery expert", "recover my lost", "recovery hacker", "wizard hacker",
+                "hire a hacker", "recover all my lost", "binary option", "romance scam",
+                "whatsapp: +", "telegram : @", "telegram: @")
+
+
+def is_spam(body: str) -> bool:
+    low = body.lower()
+    return sum(1 for m in SPAM_MARKERS if m in low) >= 2
 
 
 def permalink(article_url: str, id_code: str) -> str:
@@ -142,7 +172,8 @@ def report(username: str, article_limit: int = 5) -> Dict[str, Any]:
         if cerr:
             out["problems"].append(f"{a['title'][:40]}: comments {cerr}")
             continue
-        owed = threads_needing_reply(tree, username.lower())
+        owed = threads_needing_reply(tree, username.lower(),
+                                     article_url=a.get("url", ""))
         out["articles"].append({
             "title": a.get("title", ""),
             "url": a.get("url", ""),
