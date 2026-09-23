@@ -294,3 +294,50 @@ def test_every_call_refused_grades_nothing(monkeypatch):
     r = probe(STABLE)
     assert r["metrics"]["graded_total"] == 0.0
     assert r["_reliability"] == 0.0
+
+
+def _errored_case(task_id: str, kind: str) -> dict:
+    """The exact shape probe() builds when a provider call raises: passed is None,
+    so the case is neither a pass nor a fail. Mirrors run.py's error branch."""
+    return {
+        "id": task_id,
+        "q": f"[{task_id}] ...",
+        "answer": "",
+        "scores": {"faithfulness": 0.0, "precision@k": 0.0,
+                   "recall@k": 0.0, "citation": 0.0},
+        "flagged": False,          # passed is None, so `passed is False` is False
+        "note": f"{kind} · provider error: 402 prepayment credits are depleted",
+    }
+
+
+def test_an_unanswered_call_is_not_counted_as_a_passing_case():
+    """Regression, 2026-09-22. Three Gemini models returned HTTP 402 on 35 of 35
+    calls and the board printed `acc 0%` beside `instruction-following 100%`
+    for every kind, because per_kind scored `not flagged` as OK and an errored
+    case is unflagged. Billing published as a perfect category score."""
+    dark = {"cases": [_errored_case("if-json", "instruction-following"),
+                      _errored_case("math-order", "arithmetic")]}
+    by = per_kind(dark)
+    assert by.get("instruction-following") != 1.0, \
+        "a call that never returned was scored as a passing case"
+    assert by.get("arithmetic") != 1.0
+
+
+def test_a_kind_with_no_graded_calls_is_omitted_not_guessed():
+    """Reporting 0% would be just as wrong as 100% — nothing was measured."""
+    dark = {"cases": [_errored_case("if-json", "instruction-following")]}
+    assert "instruction-following" not in per_kind(dark)
+
+
+def test_a_partly_dark_run_scores_only_the_calls_that_returned():
+    """One graded FAIL and one dead call in the same kind must read 0%, not 50%.
+    Chosen so the assertion can actually go red: the old code averaged the dead
+    call in as a pass and returned 0.5."""
+    mixed = {"cases": [
+        {"id": "if-json", "q": "[if-json] ...", "answer": "nope",
+         "scores": {"faithfulness": 0.0, "precision@k": 0.0,
+                    "recall@k": 0.0, "citation": 0.0},
+         "flagged": True, "note": "instruction-following \u00b7 wrong"},
+        _errored_case("if-one-word", "instruction-following"),
+    ]}
+    assert per_kind(mixed)["instruction-following"] == 0.0

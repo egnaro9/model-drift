@@ -101,6 +101,11 @@ def probe(model: Model) -> dict:
                        "precision@k": 1.0 if passed else 0.0,
                        "recall@k": 1.0 if passed else 0.0, "citation": 1.0 if passed else 0.0},
             "flagged": passed is False,   # a truncated call (None) is not an accuracy fail
+            # Three states, not two. passed is True/False/None, and `flagged`
+            # alone cannot tell a pass from a call that never returned — both
+            # are unflagged. per_kind needs the distinction or a dead provider
+            # reports 100% in every category. See the 2026-09-22 regression test.
+            "graded": passed is not None,
             "note": note,
         })
     n = len(cases)
@@ -199,11 +204,28 @@ def probe_repeated(model: Model, runs: int = 3) -> dict:
 def per_kind(result: dict) -> Dict[str, float]:
     by = defaultdict(lambda: [0, 0])
     for c in result["cases"]:
+        if not _was_graded(c):
+            continue            # nothing was measured; averaging it in invents a result
         kind = c["note"].split(" · ")[0]
         by[kind][1] += 1
         if not c["flagged"]:
             by[kind][0] += 1
-    return {k: round(ok / total, 3) for k, (ok, total) in by.items()}
+    # A kind with no graded calls is omitted rather than reported. 0% and 100%
+    # are both claims about a model that never answered.
+    return {k: round(ok / total, 3) for k, (ok, total) in by.items() if total}
+
+
+def _was_graded(case: dict) -> bool:
+    """Whether this case produced an answer the graders could score.
+
+    Cases written before the explicit `graded` key lack it, so fall back to the
+    signature the three-state encoding makes unambiguous: a graded pass scores
+    1.0, a graded fail is flagged, and only an ungraded call is both unflagged
+    and zero.
+    """
+    if "graded" in case:
+        return bool(case["graded"])
+    return bool(case.get("flagged")) or case.get("scores", {}).get("faithfulness") == 1.0
 
 
 def _post(api: str, key: str, payload: dict) -> Optional[str]:
@@ -352,7 +374,13 @@ def main(argv: Optional[List[str]] = None) -> int:
         kinds = ", ".join(f"{k} {v:.0%}" for k, v in per_kind(result).items())
         spread = result.get("_acc_spread") or 0.0
         band = f" ±{spread*100:.0f}" if spread else "    "
-        print(f"  {m.label:26} acc {acc:.0%}{band} · {speed:>7} · {chars:>5}  ({kinds})")
+        # graded_total is the denominator. At zero, `acc` is a floored 0.0 rather
+        # than a score, and printing "acc 0%" reads as a model that answered
+        # everything wrong instead of one that answered nothing.
+        if result["metrics"]["graded_total"]:
+            print(f"  {m.label:26} acc {acc:.0%}{band} · {speed:>7} · {chars:>5}  ({kinds})")
+        else:
+            print(f"  {m.label:26} NO GRADED CALLS — not a score")
         if result["_errors"]:   # surface the real error so a 0% is diagnosable, not mysterious
             print(f"      ↳ {result['_errors']}/{len(SUITE)} failed — first error: {result['_first_error']}")
         # A probe that entirely failed is an infra/key problem, not a 0% score —
