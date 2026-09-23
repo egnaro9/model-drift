@@ -55,7 +55,7 @@ The runner **only probes a model whose API key is present**, so you fund exactly
 | xAI: Grok 4.5 · 4.3 · 4 Fast | `XAI_API_KEY` |
 | Meta: Llama 3.3 70B · Llama 3.1 8B (open-weights; served free via Groq) | `GROQ_API_KEY` |
 
-Plus `EVAL_HISTORY_WRITE_KEY` to record runs. Each provider is tracked across the tiers it actually has, **heavy → flagship → mid → mini → nano**, so you can see whether a cheap tier keeps pace with the top model (tiers are only added where a real model exists; Google and xAI have no model above their flagship on the API, so they stay at three. No padding). Edit [`models.json`](modeldrift/models.json) to change models; any OpenAI-compatible endpoint works with a `base_url`, and a model that rejects a `temperature` param (Fable 5, Opus 4.8, Sonnet 5, GPT-5 / mini / nano, Grok 4.5 / 4.3 / 4 Fast) sets `"temperature": null`. **16 models**, 35 prompts each, daily. Still **cents per run** (Fable 5 is the priciest at ~$10/$50 per 1M, but the tiny token count keeps it under a cent) on the free GitHub Actions cron.
+Plus `EVAL_HISTORY_WRITE_KEY` to record runs. Each provider is tracked across the tiers it actually has, **heavy → flagship → mid → mini → nano**, so you can see whether a cheap tier keeps pace with the top model (tiers are only added where a real model exists; Google and xAI have no model above their flagship on the API, so they stay at three. No padding). Edit [`models.json`](modeldrift/models.json) to change models; any OpenAI-compatible endpoint works with a `base_url`, and a model that rejects a `temperature` param (Fable 5, Opus 4.8, Sonnet 5, GPT-5 / mini / nano, Grok 4.5 / 4.3 / 4 Fast) sets `"temperature": null`. **17 models**, 35 prompts each, daily. Still **cents per run** (Fable 5 is the priciest at ~$10/$50 per 1M, but the tiny token count keeps it under a cent) on the free GitHub Actions cron.
 
 ```bash
 pip install -e .
@@ -66,7 +66,7 @@ python -m modeldrift.run
 
 ## One run is a sample, not a measurement
 
-Three runs of this identical frozen suite, half an hour apart, moved **Claude Sonnet 5 by 9 points** and **Fable 5 by 6**, while **11 of 16 models did not move at all**. Same questions, same deterministic grader, same day. None of the 16 models accept a `temperature` parameter, so nothing can be pinned to 0. That spread is the floor under any drift signal, and a board that alerts on a single run alerts on sampling noise.
+Three runs of this identical frozen suite, half an hour apart, moved **Claude Sonnet 5 by 9 points** and **Fable 5 by 6**, while **11 of 16 models did not move at all**. Same questions, same deterministic grader, same day. **Nine of the models reject a `temperature` parameter outright** and the probe omits it for them, so they cannot be pinned to 0 at all; that set includes both models that moved. The other eight are sent `temperature: 0` and are still subject to whatever spread the provider has above that. That spread is the floor under any drift signal, and a board that alerts on a single run alerts on sampling noise.
 
 So each model is probed **three times per night and the median is recorded**. A number only moves when two of three runs agree, which is exactly the "is this a fluke?" question. A real regression shows up in most runs and survives; one odd run doesn't.
 
@@ -77,7 +77,7 @@ Claude Sonnet 5    77 → 83 → 86     recorded: 83, spread 9
 GPT-5             100 → 100 → 100   recorded: 100, spread 0
 ```
 
-Cost: 35 tasks × 16 models × 3 runs is ~1,700 calls a night, still cents.
+Cost: 35 tasks × 17 models × 3 runs is ~1,800 calls a night, still cents.
 
 ## Why the suite is hard on purpose
 
