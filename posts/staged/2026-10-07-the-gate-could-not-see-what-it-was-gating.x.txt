@@ -1,13 +1,17 @@
-I keep a pre-commit hook on my portfolio repo that refuses a commit touching a claim-bearing file unless a receipts file carries a receipt for it. It never judges whether a claim is true. 1/4
+I keep a pre-commit hook on my portfolio repo that refuses a commit touching a claim-bearing file unless a receipts file carries a receipt for it. It never judges whether a claim is true. 1/5
 
 ---
 
-It checks that a receipt exists and that its pointer resolves: a local path has to exist, an https pointer has to answer 2xx. Prose alone cannot satisfy it. 2/4
+It checks that a receipt exists and that its pointer resolves: a local path has to exist, an https pointer has to answer 2xx. Prose alone cannot satisfy it. 2/5
 
 ---
 
-If you have run mutation testing against your *guard* code rather than your product code, I would like to know what it killed that you were sure was fine. 3/4
+If you have run mutation testing against your *guard* code rather than your product code, I would like to know what it killed that you were sure was fine. 3/5
 
 ---
 
-Full note, with the evidence: https://erikhill.dev/notes/2026-10-07-the-gate-could-not-see-what-it-was-gating/ 4/4
+I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC. 4/5
+
+---
+
+Full note, with the evidence: https://erikhill.dev/notes/2026-10-07-the-gate-could-not-see-what-it-was-gating/ 5/5

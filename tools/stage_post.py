@@ -168,6 +168,10 @@ def x_thread(fm: Dict[str, str], body: str, url: str) -> List[str]:
         chunks.append(cur.strip())
     if k and len(k) <= X_LIMIT - 8:
         chunks.append(k)
+    # Same order as the note itself: the availability line, then the links. It
+    # gets its own part because it must not be truncated, and a thread part is
+    # the only place on this surface where a whole sentence is guaranteed.
+    chunks.append(AVAILABILITY)
     chunks.append(f"Full note, with the evidence: {url}")
 
     n = len(chunks)
@@ -189,6 +193,16 @@ def stage(path: Path, out_dir: Path, cover: Optional[str]) -> List[Path]:
         p = out_dir / f"{path.stem}{suffix}"
         p.write_text(content, encoding="utf-8")
         written.append(p)
+
+    # Every surface carries the availability line. This is a standing
+    # requirement, not a per-post choice, so it is checked on every emitted
+    # artifact rather than trusted to the template.
+    MARK = "looking for my first full-time role"
+    missing = [p.name for p in written if MARK not in p.read_text(encoding="utf-8")]
+    if missing:
+        raise SystemExit(
+            f"REFUSED: {path.stem} emitted artifact(s) with no availability line: "
+            f"{', '.join(missing)}")
 
     over = [i for i, part in enumerate(x_thread(fm, body, url), 1) if len(part) > X_LIMIT]
     if over:
