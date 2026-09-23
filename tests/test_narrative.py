@@ -446,3 +446,32 @@ def test_a_tie_for_lowest_accuracy_never_produces_the_tradeoff_sentence():
                    "lab-a:tiny": [_pt(0.50, 800, 8)]})
     out = claim_speed_accuracy(tied) or ""
     assert "scores lowest" not in out and "tradeoff" not in out
+
+
+def _one_lab_board():
+    """Two clean models from the same group, which is the live board's shape
+    whenever every other provider is dark. Synthetic rather than read from
+    drift_board.json so it cannot quietly stop testing when the outage clears."""
+    pt = lambda acc: {"t": "2026-09-22T12:00:00Z", "acc": acc, "latency_ms": 500.0,
+                      "out_chars": 40.0, "reliability": 1.0, "refusal_rate": 0.0}
+    metrics = {"series": {"anthropic:a": [pt(0.94)], "anthropic:b": [pt(0.85)]}}
+    registry = [
+        {"id": "anthropic:a", "label": "A", "group": "Anthropic", "tier": "flagship"},
+        {"id": "anthropic:b", "label": "B", "group": "Anthropic", "tier": "mid"},
+        {"id": "other:c", "label": "C", "group": "Other", "tier": "mid"},
+    ]
+    return metrics, registry
+
+
+def test_a_single_lab_is_not_called_labs():
+    """Live on the public page 2026-09-22: 'against 4 models across 1 labs'."""
+    text = narrate(*_one_lab_board())["text"]
+    assert "1 labs" not in text, text
+    assert "1 lab" in text
+
+
+def test_one_dark_model_takes_a_singular_verb():
+    """Same sentence, other half. The subject is the count, so one dark model
+    'is left out', not 'are left out'. Chosen to go red on the shipped text."""
+    text = narrate(*_one_lab_board())["text"]
+    assert "1 of the 3 tracked models did not return a clean run and is left out" in text, text

@@ -372,20 +372,29 @@ def narrate(metrics: dict, registry: Sequence[dict], limit: int = 3) -> dict:
 
     labs = len({r.group for r in clean if r.group})
     lead = (f"A frozen, deterministically-graded suite against "
-            f"<strong>{len(clean)} models across {labs} labs</strong>.")
+            f"<strong>{_pl(len(clean), 'model')} across {_pl(labs, 'lab')}</strong>.")
     # When some models didn't report cleanly, say so *before* any superlative.
     # Otherwise "the fastest model" silently means "the fastest of the ones that
     # happened to work this week", which is the reader's reasonable other
     # reading and not what the sentence says.
     if len(clean) < tracked:
-        lead += (f" {tracked - len(clean)} of the {tracked} tracked models did not "
-                 f"return a clean run and are left out of the comparisons below.")
+        dark = tracked - len(clean)
+        lead += (f" {dark} of the {tracked} tracked models did not return a clean "
+                 f"run and {'is' if dark == 1 else 'are'} left out of the "
+                 f"comparisons below.")
     tail = (f"<em>Generated from the run of {_date(stamp)} — this paragraph is rebuilt "
             f"from the board's own numbers, never hand-written.</em>")
     html = " ".join([lead] + sentences + [tail])
     return {"sentences": sentences, "html": html, "text": _strip(html),
             "models": len(rows), "clean": len(clean), "updated": stamp,
             "claims_fired": len(sentences)}
+
+
+def _pl(n: int, noun: str) -> str:
+    """`3 labs`, but `1 lab`. The board really does reach one of each: a week
+    where every provider but one is dark leaves a single lab standing, and
+    "1 labs" shipped live on the public page on 2026-09-22."""
+    return f"{n} {noun}" if n == 1 else f"{n} {noun}s"
 
 
 def _date(stamp: str) -> str:
