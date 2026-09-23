@@ -43,13 +43,12 @@ That commit does not touch the board. It adds a blog post.
 CI checks out at the default depth of 1. My laptop has the full history.
 
 A shallow clone does not make `git log -- <path>` fail. It does not make it
-empty. The single fetched commit has no parent, and **git cannot distinguish
-"this commit created the file" from "I do not have the commit that created the
-file."** A root commit and a shallow boundary are the same shape. There is no
-third answer where git says it does not know.
+empty. The single fetched commit has no parent, so by parent list a shallow
+boundary and a genuine root commit are **the same shape**, and the log answered
+as though that commit had created the file.
 
-So it answered. Measured on two clones of the same repository, at the same
-commit, minutes apart:
+Measured on two clones of the same repository, at the same commit, minutes
+apart:
 
 | question | full clone | depth-1 clone |
 |---|---|---|
@@ -60,6 +59,27 @@ commit, minutes apart:
 That last row is the whole post. Git reported a 33,403-line insertion that
 never happened, attributed it to the person who pushed last, and my check read
 that number and did exactly what it was built to do.
+
+## Git did tell me. I did not ask.
+
+I wrote the paragraph above claiming git has no way to signal this. That was
+wrong, and an adversarial re-check of my own draft caught it before this went
+out. The signal exists and it is one flag away:
+
+    $ git log --diff-filter=A --decorate -- dashboard/drift_board.json
+    600d503 (grafted, HEAD -> main, origin/main) A shallow clone does not...
+
+`grafted` is git saying precisely what I needed, per commit rather than per
+repository, so it marks exactly which log lines are untrustworthy. The full
+clone prints no such marker on the real creating commit. It survives
+`--no-decorate` being the scripting default, which is the point: nobody adds
+`--decorate` to a query they intend to parse.
+
+So the honest claim is smaller and more useful than the one I made. Git does
+not tell you by default, and the field that would tell you is one nobody reads.
+The answer was sitting in the output I chose not to ask for.
+
+(Measured on git 2.50.1 only. I have not checked older versions.)
 
 ## The guard I had already written for this did not fire
 
