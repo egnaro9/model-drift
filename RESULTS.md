@@ -25,3 +25,4 @@ _Auto-generated after each scheduled probe. Live chart: [egnaro9.github.io/model
 | Grok 4 Fast | 88.6% | -2.9 pts | ±2.9 | 🔴 regressed |
 | GPT-OSS 120B | — | — | — | ⚫ no runs yet |
 | GPT-OSS 20B | — | — | — | ⚫ no runs yet |
+| Qwen3.8 27B | — | — | — | ⚫ no runs yet |
