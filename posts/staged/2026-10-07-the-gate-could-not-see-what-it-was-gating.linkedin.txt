@@ -1,0 +1,9 @@
+I keep a pre-commit hook on my portfolio repo that refuses a commit touching a claim-bearing file unless a receipts file carries a receipt for it. It never judges whether a claim is true. It checks that a receipt exists and that its pointer resolves: a local path has to exist, an https pointer has to answer 2xx. Prose alone cannot satisfy it.
+
+If you have run mutation testing against your *guard* code rather than your product code, I would like to know what it killed that you were sure was fine.
+
+Full note, with the evidence table: https://erikhill.dev/notes/2026-10-07-the-gate-could-not-see-what-it-was-gating/
+
+I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC.
+
+https://erikhill.dev

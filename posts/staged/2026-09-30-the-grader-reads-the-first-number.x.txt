@@ -1,0 +1,13 @@
+A week ago I published a post saying three of my factual-recall tasks were scoring format rather than facts, and I ended it with a guess I had not tested. 1/4
+
+---
+
+The guess was that models read `Answer with only the city name` as a constraint on the output and `Two letters only` as a description of the answer, and that the difference decides whether you get a bare token or a sentence. 2/4
+
+---
+
+If you grade numeric answers with a regex: check which end of the string you are reading, and check it against an output that restates the question. Mine had been reading the question back to itself for months, and the board recorded the result as an arithmetic failure. 3/4
+
+---
+
+Full note, with the evidence: https://erikhill.dev/notes/2026-09-30-the-grader-reads-the-first-number/ 4/4

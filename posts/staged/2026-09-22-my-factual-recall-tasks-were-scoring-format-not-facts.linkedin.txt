@@ -1,0 +1,9 @@
+I built a detector that decides whether a day's drift run contains anything worth writing up. The first thing it did was accuse my own suite. One task, `fact-element`, had failed on three or more providers on the same day, on 46 separate days.
+
+If you maintain an eval suite with exact-match graders on short answers: check what your passing models actually return, not just whether they passed. The board I built recorded *which* tasks failed for three months and never once recorded *what the model said*, which is why this took a live call to see. That gap is the more embarrassing half of this post.
+
+Full note, with the evidence table: https://erikhill.dev/notes/2026-09-22-my-factual-recall-tasks-were-scoring-format-not-facts/
+
+I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC.
+
+https://erikhill.dev

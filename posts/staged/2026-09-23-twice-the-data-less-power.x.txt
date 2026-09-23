@@ -1,0 +1,9 @@
+I was comparing two models on a frozen 159 task suite and I had a problem most eval code does not admit to having: the same model, asked the same question three times, sometimes disagrees with itself. I had written a rule for that. 1/3
+
+---
+
+A task where a config does not agree with itself is discarded, not counted. Call it `strict`. 2/3
+
+---
+
+Full note, with the evidence: https://erikhill.dev/notes/2026-09-23-twice-the-data-less-power/ 3/3

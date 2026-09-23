@@ -1,0 +1,9 @@
+evalmut takes an eval case your grader already passes, plants a known defect in the output, and reruns the grader. If the grader still passes a provably wrong output, that is a hole: a class of regression your eval would let ship green. 1/3
+
+---
+
+If you publish a score from a harness that wraps someone else's library: ask what would still be true if the library were never called. If the answer is "the score", your harness is answering for it. 2/3
+
+---
+
+Full note, with the evidence: https://erikhill.dev/notes/2026-10-14-labelled-caught-is-not-caught/ 3/3

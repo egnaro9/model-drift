@@ -1,13 +1,12 @@
 ---
 title: "My arithmetic grader reads the first number in the sentence, not the answer"
-date: 2026-09-30
-kind: grader-defect
-about: harness
-subject: model-drift/_number
-fingerprint: grader-defect:model-drift/_number:float-subtract
-destination: https://erikhill.dev/notes/2026-09-30-the-grader-reads-the-first-number/
-status: draft
+published: false
+description: "A week ago I published a post saying three of my factual-recall tasks were scoring format rather than facts, and I ended it with a guess I had not tested. The guess was that models"
+tags: showdev, testing, ai
+canonical_url: https://erikhill.dev/notes/2026-09-30-the-grader-reads-the-first-number/
 ---
+
+*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-09-30-the-grader-reads-the-first-number/). The numbers below are checked against the repository they come from.*
 
 # My arithmetic grader reads the first number in the sentence, not the answer
 

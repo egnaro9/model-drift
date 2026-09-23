@@ -1,0 +1,9 @@
+I was comparing two models on a frozen 159 task suite and I had a problem most eval code does not admit to having: the same model, asked the same question three times, sometimes disagrees with itself. I had written a rule for that. A task where a config does not agree with itself is discarded, not counted. Call it `strict`.
+
+If you maintain an eval suite with a stability or flakiness filter: count what it discards, and count it again after you add data. If the discard count rises faster than your informative count, your filter is spending your sample size, and the direction of that trade is not obvious from the code.
+
+Full note, with the evidence table: https://erikhill.dev/notes/2026-09-23-twice-the-data-less-power/
+
+I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC.
+
+https://erikhill.dev

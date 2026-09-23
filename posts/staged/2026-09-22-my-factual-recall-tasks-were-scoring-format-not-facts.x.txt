@@ -1,0 +1,5 @@
+I built a detector that decides whether a day's drift run contains anything worth writing up. The first thing it did was accuse my own suite. One task, `fact-element`, had failed on three or more providers on the same day, on 46 separate days. 1/2
+
+---
+
+Full note, with the evidence: https://erikhill.dev/notes/2026-09-22-my-factual-recall-tasks-were-scoring-format-not-facts/ 2/2
