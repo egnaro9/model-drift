@@ -27,6 +27,10 @@ on:
         description: "How many independent runs"
         required: true
         default: "3"
+      move_pts:
+        description: "A reported move to test against, in points. Blank = just report the spread."
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -63,12 +67,17 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: |
           set -euo pipefail
-          python - "${{ inputs.model }}" "${{ inputs.runs }}" <<'PY'
+          python - "${{ inputs.model }}" "${{ inputs.runs }}" "${{ inputs.move_pts }}" <<'PY'
           import os, pathlib, sys
           from modeldrift.providers import load_registry
           from modeldrift.run import probe_repeated
 
           want, n = sys.argv[1], int(sys.argv[2])
+          # The move to judge is an INPUT. An earlier version hardcoded 4.30,
+          # the grok-4.3 figure, so running this against any other model would
+          # have printed a confident comparison against a number from a
+          # different investigation.
+          move = float(sys.argv[3]) if len(sys.argv) > 3 and sys.argv[3].strip() else None
           models = [m for m in load_registry("one.json")]
           if len(models) != 1:
               raise SystemExit(f"registry holds {len(models)} models, expected 1")
@@ -100,12 +109,16 @@ jobs:
           else:
               pts = spread * 100
               lines += [f"- **accuracy spread across those runs: {pts:.2f} points**", ""]
-              lines += [f"The move under investigation was 4.30 points.",
-                        f"That is {'INSIDE' if pts >= 4.30 else 'OUTSIDE'} this model's own "
-                        f"run-to-run spread of {pts:.2f} points."]
-              if pts >= 4.30:
-                  lines += ["", "So the reported regression is not distinguishable from sampling "
-                                "noise on this suite, and the note should not go out as a finding."]
+              if move is None:
+                  lines += ["A reported move must exceed this to be distinguishable from "
+                            "taking the sample again."]
+              else:
+                  lines += [f"The move under investigation was {move:.2f} points.",
+                            f"That is {'INSIDE' if pts >= move else 'OUTSIDE'} this model's own "
+                            f"run-to-run spread of {pts:.2f} points."]
+                  if pts >= move:
+                      lines += ["", "So the reported move is not distinguishable from sampling "
+                                    "noise on this suite, and should not go out as a finding."]
           if rel is not None and rel < 0.999:
               lines += ["", f"CAVEAT: the median run graded only {rel:.1%} of its calls, so this "
                             "is not the full-reliability measurement that was asked for."]
