@@ -94,12 +94,65 @@ def build_index(posts_dir: str) -> List[Dict[str, Any]]:
     return out
 
 
+def due_drafts(posts_dir: str, today: Optional[str] = None) -> List[str]:
+    """Slugs of drafts whose date has arrived, oldest first.
+
+    Date, not filesystem order: these are written weeks ahead and the front
+    matter date IS the schedule. A post dated next month is not due today no
+    matter where it sits in the directory.
+    """
+    import datetime
+    today = today or datetime.date.today().isoformat()
+    out = []
+    for p in sorted(Path(posts_dir).glob("*.md")):
+        if not is_post(p):
+            continue
+        fm = parse_front_matter(p.read_text(encoding="utf-8"))
+        if fm.get("status") != "draft":
+            continue
+        date = str(fm.get("date", "")).strip()
+        if date and date <= today:
+            out.append((date, p.stem))
+    return [slug for _, slug in sorted(out)]
+
+
+def _pick(posts_dir: str, want: str = "") -> int:
+    """Emit the chosen slug as a GitHub output, or nothing if none is due."""
+    import os
+    due = due_drafts(posts_dir)
+    if want:
+        # An explicit slug still has to BE a draft. Publishing an already
+        # published post would rewrite its date and re-cross-post it.
+        if want not in due:
+            print(f"REFUSED: {want} is not a due draft. Due: {due or 'none'}")
+            return 1
+        chosen = want
+    else:
+        chosen = due[0] if due else ""
+
+    if chosen:
+        print(f"picked {chosen} (due: {', '.join(due)})")
+    else:
+        print("nothing due")
+    gh = os.environ.get("GITHUB_OUTPUT")
+    if gh:
+        with open(gh, "a") as f:
+            f.write(f"slug={chosen}\n")
+    return 0
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     import argparse
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--posts", default="posts")
     ap.add_argument("--out", default="posts/index.json")
+    ap.add_argument("--pick", action="store_true",
+                    help="name the oldest draft that is due, and write nothing")
+    ap.add_argument("--slug", default="", help="with --pick, demand this slug specifically")
     a = ap.parse_args(argv)
+
+    if a.pick:
+        return _pick(a.posts, a.slug.strip())
 
     Path(a.posts).mkdir(parents=True, exist_ok=True)
     index = build_index(a.posts)

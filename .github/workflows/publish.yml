@@ -1,0 +1,126 @@
+name: publish
+# Publish the week's drift note without needing Erik's laptop awake.
+#
+# This replaces five one-shot scheduled tasks that ran on his Mac. Those do not
+# fire while the machine is asleep: measured, 8 of 110 expected inbox-triage
+# runs and 6 of 168 promptfoo runs simply never happened. A weekly post that
+# silently skips a week is the failure this exists to remove.
+#
+# It publishes in a fixed order and REFUSES to cross-post until the canonical
+# url is live, because the dev.to article carries that url and a canonical that
+# 404s tells search engines the real article is somewhere it is not. That
+# happened on 2026-09-23 to two already published notes.
+on:
+  schedule:
+    - cron: "4 12 * * 3"        # Wednesdays 12:04 UTC = 8:04 EDT. Off the hour on purpose.
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: "Publish this slug specifically. Leave blank to take the oldest due draft."
+        required: false
+      dry_run:
+        description: "true = report what would happen and change nothing"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -e ".[dev]"
+
+      # ONE post per week, and it is measured rather than a preference: the
+      # 2026-08-14 double launch got under 25 views each and zero comments,
+      # while the same topic alone five days earlier got 48 views and 5.
+      - name: Refuse if a post already went out this week
+        run: |
+          set -euo pipefail
+          recent=$(git log --since="6 days ago" --format=%s -- posts/ | grep -c '^publish:' || true)
+          echo "posts published in the last 6 days: $recent"
+          if [ "$recent" != "0" ]; then
+            echo "::error::A post already went out this week. Refusing to publish a second."
+            exit 1
+          fi
+
+      - name: Choose the post
+        id: pick
+        run: python -m modeldrift.publish --pick --posts posts --slug "${{ inputs.slug }}"
+
+      - name: Nothing is due
+        if: steps.pick.outputs.slug == ''
+        run: |
+          echo "### Nothing due this week" >> "$GITHUB_STEP_SUMMARY"
+          echo "No staged note has a date on or before today. A quiet week is a result." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish on the site
+        if: steps.pick.outputs.slug != '' && inputs.dry_run != 'true'
+        run: |
+          set -euo pipefail
+          slug='${{ steps.pick.outputs.slug }}'
+          python - "$slug" <<'PY'
+          import pathlib, sys, re
+          p = pathlib.Path(f"posts/{sys.argv[1]}.md"); s = p.read_text()
+          assert re.search(r"^status:\s*draft\s*$", s, re.M), "not a draft; refusing"
+          p.write_text(re.sub(r"^status:\s*draft\s*$", "status: published", s, count=1, flags=re.M))
+          PY
+          python -m modeldrift.publish --posts posts --out posts/index.json
+          pytest -q
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add posts
+          git commit -m "publish: $slug"
+          git push
+
+      # The site repo's notes workflow rebuilds four times an hour and verifies
+      # its own deploy byte for byte. This waits for the result rather than
+      # assuming it.
+      - name: GATE, wait for the canonical to be live
+        if: steps.pick.outputs.slug != '' && inputs.dry_run != 'true'
+        run: |
+          set -euo pipefail
+          url="https://erikhill.dev/notes/${{ steps.pick.outputs.slug }}/"
+          echo "waiting for $url"
+          for i in $(seq 1 60); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+            echo "  attempt $i: $code"
+            [ "$code" = "200" ] && exit 0
+            sleep 30
+          done
+          echo "::error::$url never returned 200. The site build did not pick this up."
+          echo "::error::NOTHING was cross-posted. The note IS live in the repo; only the"
+          echo "::error::page is missing. Check the notes workflow in egnaro9.github.io."
+          exit 1
+
+      - name: Cross-post to dev.to
+        if: steps.pick.outputs.slug != '' && inputs.dry_run != 'true'
+        env:
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+        run: python tools/devto_publish.py --slug "${{ steps.pick.outputs.slug }}"
+
+      - name: Hand LinkedIn back to Erik
+        if: steps.pick.outputs.slug != '' && inputs.dry_run != 'true'
+        run: |
+          slug='${{ steps.pick.outputs.slug }}'
+          {
+            echo "## Published: $slug"
+            echo ""
+            echo "- https://erikhill.dev/notes/$slug/"
+            echo ""
+            echo "### Paste this into the Drift Notes newsletter"
+            echo ""
+            echo '```'
+            cat "posts/staged/$slug.linkedin.txt" 2>/dev/null || echo "(no staged linkedin text)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
