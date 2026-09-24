@@ -111,9 +111,42 @@ def due_drafts(posts_dir: str, today: Optional[str] = None) -> List[str]:
         if fm.get("status") != "draft":
             continue
         date = str(fm.get("date", "")).strip()
-        if date and date <= today:
-            out.append((date, p.stem))
+        if not (date and date <= today):
+            continue
+        if unfilled_section(p.read_text(encoding="utf-8")):
+            # Not due. The draft template says "REQUIRED before this can be
+            # published" in an HTML comment, and a comment enforces nothing.
+            # On 2026-09-23 an auto-drafted post landed on main dated that same
+            # day, which made it the next thing the publisher would pick, TODO
+            # and all.
+            continue
+        out.append((date, p.stem))
     return [slug for _, slug in sorted(out)]
+
+
+def unfilled_section(text: str) -> str:
+    """Name a required section still left as a placeholder, or "".
+
+    The rule is measured, not stylistic: a post with nothing to argue with does
+    not open a thread, and the thread is the product. His strongest post carried
+    68 comments on 510 views.
+    """
+    import re
+    for heading in ("What I might have wrong", "What the extra data did not buy"):
+        m = re.search(rf"^##\s+{re.escape(heading)}\s*$(.*?)(?=^##\s|\Z)",
+                      text, re.M | re.S)
+        if not m:
+            continue
+        body = m.group(1)
+        # Cut at the horizontal rule that separates the post from its footer.
+        # Without this the availability line leaks in and an EMPTY required
+        # section reads as filled, which is the exact case this guard exists
+        # for. Caught by test_an_empty_section_is_not_due.
+        body = re.split(r"^-{3,}\s*$", body, maxsplit=1, flags=re.M)[0]
+        body = re.sub(r"<!--.*?-->", "", body, flags=re.S).strip()
+        if not body or body.upper() == "TODO" or body.upper().startswith("TODO"):
+            return heading
+    return ""
 
 
 def _pick(posts_dir: str, want: str = "") -> int:
