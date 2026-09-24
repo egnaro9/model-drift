@@ -190,10 +190,15 @@ def main(argv: Optional[List[str]] = None) -> int:
     Path(a.posts).mkdir(parents=True, exist_ok=True)
     index = build_index(a.posts)
     Path(a.out).write_text(json.dumps(index, indent=1) + "\n", encoding="utf-8")
-    drafts = sum(1 for p in Path(a.posts).glob("*.md")
-                 if is_post(p)
-                 and parse_front_matter(p.read_text(encoding="utf-8")).get("status") != "published")
-    print(f"{len(index)} published note(s) indexed; {drafts} still marked draft")
+    states = {}
+    for p in Path(a.posts).glob("*.md"):
+        if is_post(p):
+            st = parse_front_matter(p.read_text(encoding="utf-8")).get("status", "unknown")
+            states[st] = states.get(st, 0) + 1
+    # "not published" is not the same as "draft": a retired finding is neither,
+    # and counting it as a draft overstates how much is queued to go out.
+    tally = ", ".join(f"{n} {k}" for k, n in sorted(states.items()))
+    print(f"{len(index)} published note(s) indexed. All posts by status: {tally}")
     return 0
 
 
