@@ -1,12 +1,14 @@
 ---
 title: "The gate could not see what it was gating"
-published: false
-description: "I keep a pre-commit hook on my portfolio repo that refuses a commit touching a claim-bearing file unless a receipts file carries a receipt for it. It never judges whether a claim i"
-tags: showdev, testing, ai
-canonical_url: https://erikhill.dev/notes/2026-10-07-the-gate-could-not-see-what-it-was-gating/
+date: 2026-10-02
+kind: gate-defect
+about: harness
+subject: egnaro9.github.io/claim-gate
+fingerprint: gate-defect:egnaro9.github.io/claim-gate:47f82a1
+destination: https://erikhill.dev/notes/2026-10-02-the-gate-could-not-see-what-it-was-gating/
+status: draft
+cadence_exception: pre-registered cadence test, 2026-09-23. Publishes 48h after 2026-09-30 to break the cadence/account-age confound. See POSTING_AB_LOG.md.
 ---
-
-*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-10-07-the-gate-could-not-see-what-it-was-gating/). The numbers below are checked against the repository they come from.*
 
 # The gate could not see what it was gating
 

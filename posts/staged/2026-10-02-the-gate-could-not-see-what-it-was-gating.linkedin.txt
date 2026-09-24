@@ -2,7 +2,7 @@ I keep a pre-commit hook on my portfolio repo that refuses a commit touching a c
 
 If you have run mutation testing against your *guard* code rather than your product code, I would like to know what it killed that you were sure was fine.
 
-Full note, with the evidence table: https://erikhill.dev/notes/2026-10-07-the-gate-could-not-see-what-it-was-gating/
+Full note, with the evidence table: https://erikhill.dev/notes/2026-10-02-the-gate-could-not-see-what-it-was-gating/
 
 I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC.
 

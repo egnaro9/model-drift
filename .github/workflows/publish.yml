@@ -12,7 +12,11 @@ name: publish
 # happened on 2026-09-23 to two already published notes.
 on:
   schedule:
-    - cron: "4 12 * * 3"        # Wednesdays 12:04 UTC = 8:04 EDT. Off the hour on purpose.
+    - cron: "4 12 * * *"        # DAILY 12:04 UTC = 8:04 ET. Off the hour on purpose.
+    # Daily, because the front-matter DATE is the schedule. --pick only returns a
+    # draft whose date has arrived, so a post publishes on its own date and a
+    # quiet day is a no-op that exits in seconds. A Wednesday-only cron silently
+    # could not run the 2026-10-02 cadence test, which falls on a Friday.
   workflow_dispatch:
     inputs:
       slug:
@@ -44,19 +48,34 @@ jobs:
       # ONE post per week, and it is measured rather than a preference: the
       # 2026-08-14 double launch got under 25 views each and zero comments,
       # while the same topic alone five days earlier got 48 views and 5.
-      - name: Refuse if a post already went out this week
+      - name: Choose the post
+        id: pick
+        run: python -m modeldrift.publish --pick --posts posts --slug "${{ inputs.slug }}"
+
+      # ONE post per week, unless the POST ITSELF declares an exception. The rule
+      # is measured and worth keeping; it is also not a law of nature, and an
+      # experiment that needs two posts close together must be able to say so in
+      # a way a reader of the repo can audit. The exception lives in the post's
+      # front matter, not in a workflow input, so it cannot be waved through at
+      # dispatch time and leaves a permanent record next to the claim it enables.
+      - name: One post per week, unless this one is a declared exception
+        if: steps.pick.outputs.slug != ''
         run: |
           set -euo pipefail
           recent=$(git log --since="6 days ago" --format=%s -- posts/ | grep -c '^publish:' || true)
           echo "posts published in the last 6 days: $recent"
-          if [ "$recent" != "0" ]; then
-            echo "::error::A post already went out this week. Refusing to publish a second."
+          [ "$recent" = "0" ] && exit 0
+          slug='${{ steps.pick.outputs.slug }}'
+          if grep -qE '^cadence_exception:[[:space:]]*\S' "posts/$slug.md"; then
+            echo "::warning::Publishing inside the weekly window by declared exception:"
+            grep -E '^cadence_exception:' "posts/$slug.md"
+          else
+            echo "::error::A post went out in the last 6 days and $slug declares no"
+            echo "::error::cadence_exception. Refusing. His 2026-08-14 double launch got"
+            echo "::error::under 25 views each at T+24h; the same topic alone five days"
+            echo "::error::earlier got 48. Add a cadence_exception line if this is deliberate."
             exit 1
           fi
-
-      - name: Choose the post
-        id: pick
-        run: python -m modeldrift.publish --pick --posts posts --slug "${{ inputs.slug }}"
 
       - name: Nothing is due
         if: steps.pick.outputs.slug == ''
