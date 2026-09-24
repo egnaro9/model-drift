@@ -1,0 +1,5 @@
+If you run an eval suite that reports regressions: find the threshold, and then ask which of the two floors it is. If the answer is `100/n`, or a constant somebody picked, run your suite three times without changing anything and compare.
+
+I might be wrong about this one. If you have run the same check and got a different answer, I want to hear it.
+
+I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC.
