@@ -26,7 +26,7 @@ from typing import Any, Dict, List, Optional, Sequence
 
 from .flips import analyze as analyze_flips
 from .policy import REL_FLOOR
-from .report import ModelStatus, min_detectable_change
+from .report import ModelStatus, reportable_threshold
 
 # What a finding can be *about*. This is the field that stops a provider outage
 # being written up as a model getting worse, which is the single most expensive
@@ -81,7 +81,11 @@ def regressions_and_recoveries(statuses: Sequence[ModelStatus]) -> List[Finding]
     for s in statuses:
         if s.verdict not in ("regressed", "improved") or s.delta is None:
             continue
-        floor = min_detectable_change(s.graded)
+        # BOTH floors. The arithmetic one alone let a 4.30 point move on
+        # grok-4.3 be drafted as a regression on 2026-09-23, when that model's
+        # own run-to-run spread was 8.57 points. The finding was retired after a
+        # confirming run; this is the fix that stops the next one being written.
+        floor = reportable_threshold(s.graded, s.noise_pts)
         move_pts = abs(s.delta) * 100
         if floor is not None and move_pts < floor:
             continue

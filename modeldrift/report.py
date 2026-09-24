@@ -55,6 +55,11 @@ class ModelStatus:
     # Populated ONLY by board.statuses_from_series, the one function that sees
     # the series before and after the floor.
     observed_when: Optional[str] = None
+
+    # The model's OWN run-to-run spread, in points, from its recent history.
+    # Distinct from `graded`, which sets the arithmetic floor. See noise_floor.
+    # Populated only by board.statuses_from_series, like observed_when.
+    noise_pts: Optional[float] = None
     observed_acc: Optional[float] = None
     observed_reliability: Optional[float] = None
     observed_spread: Optional[float] = None
@@ -95,6 +100,53 @@ def runs_for(api: str, name: str, limit: int = 2):
     rows = [r for r in _ARCHIVE_RUNS[base] if r.get("name") == name]
     rows.sort(key=lambda r: r.get("created_at", ""), reverse=True)
     return rows[:limit]
+
+
+NOISE_WINDOW = 10
+
+
+def noise_floor(spreads: "list[Optional[float]]") -> Optional[float]:
+    """The model's own run-to-run spread, in points, as a MEDIAN of recent runs.
+
+    This is the number the resolution floor is not. min_detectable_change asks
+    what the smallest difference ONE run can print is, given its denominator:
+    pure arithmetic, about 2.86 points on 35 graded calls. It says nothing about
+    how far the SAME model moves between runs of the identical frozen suite.
+
+    Measured 2026-09-23, three probes of grok-4.3 half an hour apart: the spread
+    was 8.57 points while the arithmetic floor was 2.94. A 4.30 point "drop" was
+    drafted as a regression and published nowhere only because a human asked for
+    a confirming run. Across the board, 10 of 20 models have a recorded spread
+    larger than the arithmetic floor.
+
+    MEDIAN, not max. grok-4.5's worst recorded spread is 91.43 points, which is
+    an outage signature rather than sampling; its median is 1.43. Taking the max
+    would suppress every finding on any model that ever had a bad morning.
+
+    Returns None when no run has recorded a spread, in which case callers fall
+    back to the arithmetic floor alone.
+    """
+    import statistics
+    vals = [s for s in spreads[-NOISE_WINDOW:] if s is not None]
+    if not vals:
+        return None
+    return round(statistics.median(vals) * 100, 3)
+
+
+def reportable_threshold(graded: Optional[int],
+                         noise_pts: Optional[float] = None) -> Optional[float]:
+    """How large a move has to be before it is worth reporting, in points.
+
+    A move must clear BOTH floors: the arithmetic one, below which the run
+    could not have resolved it at all, and the model's own measured spread,
+    below which it is not distinguishable from taking the sample again.
+    """
+    floor = min_detectable_change(graded)
+    if floor is None:
+        return noise_pts
+    if noise_pts is None:
+        return floor
+    return max(floor, noise_pts)
 
 
 def min_detectable_change(graded: Optional[int]) -> Optional[float]:

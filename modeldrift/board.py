@@ -26,7 +26,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Sequence
 
 from .policy import REL_FLOOR  # re-exported: callers and tests use board.REL_FLOOR
-from .report import ModelStatus, min_detectable_change, results_md
+from .report import ModelStatus, min_detectable_change, noise_floor, results_md
 
 
 
@@ -67,6 +67,11 @@ def statuses_from_series(series: Dict[str, List[dict]],
             "observed_qualified": (obs.get("reliability") is None
                                    or obs.get("reliability") >= REL_FLOOR),
         }
+        # The model's own run-to-run spread, from TRUSTED points only. An
+        # outage run's spread is not sampling noise, it is the outage, and
+        # trusted_points has already removed those.
+        seen["noise_pts"] = noise_floor([p.get("acc_spread") for p in pts])
+
         if not pts:
             out.append(ModelStatus(m["id"], label, None, None, "no-data",
                                    None, None, **seen))
