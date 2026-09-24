@@ -215,7 +215,8 @@ def social_draft(regs: List[ModelStatus], all_statuses: List[ModelStatus]) -> st
     lines = [
         f"Caught an LLM regression this week with my public drift tracker.\n",
         f"**{worst.label}** dropped **{worst.delta*100:+.1f} points** on a frozen, "
-        "deterministically-graded suite — same questions, same grader, temperature 0, so it's the "
+        "deterministically-graded suite: same questions, same grader. No model here accepts a "
+        "temperature, so it is the "
         "model that moved, not the test.\n",
     ]
     if len(regs) > 1:

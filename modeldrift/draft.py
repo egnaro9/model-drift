@@ -104,7 +104,13 @@ def render(finding: Finding, statuses: Sequence[ModelStatus],
         "## What happened",
         "",
         f"On {run_date} my drift tracker ran its frozen suite ({suite_version}) "
-        f"against the live models, same questions, same graders, temperature 0. "
+        f"against the live models, same questions, same graders. "
+        # NOT "temperature 0". All 18 registry entries carry temperature: null,
+        # because none of these models accept the parameter, so providers.py omits
+        # it for every one. Claiming determinism the suite does not have made the
+        # sampling spread invisible in every regression post this template writes.
+        f"Nothing is pinned: no model here accepts a temperature, so run-to-run "
+        f"spread is part of the measurement. "
         f"{finding.headline}.",
         "",
         "## The evidence",

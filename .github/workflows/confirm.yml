@@ -1,0 +1,121 @@
+name: confirm
+# Re-measure ONE model several times, to find out whether a reported move is a
+# finding or the instrument's own spread.
+#
+# Written 2026-09-23 for a concrete case. The tracker reported grok-4.3 down
+# 4.3 points, and the drafted note said the move cleared the resolution floor
+# of 2.86 points. But the floor answers a different question: it is the
+# smallest difference ONE run can print, given its denominator. It says nothing
+# about how much the same model varies between runs of the same suite.
+#
+# Those are different numbers and only the second one decides whether a 4.3
+# point move means anything. run.py's own help has claimed "the noise floor
+# across 3 runs was 9 points" for months, and there is no measurement in this
+# repository behind it.
+#
+# So this measures it. It writes NOTHING to the board: three runs on one day
+# would distort a daily time series, and an experiment that alters the record
+# it is testing is not an experiment.
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Registry id, e.g. xai:grok-4.3"
+        required: true
+        default: "xai:grok-4.3"
+      runs:
+        description: "How many independent runs"
+        required: true
+        default: "3"
+
+permissions:
+  contents: read
+
+jobs:
+  confirm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -e .
+
+      - name: Build a registry holding only this model
+        run: |
+          set -euo pipefail
+          python - "${{ inputs.model }}" <<'PY'
+          import json, pathlib, sys
+          want = sys.argv[1]
+          reg = json.loads((pathlib.Path("modeldrift") / "models.json").read_text())
+          hit = [m for m in reg if m["id"] == want]
+          if len(hit) != 1:
+              raise SystemExit(f"expected exactly 1 registry entry for {want!r}, found {len(hit)}")
+          pathlib.Path("one.json").write_text(json.dumps(hit))
+          print(f"registry narrowed to {want}")
+          PY
+
+      - name: Run it N times and report the spread
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          set -euo pipefail
+          python - "${{ inputs.model }}" "${{ inputs.runs }}" <<'PY'
+          import os, pathlib, sys
+          from modeldrift.providers import load_registry
+          from modeldrift.run import probe_repeated
+
+          want, n = sys.argv[1], int(sys.argv[2])
+          models = [m for m in load_registry("one.json")]
+          if len(models) != 1:
+              raise SystemExit(f"registry holds {len(models)} models, expected 1")
+          m = models[0]
+          if not m.available:
+              raise SystemExit(f"{want} is not available: its key is missing from this environment")
+
+          r = probe_repeated(m, n)
+
+          # probe_repeated returns the MEDIAN run and keeps the spread across the
+          # set on _acc_spread. Both are read straight off the object: writing
+          # them via --out would lose them, because that path drops every key
+          # beginning with an underscore, which is where the runner keeps exactly
+          # the fields this experiment is about.
+          acc = r["metrics"]["faithfulness"]
+          graded = r["metrics"].get("graded_total")
+          rel = r.get("_reliability")
+          spread = r.get("_acc_spread")
+          used = r.get("_runs")
+
+          lines = [f"## {want}, {n} requested run(s)", ""]
+          lines += [f"- usable runs: {used}",
+                    f"- median accuracy: {acc*100:.2f}%",
+                    f"- reliability of the median run: {rel}",
+                    f"- graded calls: {graded}"]
+          if spread is None:
+              lines += ["", "No spread reported: fewer than two runs were usable, so this "
+                            "settles nothing. Treat the earlier move as unconfirmed."]
+          else:
+              pts = spread * 100
+              lines += [f"- **accuracy spread across those runs: {pts:.2f} points**", ""]
+              lines += [f"The move under investigation was 4.30 points.",
+                        f"That is {'INSIDE' if pts >= 4.30 else 'OUTSIDE'} this model's own "
+                        f"run-to-run spread of {pts:.2f} points."]
+              if pts >= 4.30:
+                  lines += ["", "So the reported regression is not distinguishable from sampling "
+                                "noise on this suite, and the note should not go out as a finding."]
+          if rel is not None and rel < 0.999:
+              lines += ["", f"CAVEAT: the median run graded only {rel:.1%} of its calls, so this "
+                            "is not the full-reliability measurement that was asked for."]
+
+          out = "\n".join(lines)
+          print(out)
+          if (s := os.environ.get("GITHUB_STEP_SUMMARY")):
+              pathlib.Path(s).write_text(out + "\n")
+          PY
+
+      - name: Say plainly that nothing was recorded
+        if: always()
+        run: echo "Board untouched. This workflow reads the models and writes no run to dashboard/drift_board.json."
