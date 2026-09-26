@@ -13,16 +13,16 @@ _Auto-generated after each scheduled probe. Live chart: [egnaro9.github.io/model
 | GPT-5 mini | 100.0% | +0.0 pts | ±2.9 | ⚪ unchanged |
 | GPT-4o mini | 80.0% | +0.0 pts | ±2.9 | ⚪ unchanged |
 | GPT-5 nano | 100.0% | +0.0 pts | ±2.9 | ⚪ unchanged |
-| Claude Fable 5 | 94.3% | -2.8 pts | ±2.9 ⚠ below floor | 🔴 regressed |
+| Claude Fable 5 | 94.3% | +0.0 pts | ±2.9 | ⚪ unchanged |
 | Claude Opus 4.8 | 91.4% | +0.0 pts | ±2.9 | ⚪ unchanged |
-| Claude Sonnet 5 | 85.3% | -0.4 pts | ±2.9 ⚠ below floor | 🔴 regressed |
+| Claude Sonnet 5 | 82.9% | -2.4 pts | ±2.9 ⚠ below floor | 🔴 regressed |
 | Claude Haiku 4.5 | 85.7% | +0.0 pts | ±2.9 | ⚪ unchanged |
 | Gemini 3.1 Pro | 97.1% | +0.0 pts | ±2.9 | ⚪ unchanged |
-| Gemini 3.5 Flash | 97.1% | -2.9 pts | ±2.9 | 🔴 regressed |
+| Gemini 3.5 Flash | 97.1% | +0.0 pts | ±2.9 | ⚪ unchanged |
 | Gemini 3.1 Flash-Lite | 94.3% | +0.0 pts | ±2.9 | ⚪ unchanged |
 | Grok 4.5 | 97.1% | +0.0 pts | ±2.9 | ⚪ unchanged |
-| Grok 4.3 | 94.3% | -2.9 pts | ±2.9 ⚠ below floor | 🔴 regressed |
+| Grok 4.3 | 97.1% | +2.9 pts | ±2.9 ⚠ below floor | 🟢 improved |
 | Grok 4 Fast | 94.3% | +0.0 pts | ±2.9 | ⚪ unchanged |
-| GPT-OSS 120B | 97.1% | +0.0 pts | ±2.9 | ⚪ unchanged |
-| GPT-OSS 20B | 100.0% | +0.0 pts | ±2.9 | ⚪ unchanged |
+| GPT-OSS 120B | 100.0% | +2.9 pts | ±2.9 | 🟢 improved |
+| GPT-OSS 20B | 97.1% | -2.9 pts | ±2.9 | 🔴 regressed |
 | Qwen3.8 27B | 94.3% | +0.0 pts | ±2.9 | ⚪ unchanged |
