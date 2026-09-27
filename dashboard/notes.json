@@ -1,5 +1,25 @@
 [
   {
+    "date": "2026-09-27",
+    "run_key": [
+      "groq:gpt-oss-20b@2026-09-27",
+      "xai:grok-4.3@2026-09-27"
+    ],
+    "title": "Regression: Grok 4.3 -5.7 pts",
+    "metric": "accuracy",
+    "models": [
+      "xai:grok-4.3",
+      "groq:gpt-oss-20b"
+    ],
+    "summary": "2 model(s) regressed against the previous run; worst was Grok 4.3 at -5.7 pts. Auto-logged — confirm it's real before writing it up.",
+    "body": [
+      {
+        "p": "Auto-logged when the scheduled probe flagged a run-over-run regression. Before this becomes a post, check the run log and the Reliability metric — a rate limit or provider outage can look exactly like a regression. If it holds up, the written explanation goes here."
+      }
+    ],
+    "stub": true
+  },
+  {
     "date": "2026-09-26",
     "run_key": [
       "anthropic:claude-sonnet-5@2026-09-26",
