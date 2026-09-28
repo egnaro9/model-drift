@@ -10,11 +10,14 @@ import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-import pytest
-
-from tools.cadence_read import (ARMS, MIN_GAP_MINUTES, WINDOW_DAYS, Refused,
-                                collect, elapsed_hours, last_reading, load,
-                                match_article, parse_iso, should_record)
+import sys, pathlib, pytest
+# Same shape as tests/test_devto_publish.py. CI runs bare `pytest`, which does NOT
+# put the repo root on sys.path, so `from tools.x import ...` collects locally under
+# `python -m pytest` and fails in CI with ModuleNotFoundError.
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "tools"))
+from cadence_read import (ARMS, MIN_GAP_MINUTES, WINDOW_DAYS, Refused,
+                          collect, elapsed_hours, last_reading, load,
+                          match_article, parse_iso, should_record)
 
 A_SLUG = ARMS["A"]
 B_SLUG = ARMS["B"]
