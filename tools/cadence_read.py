@@ -140,6 +140,15 @@ def collect(articles: List[dict], readings: List[dict], now: datetime) -> List[d
         eh = elapsed_hours(art["published_at"], now)
         if not should_record(readings + out, arm, eh, now):
             continue
+        # page_views_count exists ONLY on the authenticated /articles/me/published
+        # endpoint; the public /articles listing omits it entirely. If this is
+        # ever pointed at the public endpoint, or dev.to renames the field, the
+        # readings would still be written with views: null and the series would
+        # look populated while holding nothing. Refuse instead.
+        if not isinstance(art.get("page_views_count"), int):
+            raise Refused(
+                f"arm {arm} ({slug}) has no integer page_views_count; this is the "
+                "authenticated field, so either the endpoint or the field changed")
         out.append({
             "arm": arm,
             "slug": slug,
@@ -157,7 +166,28 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--out", default="posts/cadence_test_readings.json")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--probe", metavar="SLUG",
+                    help="Check an ALREADY published slug end to end and write "
+                         "nothing. Use before the test arms publish, so a missing "
+                         "field is found while a reading can still be salvaged "
+                         "rather than on the one day it cannot.")
     a = ap.parse_args()
+
+    if a.probe:
+        try:
+            art = match_article(_published(), a.probe)
+        except Refused as e:
+            print(f"REFUSED: {e}")
+            return 1
+        if art is None:
+            print(f"PROBE FAIL: nothing published carries the canonical for {a.probe}")
+            return 1
+        v = art.get("page_views_count")
+        ok = isinstance(v, int)
+        print(f"PROBE {'PASS' if ok else 'FAIL'}: matched {a.probe}, "
+              f"page_views_count is {type(v).__name__}"
+              + (f" (value present)" if ok else " (MISSING on this endpoint)"))
+        return 0 if ok else 1
 
     path = Path(a.out)
     doc = load(path)

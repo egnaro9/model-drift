@@ -178,3 +178,28 @@ def test_load_round_trips_existing_readings(tmp_path: Path):
     p = tmp_path / "r.json"
     p.write_text(json.dumps({"readings": [{"arm": "A", "t": "2026-10-02T00:00:00Z"}]}))
     assert len(load(p)["readings"]) == 1
+
+
+# ---- the silent-null guard ----
+
+def test_collect_refuses_an_article_with_no_page_views_count():
+    """page_views_count lives only on the authenticated endpoint. Pointed at the
+    public one, every reading would be written with views: null and the series
+    would look populated while holding nothing."""
+    a = art(A_SLUG)
+    del a["page_views_count"]
+    with pytest.raises(Refused):
+        collect([a], [], at(48))
+
+
+def test_collect_refuses_a_null_view_count():
+    a = art(A_SLUG)
+    a["page_views_count"] = None
+    with pytest.raises(Refused):
+        collect([a], [], at(48))
+
+
+def test_collect_accepts_a_genuine_zero_view_count():
+    """Zero views is a real measurement and must not be mistaken for missing."""
+    got = collect([art(A_SLUG, views=0)], [], at(48))
+    assert got[0]["views"] == 0
