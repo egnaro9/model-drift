@@ -26,7 +26,8 @@ from typing import Any, Dict, List, Optional, Sequence
 
 from .flips import analyze as analyze_flips
 from .policy import REL_FLOOR
-from .report import ModelStatus, reportable_threshold
+from .report import (ModelStatus, clears_floor, min_detectable_change,
+                     reportable_threshold)
 
 # What a finding can be *about*. This is the field that stops a provider outage
 # being written up as a model getting worse, which is the single most expensive
@@ -68,6 +69,33 @@ def _pts(delta: Optional[float]) -> str:
     return "—" if delta is None else f"{delta * 100:+.1f} pts"
 
 
+def _floor_evidence(graded: Optional[int], noise_pts: Optional[float],
+                    move_pts: float) -> str:
+    """Say which floor the move had to clear, and name the one that actually bound it.
+
+    The previous wording was "graded N calls, so the floor is X", which attributed the
+    floor to the graded count even when X came from the model's measured spread and had
+    nothing to do with N. It also printed the floor at .2f and the move at .1f, so a
+    one-item flip read as "the floor is 2.86 pts and the move was 2.9": a strict
+    inequality displayed over two values that were the same number. Both numbers are
+    now shown at the same precision, so the claim above this line can be checked
+    against the figures under it.
+    """
+    arith = min_detectable_change(graded)
+    binding = reportable_threshold(graded, noise_pts)
+    if binding is None:
+        return "graded_total not recorded on this row, so the floor is UNKNOWN"
+    parts = []
+    if arith is not None:
+        parts.append(f"graded {graded} calls gives an arithmetic floor of {arith:.2f} pts")
+    if noise_pts is not None:
+        parts.append(f"this model's measured run-to-run spread is {noise_pts:.2f} pts")
+    which = "the spread" if (noise_pts is not None and arith is not None
+                             and noise_pts > arith) else "the arithmetic floor"
+    parts.append(f"{which} binds at {binding:.2f} pts and the move was {move_pts:.2f}")
+    return "; ".join(parts)
+
+
 def regressions_and_recoveries(statuses: Sequence[ModelStatus]) -> List[Finding]:
     """Run-over-run moves that clear the instrument's own resolution.
 
@@ -87,7 +115,12 @@ def regressions_and_recoveries(statuses: Sequence[ModelStatus]) -> List[Finding]
         # confirming run; this is the fix that stops the next one being written.
         floor = reportable_threshold(s.graded, s.noise_pts)
         move_pts = abs(s.delta) * 100
-        if floor is not None and move_pts < floor:
+        # EXCEED the floor, not merely reach it. The floor is the smallest move this
+        # run could print, so a move sitting on it says nothing. `move_pts < floor`
+        # admitted those: on 2026-09-28 three models were drafted at 2.86 pts against
+        # a 2.857 floor, each one graded call changing. See clears_floor for why the
+        # margin is the board's storage precision rather than float epsilon.
+        if not clears_floor(move_pts, floor):
             continue
         kind = "regression" if s.verdict == "regressed" else "recovery"
         out.append(Finding(
@@ -101,10 +134,7 @@ def regressions_and_recoveries(statuses: Sequence[ModelStatus]) -> List[Finding]
                 {"claim": f"{s.label} moved {_pts(s.delta)} run over run",
                  "how": f"latest {s.latest * 100:.1f}% vs previous, dated {s.when}"},
                 {"claim": "the move is larger than this run could print by accident",
-                 "how": (f"graded {s.graded} calls, so the floor is "
-                         f"{floor:.2f} pts and the move was {move_pts:.1f}")
-                        if floor is not None else
-                        "graded_total not recorded on this row, so the floor is UNKNOWN"},
+                 "how": _floor_evidence(s.graded, s.noise_pts, move_pts)},
                 {"claim": "the run was not an outage being scored as a score",
                  "how": (f"reliability {s.observed_reliability}, at or above the "
                          f"{REL_FLOOR} floor" if s.observed_qualified

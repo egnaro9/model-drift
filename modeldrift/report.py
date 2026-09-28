@@ -22,6 +22,7 @@ already knows.
 from __future__ import annotations
 
 import json
+import math
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
@@ -147,6 +148,49 @@ def reportable_threshold(graded: Optional[int],
     if noise_pts is None:
         return floor
     return max(floor, noise_pts)
+
+
+# The board stores `acc` rounded to 4 decimal places, so a move never arrives as an
+# exact fraction. 31/35 and 32/35 are stored 0.8857 and 0.9143, whose difference is
+# 0.0286, or 2.860 points against an exact floor of 2.857142. That is why the floor
+# test cannot be a comparison of points at full precision.
+ACC_DECIMALS = 4
+# Half a stored unit on each of two values, expressed in points: 2 * 0.5e-4 * 100.
+POINT_TOLERANCE = 10.0 ** (2 - ACC_DECIMALS)
+
+
+def clears_floor(move_pts: float, floor: Optional[float]) -> bool:
+    """Whether a move is big enough to report. It must EXCEED the floor, not reach it.
+
+    The floor is the smallest move the run could possibly print, so a move equal to it
+    carries no information. On 35 graded calls that is one single item flipping: 1/35
+    is 2.857 points and so is the arithmetic floor. The old test was
+    `move_pts < floor`, which admitted them. Three drafts on 2026-09-28 (Opus 4.8,
+    GPT-OSS 20B, Gemini 3.5 Flash) were each one item moving, each published under the
+    claim that the move was "larger than this run could print by accident".
+
+    Two rounding traps, and the second is why this counts items instead of points.
+
+    Full-precision fractions disagree with the floor in the last bits: 32/35 - 31/35
+    is 2.857142857142858 against a floor of 2.857142857142857, which a bare `>` admits,
+    while 30/35 - 29/35 is 2.857142857142847, which it rejects. Same physical event,
+    opposite verdicts, decided by float noise.
+
+    Worse, the board rounds `acc` to 4 dp before anyone subtracts, which inflates a
+    one-item move to 2.860 and floats it a full 0.003 above the floor. So the margin
+    has to be the storage precision, not float epsilon: POINT_TOLERANCE is half a
+    stored unit on each of the two accuracies, in points.
+
+    Counting graded items instead was tried and rejected. It looks exact, but `graded`
+    VARIES between runs (see min_detectable_change: a run that grades 33 of 35 has a
+    coarser floor than one grading 35), so a real move is not a whole number of items.
+    Grok 4.3's retired regression was 4.28 points on 34 graded, which is 1.46 items;
+    an item-count rule suppresses it, and that move was real enough to need a
+    confirming run to retire it.
+    """
+    if floor is None:
+        return True
+    return move_pts > floor + POINT_TOLERANCE
 
 
 def min_detectable_change(graded: Optional[int]) -> Optional[float]:

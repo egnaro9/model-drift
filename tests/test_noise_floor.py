@@ -106,3 +106,74 @@ def test_findings_falls_back_when_the_spread_is_unknown():
     """Runs predating acc_spread keep the old behaviour."""
     out = regressions_and_recoveries([_status(noise_pts=None)])
     assert len(out) == 1
+
+
+# ---- the boundary: a move must EXCEED the floor, not land on it ----
+# Added 2026-09-28. `move_pts < floor` admitted single-item flips, and three drafts
+# (Opus 4.8, GPT-OSS 20B, Gemini 3.5 Flash) each reported one item moving as a
+# regression whose evidence claimed it was larger than the run could print.
+
+from modeldrift.report import clears_floor
+
+
+def one_item(graded: int, passed: int) -> float:
+    """move_pts for one graded item flipping, by the same route findings.py uses."""
+    return abs(passed / graded - (passed - 1) / graded) * 100
+
+
+def test_the_real_board_row_that_shipped_a_false_draft():
+    """The exact numbers from dashboard/drift_board.json on 2026-09-28, which my first
+    attempt at this fix did NOT suppress. The board rounds acc to 4 dp, so the move
+    arrives as 2.860 rather than 2.857142, a full 0.003 ABOVE the exact floor. Any
+    fix that compares points at full precision passes this through."""
+    move = abs(0.8857 - 0.9143) * 100          # stored 31/35 and 32/35
+    assert move > min_detectable_change(35), "the stored move really is above the floor"
+    assert not clears_floor(move, min_detectable_change(35))
+
+
+def test_one_item_flip_never_clears_the_arithmetic_floor():
+    """The whole bug. One item is the smallest move possible, so it cannot be
+    evidence that a move was larger than the smallest move possible."""
+    for passed in range(1, 36):
+        move = one_item(35, passed)
+        assert not clears_floor(move, min_detectable_change(35)), (
+            f"{passed}/35 vs {passed-1}/35 reported a one-item flip")
+
+
+def test_the_old_comparison_would_have_admitted_these():
+    """Guards the regression. A bare `>` disagrees with itself on float noise: the
+    same physical event passes at 32/35 and fails at 30/35."""
+    floor = min_detectable_change(35)
+    assert one_item(35, 32) > floor, "32/35 slipped past a bare >"
+    assert one_item(35, 30) < floor, "30/35 was caught by a bare >, same event"
+    for passed in (30, 32):
+        assert not clears_floor(one_item(35, passed), floor)
+
+
+def test_two_items_still_clears():
+    move = abs(33 / 35 - 31 / 35) * 100
+    assert clears_floor(move, min_detectable_change(35))
+
+
+def test_the_boundary_holds_across_denominators():
+    for graded in (7, 20, 33, 35, 100, 159):
+        floor = min_detectable_change(graded)
+        assert not clears_floor(one_item(graded, graded), floor), f"graded={graded}"
+        two = abs(graded / graded - (graded - 2) / graded) * 100
+        assert clears_floor(two, floor), f"graded={graded} suppressed a two-item move"
+
+
+def test_a_move_equal_to_the_measured_spread_is_suppressed():
+    """Equal to the model's own run-to-run spread is not distinguishable from
+    sampling it again, so it is not reportable either."""
+    assert not clears_floor(8.57, reportable_threshold(35, 8.57))
+    # 8.58 is NOT enough: one stored unit on each acc is worth 0.01 pts, so a move
+    # that beats the spread by 0.01 has not beaten it at this precision.
+    assert not clears_floor(8.58, reportable_threshold(35, 8.57))
+    assert clears_floor(8.60, reportable_threshold(35, 8.57))
+
+
+def test_unknown_floor_still_reports():
+    """A row predating graded_total must not be silently suppressed; the evidence
+    line says the floor is UNKNOWN instead."""
+    assert clears_floor(2.0, None) is True
