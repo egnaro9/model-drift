@@ -66,7 +66,11 @@ class Finding:
 
 
 def _pts(delta: Optional[float]) -> str:
-    return "—" if delta is None else f"{delta * 100:+.1f} pts"
+    # ASCII on purpose. This lands in post headlines and PR bodies, and an em-dash is
+    # barred from anything published. The None branch is unreachable from the two
+    # callers below, which skip a None delta first, so it says what it means rather
+    # than rendering a punctuation mark nobody can search for.
+    return "delta unknown" if delta is None else f"{delta * 100:+.1f} pts"
 
 
 def _floor_evidence(graded: Optional[int], noise_pts: Optional[float],
@@ -384,7 +388,7 @@ def main(argv: Optional[List[str]] = None) -> int:
                  "of them up by hand and delete the line.",
                  ""]
         for f in all_found:
-            lines.append(f"- [ ] `{f.about}` **{f.kind}** — {f.headline}")
+            lines.append(f"- [ ] `{f.about}` **{f.kind}**: {f.headline}")
         blog.write_text("\n".join(lines) + "\n", encoding="utf-8")
         record(all_found, a.ledger)
         print(f"\nSeeded the ledger with {len(all_found)} existing finding(s) and "
