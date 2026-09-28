@@ -18,6 +18,7 @@
  "provider-dark:google:gemini-3.5-flash:google:gemini-3.5-flash@2026-09-08",
  "provider-dark:openai:gpt-5-nano:openai:gpt-5-nano@2026-09-21",
  "recovery:xai:grok-4.5:xai:grok-4.5@2026-09-13",
+ "regression:anthropic:claude-opus-4-8:anthropic:claude-opus-4-8@2026-09-28",
  "regression:google:gemini-3.1-flash-lite:google:gemini-3.1-flash-lite@2026-08-09",
  "regression:google:gemini-3.1-pro:google:gemini-3.1-pro@2026-08-08",
  "regression:xai:grok-4-fast:xai:grok-4-fast@2026-09-12",
