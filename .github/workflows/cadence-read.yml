@@ -1,0 +1,87 @@
+name: cadence-read
+# Capture the cadence test's view counts without depending on Erik's laptop.
+#
+# This replaces two one-shot scheduled tasks on his Mac, cadence-test-read-a
+# (2026-10-02) and cadence-test-read-b (2026-10-04). Each was due at a single
+# instant, and views only ever accumulate, so a missed reading could not be
+# recovered: dev.to will not tell you what a count was yesterday.
+#
+# That scheduler is not reliable enough to hold the only copy of a number. On
+# 2026-09-28 it produced runs for 3 of 13 scheduled slots across 89 hours, and
+# two of the misses fell inside windows where the Mac was demonstrably awake
+# (Chrome holding audio and video wake locks, the Claude app's own assertion
+# live). Sleep was not the cause, so "keep the lid open" is not the fix.
+#
+# It samples hourly and APPENDS. A skipped run costs nothing because the next one
+# still lands, and every reading records the elapsed hours it was actually taken
+# at, so no figure has to pretend it was exactly T+48h. That also removes a
+# quieter error: scheduled runs here start well after their nominal minute, which
+# made the old "T+48h" readings closer to T+46h without saying so.
+#
+# It captures ONLY the perishable number. Comments from other people, which
+# read-b also needs, stay a local step on purpose: comments persist and can be
+# re-read at any time, so they are not at risk and do not belong in a cron.
+#
+# This workflow does not interpret. The verdict against the pre-registration in
+# ~/Desktop/Resume/POSTING_AB_LOG.md is a deliberate human step, so a favourable
+# number cannot quietly become a conclusion.
+#
+# Once the test is read out, delete this workflow. Until then WINDOW_DAYS in
+# tools/cadence_read.py makes it an inert no-op after the window closes.
+on:
+  schedule:
+    - cron: "23 * * * *"        # hourly, off the hour: :00 is the most contended minute
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true = report the reading and commit nothing"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write
+
+# Serialise, because two runs appending to the same file would race the commit.
+concurrency:
+  group: cadence-read
+  cancel-in-progress: false
+
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -e ".[dev]"
+
+      # The guards are the point of this file, so prove they still hold before
+      # trusting a number it writes. A reader whose refusals have rotted can
+      # measure the wrong article and the result still looks like data.
+      - name: Test the reader before using it
+        run: python -m pytest tests/test_cadence_read.py -q
+
+      - name: Take a reading
+        env:
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+        run: |
+          python tools/cadence_read.py \
+            ${{ inputs.dry_run == 'true' && '--dry-run' || '' }}
+
+      - name: Commit the reading
+        if: inputs.dry_run != 'true'
+        run: |
+          set -euo pipefail
+          # Ask about the working tree, not just the index. `git diff --quiet`
+          # reports "no change" for an UNTRACKED file, so on the very first run
+          # it would have skipped the commit and dropped the one reading that
+          # cannot be taken again. porcelain sees `??` as well as ` M`.
+          if [ -z "$(git status --porcelain -- posts/cadence_test_readings.json)" ]; then
+            echo "no change to commit"
+            exit 0
+          fi
+          git config user.name  "egnaro9"
+          git config user.email "egnaro9@gmail.com"
+          git add posts/cadence_test_readings.json
+          git commit -m "cadence test: record a reading"
+          git push
