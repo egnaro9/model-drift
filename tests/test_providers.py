@@ -6,7 +6,7 @@ anyway, every flagship call would error and the model would read as 100% broken 
 a fake regression. These pin that temperature is omitted when a model declares
 `temperature=None`, and sent when it doesn't.
 """
-from modeldrift.providers import Model, anthropic_body, gemini_body, load_registry, openai_body
+from modeldrift.providers import Model, _safe, anthropic_body, gemini_body, load_registry, openai_body
 
 FLAGSHIP = Model("x:flag", "Flag", "openai", "gpt-5", "K", temperature=None)
 MINI = Model("x:mini", "Mini", "openai", "gpt-4o-mini", "K")  # default temp 0.0
@@ -150,3 +150,56 @@ def test_a_rate_capped_host_is_throttled(monkeypatch):
     slept.clear()
     providers._throttle("https://api.openai.com/v1/chat/completions")
     assert slept == []                 # uncapped host never sleeps
+
+
+# ── _safe: the credential scrub that guards public Actions logs ──────────
+# This existed with ZERO tests. It is interpolated into every ProviderError in
+# the module and this repo's Actions logs are public, so a regression here
+# publishes a live key on the next failure. The neighbouring lesson is that
+# masking is exact-match and a truncated key slips past it, so the scrub itself
+# is the only thing standing between a careless `?key=` and a public log.
+
+
+def test_safe_redacts_every_secret_param_name_it_claims_to():
+    for name in ("key", "api_key", "access_token", "token"):
+        url = f"https://api.example.com/v1/models?{name}=AIzaSyREAL_SECRET_VALUE"
+        out = _safe(url)
+        assert "AIzaSyREAL_SECRET_VALUE" not in out, name
+        assert out.endswith(f"{name}=REDACTED"), name
+
+
+def test_safe_redacts_a_secret_that_is_not_the_first_parameter():
+    """The `&` branch of the alternation. A key is rarely the first param."""
+    out = _safe("https://api.example.com/v1/models?alt=json&key=SECRET123&pretty=true")
+    assert "SECRET123" not in out
+    assert "alt=json" in out and "pretty=true" in out
+    assert "key=REDACTED" in out
+
+
+def test_safe_stops_at_the_parameter_boundary_and_keeps_the_rest_of_the_url():
+    """A scrub that ate the remaining query string would be a different bug:
+    the error message is what a human reads to debug the failure."""
+    out = _safe("https://api.example.com/v1/x?key=SECRET&model=gpt-5&n=2")
+    assert out == "https://api.example.com/v1/x?key=REDACTED&model=gpt-5&n=2"
+
+
+def test_safe_leaves_a_url_with_no_secret_untouched():
+    url = "https://api.example.com/v1/models?model=claude-opus-4-8"
+    assert _safe(url) == url
+
+
+def test_safe_redacts_two_secrets_in_one_url():
+    out = _safe("https://x.test/a?key=AAA&token=BBB")
+    assert "AAA" not in out and "BBB" not in out
+    assert out.count("REDACTED") == 2
+
+
+def test_safe_does_not_cover_unhyphenated_or_header_style_names():
+    """Documents the REAL boundary rather than implying total coverage.
+
+    The pattern lists four parameter names. `apikey` (no separator) is not one of
+    them, so it survives. This is not a request to widen the regex blindly; it is
+    here so the limit is visible to the next person, and so widening it later
+    turns this assertion red on purpose instead of silently.
+    """
+    assert "STILL_VISIBLE" in _safe("https://x.test/a?apikey=STILL_VISIBLE")
