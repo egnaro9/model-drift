@@ -1,0 +1,25 @@
+{
+  "test": "cadence-2026-09-30-vs-2026-10-02",
+  "pre_registration": "~/Desktop/Resume/POSTING_AB_LOG.md, section 'PRE-REGISTERED: the cadence test', written 2026-09-23 before either post existed publicly",
+  "arms": {
+    "A": {
+      "slug": "2026-09-30-the-grader-reads-the-first-number"
+    },
+    "B": {
+      "slug": "2026-10-02-the-gate-could-not-see-what-it-was-gating"
+    }
+  },
+  "note": "Append-only. Every reading carries the elapsed hours it was actually taken at; do not assume any of them is exactly 48h. Compare matched elapsed values, or interpolate.",
+  "readings": [
+    {
+      "arm": "A",
+      "slug": "2026-09-30-the-grader-reads-the-first-number",
+      "t": "2026-09-30T15:58:20Z",
+      "published_at": "2026-09-30T15:55:43.676Z",
+      "elapsed_h": 0.044,
+      "views": 0,
+      "reactions": 0,
+      "comments": 0
+    }
+  ]
+}
