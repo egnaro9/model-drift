@@ -6,7 +6,7 @@ about: harness
 subject: model-drift/_number
 fingerprint: grader-defect:model-drift/_number:float-subtract
 destination: https://erikhill.dev/notes/2026-09-30-the-grader-reads-the-first-number/
-status: draft
+status: published
 ---
 
 # My arithmetic grader reads the first number in the sentence, not the answer
