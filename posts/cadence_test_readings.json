@@ -40,6 +40,16 @@
       "views": 0,
       "reactions": 0,
       "comments": 0
+    },
+    {
+      "arm": "A",
+      "slug": "2026-09-30-the-grader-reads-the-first-number",
+      "t": "2026-10-01T07:14:08Z",
+      "published_at": "2026-09-30T15:55:43.676Z",
+      "elapsed_h": 15.307,
+      "views": 0,
+      "reactions": 1,
+      "comments": 0
     }
   ]
 }
