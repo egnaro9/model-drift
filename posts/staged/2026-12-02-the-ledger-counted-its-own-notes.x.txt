@@ -1,0 +1,42 @@
+Thread, 5 posts.
+
+**1/**
+Audited an append-only ledger before switching a pipeline back on.
+
+1010 lines. Zero parse errors.
+
+Counted the rows that said "action taken": 322.
+
+Real number: 293.
+
+**2/**
+29 of those rows were notes a previous run left for the next run.
+
+They went in the same file because the file was there. To be stored they needed the file's
+fields. So they got `action: sent` and an id.
+
+After that, nothing that counted could tell them apart.
+
+**3/**
+Every field was the right type. `isinstance(id, str)` is true for
+`"SWEEP-2026-07-28T14-07Z"`.
+
+A schema validator passes this file today.
+
+**4/**
+Second defect, same file. Dedup matches a bare numeric id. 6 real records are stored as
+`vendor-role-4443156560`.
+
+The id is right there on the end. The lookup misses all 6. Pipeline acts on them twice.
+
+Acting twice looks exactly like acting once.
+
+**5/**
+Neither came from counting. Counting produced the wrong number.
+
+4 lines that sort every row into one bucket, then look at the buckets. Two buckets existed
+that shouldn't, holding 29 and 6.
+
+Right type is not right kind. Validators only check the first one.
+
+---

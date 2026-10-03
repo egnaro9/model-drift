@@ -1,0 +1,33 @@
+I spent an hour auditing a pipeline before turning it back on, and the first thing I checked
+was the number I was most confident about.
+
+An append-only JSON file, one line per action taken. 1010 lines, zero parse errors. Counting
+the rows that said an action was taken gave 322.
+
+The real number was 293.
+
+29 of those rows were not records of actions. They were notes that a previous run had left for
+the next run, written into the same file because the file was there. To be accepted they
+needed the file's fields, so they got `action: sent` and an id, and from that point on
+nothing that counted could tell them apart from the real thing.
+
+Every field was the right type. A schema validator passes this file today.
+
+While I was in there I found the second one. Dedup works by matching a bare numeric id, and 6
+real records were stored as `vendor-role-title-4443156560` instead of `4443156560`. The id is
+right there on the end, and the lookup misses all six, so the pipeline would act on them a
+second time. Acting twice looks exactly like acting once: no error, no retry, the second
+action just succeeds.
+
+Neither of these came from counting. Counting is what produced the wrong number. They came
+from writing four lines that sort every row into exactly one bucket and then looking at the
+buckets. Two buckets existed that should not have, with 29 and 6 rows in them.
+
+The part worth keeping: a field being the right type is not the field being the right kind of
+thing. Validators check types. They do not check whether a row is the kind of row the file is
+for. Give one file two jobs and eventually the second job writes something wearing the first
+job's shape.
+
+Full write-up and the classifier, on dev.to: [link]
+
+---
