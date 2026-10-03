@@ -17,8 +17,22 @@ name: devto-drafts
 # One guard is a habit. Two is a control.
 
 on:
+  # 02:04, not 11:04. GitHub's scheduled runs on this repo land 3.9 to 7.3 hours
+  # late (9 of 9 days, 2026-09-24 to 10-02, median 5.5h), and publish.yml is
+  # subject to the same jitter. An hour of nominal headroom is therefore worth
+  # nothing: at 11:04 this would fire 15.0-18.4h UTC against publish.yml's
+  # 16.0-19.4h, so the publisher could beat the draft push and devto_publish.py
+  # would find no draft to publish. At 02:04 the windows are disjoint.
   schedule:
-    - cron: "4 11 * * *"        # DAILY 11:04 UTC, one hour before publish.yml
+    - cron: "4 2 * * *"
+  # And belt-and-braces: stage a note and its draft appears without waiting for
+  # a cron at all, which removes the ordering dependency rather than widening
+  # it. This also fires on the bot's own `publish:` commit, which is harmless
+  # because the just-published note no longer reads status: draft.
+  push:
+    branches: [main]
+    paths:
+      - "posts/**"
   workflow_dispatch:
     inputs:
       dry_run:
