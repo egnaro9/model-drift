@@ -1,0 +1,81 @@
+name: devto-drafts
+
+# Creates the dev.to DRAFT for every staged note that is not published yet, so a
+# release date never arrives without one. publish.yml's cross-post step runs
+# devto_publish.py, which refuses unless EXACTLY ONE dev.to draft matches the
+# title, so a missing draft silently costs the dev.to surface on that date.
+#
+# Runs BEFORE publish.yml (12:04 UTC) on purpose: the draft has to exist by the
+# time the publisher looks for it.
+#
+# Two guards, because the payload in devto_push.py hardcodes published:false and
+# a PUT against a live article would RETRACT it:
+#   1. here: only staged files whose post still reads `status: draft` are passed,
+#      and never --dir, which would glob every staged file including the three
+#      that sit beside already-published articles;
+#   2. in devto_push.py: a title the account has published is refused outright.
+# One guard is a habit. Two is a control.
+
+on:
+  schedule:
+    - cron: "4 11 * * *"        # DAILY 11:04 UTC, one hour before publish.yml
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true = report what would happen and change nothing"
+        required: false
+        default: "true"
+
+permissions:
+  contents: read
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+
+      - name: Select the staged files whose post is still a draft
+        id: pick
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import pathlib, re, os
+          picked, skipped = [], []
+          for f in sorted(pathlib.Path("posts/staged").glob("*.devto.md")):
+              slug = f.name[: -len(".devto.md")]
+              post = pathlib.Path("posts") / f"{slug}.md"
+              if not post.exists():
+                  skipped.append(f"{slug}: no posts/{slug}.md"); continue
+              m = re.search(r"^status:\s*(\S+)", post.read_text(), re.M)
+              st = m.group(1) if m else "?"
+              (picked if st == "draft" else skipped).append(
+                  str(f) if st == "draft" else f"{slug}: status={st}")
+          print("files=" + " ".join(picked))
+          print("count=" + str(len(picked)))
+          summary = ["### devto-drafts", "", f"**{len(picked)} staged draft(s) to push**"]
+          summary += [f"- `{p}`" for p in picked] or ["- (none)"]
+          if skipped:
+              summary += ["", "Skipped, deliberately:"] + [f"- {s}" for s in skipped]
+          pathlib.Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a").write("\n".join(summary) + "\n")
+          PY
+
+      - name: Nothing staged
+        if: steps.pick.outputs.count == '0'
+        run: echo "No staged note is still a draft. Nothing to push."
+
+      - name: Push the drafts to dev.to
+        if: steps.pick.outputs.count != '0'
+        env:
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.dry_run }}" = "false" ]; then
+            python tools/devto_push.py ${{ steps.pick.outputs.files }}
+          else
+            python tools/devto_push.py --dry-run ${{ steps.pick.outputs.files }}
+          fi

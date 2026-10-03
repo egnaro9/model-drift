@@ -96,6 +96,15 @@ def parse_front(text: str) -> Tuple[Dict[str, str], str]:
     return fm, text[m.end():].strip()
 
 
+# Titles this account already has PUBLISHED, filled in by existing_drafts().
+# The article payload below hardcodes published:False, so a PUT against one of
+# these would UNPUBLISH a live post. On 2026-10-02 three staged .devto.md files
+# still sat beside three live articles, so a run over posts/staged/*.devto.md
+# would have taken all three down. Refusing is the only safe default: a push
+# tool must not be able to retract.
+PUBLISHED_TITLES: set = set()
+
+
 def existing_drafts() -> Tuple[Dict[str, int], str]:
     """{title: id} for everything already on the account, published or not.
 
@@ -109,7 +118,10 @@ def existing_drafts() -> Tuple[Dict[str, int], str]:
         if err:
             return out, err
         for a in data or []:
-            out[a["title"].strip()] = a["id"]
+            title = a["title"].strip()
+            out[title] = a["id"]
+            if "published" in path:
+                PUBLISHED_TITLES.add(title)
     return out, ""
 
 
@@ -132,6 +144,12 @@ def push(path: Path, known: Dict[str, int], dry: bool) -> str:
         article["main_image"] = fm["cover_image"]
 
     aid = known.get(title)
+    if title in PUBLISHED_TITLES:
+        raise PushError(
+            f"{path.name}: {title[:50]!r} is already PUBLISHED on dev.to. This "
+            "tool only ever sends published:false, so updating it would retract "
+            "a live article. Remove the staged file, or edit the post in dev.to's "
+            "own composer.")
     verb = "would update" if dry and aid else "would create" if dry else \
            "updated" if aid else "created"
     if dry:
