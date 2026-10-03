@@ -183,10 +183,33 @@ def main() -> int:
             print(f"PROBE FAIL: nothing published carries the canonical for {a.probe}")
             return 1
         v = art.get("page_views_count")
-        ok = isinstance(v, int)
+        # PRINT THE VALUE. The old probe asserted isinstance(v, int) and printed
+        # "(value present)" without ever showing v, so it returned PASS over a
+        # zero for three days while the series it protects held nothing. A probe
+        # that does not show the number cannot answer the question it is for.
+        # A zero is now a FAIL: present-and-integer is not populated.
+        ok = isinstance(v, int) and v > 0
+        why = ("MISSING on this endpoint" if not isinstance(v, int)
+               else "ZERO: present and integer, but not populated" if v == 0
+               else "populated")
         print(f"PROBE {'PASS' if ok else 'FAIL'}: matched {a.probe}, "
-              f"page_views_count is {type(v).__name__}"
-              + (f" (value present)" if ok else " (MISSING on this endpoint)"))
+              f"page_views_count={v!r} ({type(v).__name__}) -> {why}")
+
+        # Survey every published article, so "does this account get page views
+        # at all" is answerable instead of inferred from one post.
+        print("\n  SURVEY of page_views_count across everything published:")
+        arts = _published()
+        nz = 0
+        for x in sorted(arts, key=lambda d: d.get("published_at") or ""):
+            pv = x.get("page_views_count")
+            if isinstance(pv, int) and pv > 0:
+                nz += 1
+            print(f"    {str(x.get('published_at'))[:10]}  views={str(pv):>6}  "
+                  f"reactions={x.get('public_reactions_count')}  "
+                  f"{str(x.get('title'))[:46]}")
+        print(f"\n  {nz} of {len(arts)} published articles report a non-zero view count.")
+        print("  All zero means the field does not populate for this account, and the"
+              "\n  cadence test's primary measurement has to change rather than be retried.")
         return 0 if ok else 1
 
     path = Path(a.out)
