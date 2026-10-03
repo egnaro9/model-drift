@@ -74,8 +74,15 @@ jobs:
           DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
         run: |
           set -euo pipefail
-          if [ "${{ inputs.dry_run }}" = "false" ]; then
-            python tools/devto_push.py ${{ steps.pick.outputs.files }}
-          else
+          # inputs.dry_run is EMPTY on a schedule trigger, so this must test for
+          # "true" and not for "false". Testing "= false" made the cron dry-run
+          # forever: a daily green run that never created a draft, which is the
+          # failure this workflow exists to prevent, wearing the workflow's own
+          # clothes. workflow_dispatch still defaults to true, so a hand-run is
+          # safe unless asked otherwise.
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "dry run (dispatch default); pass dry_run=false to push for real"
             python tools/devto_push.py --dry-run ${{ steps.pick.outputs.files }}
+          else
+            python tools/devto_push.py ${{ steps.pick.outputs.files }}
           fi
