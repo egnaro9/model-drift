@@ -112,15 +112,21 @@ def existing_drafts() -> Tuple[Dict[str, int], str]:
     article the moment he publishes it, which is the worst possible moment.
     """
     out: Dict[str, int] = {}
-    for path in ("/articles/me/unpublished?per_page=100",
-                 "/articles/me/published?per_page=100"):
+    # The two endpoints differ by a PREFIX, not a substring: "published" is a
+    # substring of "unpublished", so `if "published" in path` is True for BOTH
+    # and marked every draft as published. That mistake cost a false REFUSED on
+    # the first real run. Carry the flag explicitly instead of re-deriving it
+    # from the url.
+    for path, is_published in (("/articles/me/unpublished?per_page=100", False),
+                               ("/articles/me/published?per_page=100", True)):
         data, err = _call("GET", path)
         if err:
             return out, err
         for a in data or []:
             title = a["title"].strip()
             out[title] = a["id"]
-            if "published" in path:
+            # Trust the article's own flag over the endpoint it arrived from.
+            if is_published or a.get("published") is True:
                 PUBLISHED_TITLES.add(title)
     return out, ""
 
@@ -176,18 +182,35 @@ def main(argv: Optional[List[str]] = None) -> int:
         print("no .devto.md files found")
         return 0
 
-    try:
-        known, err = ({}, "") if a.dry_run else existing_drafts()
-        if err:
-            print(f"  could not list existing articles: {err}")
-            return 1
-        for t in targets:
-            print("  " + push(t, known, a.dry_run))
-    except PushError as e:
-        print(f"  REFUSED: {e}")
+    # A dry run LISTS too. It used to pass an empty `known`, so it reported
+    # "would create" for everything, could never say "would update", and could
+    # not reach the already-published refusal at all. A preview that cannot
+    # produce the outcome it is previewing is not a preview. Listing is two GETs
+    # and changes nothing.
+    known, err = existing_drafts()
+    if err:
+        print(f"  could not list existing articles: {err}")
         return 1
 
-    print(f"\n{len(targets)} article(s) handled. All are DRAFTS; nothing was published.")
+    refused: List[str] = []
+    for t in targets:
+        try:
+            print("  " + push(t, known, a.dry_run))
+        except PushError as e:
+            msg = str(e)
+            # An already-published title is a SKIP, not a batch failure: one
+            # staged file left beside a live article must not block the other
+            # seven. Anything else is a real error and still fails the run.
+            if "already PUBLISHED" in msg:
+                print(f"  skipped: {msg}")
+                refused.append(msg)
+                continue
+            print(f"  REFUSED: {msg}")
+            return 1
+
+    handled = len(targets) - len(refused)
+    print(f"\n{handled} article(s) handled, {len(refused)} skipped as already published.")
+    print("All are DRAFTS; nothing was published.")
     print("dev.to scheduling lives in its own composer, behind the icon beside Publish.")
     return 0
 
