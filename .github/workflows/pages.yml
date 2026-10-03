@@ -28,12 +28,12 @@ jobs:
       # Pin to main. On a workflow_run event the default ref is the SHA that *started*
       # `track` — i.e. main before the standings commit — so an unpinned checkout would
       # publish the previous day's numbers and look like the bug was still there.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: main
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dashboard
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
