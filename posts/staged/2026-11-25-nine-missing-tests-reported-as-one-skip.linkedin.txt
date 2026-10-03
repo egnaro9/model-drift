@@ -1,0 +1,32 @@
+I went to fix a stale test-count badge on one of my repos. README said 30, running the suite
+said 33, so I bumped it.
+
+Then I counted the test functions in the files. There are 36.
+
+The summary line read "33 passed, 1 skipped". One skip, so I had assumed one test. It was nine:
+a single `pytest.importorskip` at module scope skips an entire file and reports it as one skip.
+Nine tests absent, one line of output, no hint of the scale.
+
+How long? The extra they need is a git dependency, and the CI workflow installs a different
+extra. The git history of that line shows exactly one change: the commit that created the repo.
+Those nine tests had never run in CI, once, ever.
+
+And they were not peripheral. They are the cross-repository integration tests, the only ones
+covering the claim that the agent is actually wired to the retrieval pipeline. The calculator
+input guard had ten tests. The thing that made it a system had nine, and none of them ran.
+
+I think that is structural rather than careless. The test that needs an optional dependency, a
+database, or a second service is the one most likely to be quietly excluded, and it is also the
+one covering what you cannot verify any other way. The exclusion mechanism selects against the
+coverage that matters most.
+
+They all pass, by the way. One line in the CI config, and the count went 33 to 42.
+
+So the badge I was correcting from 30 to 33 was wrong in both directions at once: too low for
+what exists, too high for what CI had verified.
+
+If you run suites with optional extras, how do you keep the optional path honest?
+
+#testing #cicd #softwarequality #python
+
+---

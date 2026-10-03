@@ -1,0 +1,42 @@
+One of my verification gates had been passing for weeks while printing this on every run:
+
+"not run: semantic invalidation, recorded pins were not compared to this consumer's
+current inputs"
+
+That is the gate's strongest check. The one that asks whether a certificate still describes
+reality, rather than whether it is internally consistent. It had never run once. The gate said
+so plainly, in the same block as the passes.
+
+I read that output many times. I read it as a pass, because I was checking the exit code.
+
+What makes this worth writing down is that the gate is well built. It separates "ran" from "not
+run" specifically so an unperformed check cannot read as a performed one. It was honest. The
+result was still worthless, because honesty only works if someone compares the two lists.
+
+Then the fix nearly became the bug. Enabling that check meant declaring my current inputs, and
+the obvious way to write that file is to copy the certificate's recorded values. One minute of
+work, the warning disappears, everything green. It would also have compared a document to
+itself: passing on the day I wrote it and every day after, including every day the thing it
+describes had changed.
+
+So I derived the values from live code instead. They matched, and that match means something
+because it was computed rather than copied. Change a task definition and the gate now goes red.
+
+I also left three keys undeclared. One is recorded "null" in the certificate, and the gate's own
+comment is the best line in that codebase: reading an unpinned input as matching your current
+one would be laundering the claim. The other two describe the subject at certification time and
+I have no way to read what it runs today, so declaring them would assert something I never
+checked.
+
+The report now says "4 compared, 4 matched exactly." Six was available and would have looked
+better.
+
+Two questions I take forward. Not "did it pass" but "what did it not check." And of the check
+itself: could this ever have failed?
+
+If your tooling distinguishes a declined check from a passed one, how do you surface that so it
+cannot be misread? Failing the build on any skip is the obvious answer and I am not convinced.
+
+#testing #devops #security #softwarequality
+
+---

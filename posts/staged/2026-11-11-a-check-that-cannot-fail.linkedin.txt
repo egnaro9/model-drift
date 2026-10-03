@@ -1,0 +1,33 @@
+version (post 3 to 5 days after the dev.to thread)
+
+I audited the test counts across ten of my repositories this week. Recorded total: 290. Actual:
+683 passing. Nine of ten per-repo figures were wrong.
+
+The miss that bothers me is not the arithmetic. It is that I had automated checks whose job was
+to catch exactly this, and 28 of 97 of them had recorded their own error message as their
+expected result.
+
+A command that fails, with its failure saved as the baseline, matches that baseline forever. It
+reports agreement on every run. It had been doing that long enough to pin one repository's state
+to a date three months out of date.
+
+Three smaller versions of the same shape, all from the same day:
+
+- A build tool printed "up-to-date", skipped the test task, and served a cached report. I parsed
+  it and got the right answer for the wrong reason.
+- A suite with an optional dependency fails at collection on a base install, so it reports zero
+  tests rather than failing. Nothing fails when nothing runs.
+- A badge said 198 where execution says 361.
+
+Nothing here crashed. Every signal was green, and the green was empty rather than false.
+
+The question I am taking forward: not "does this check pass", but "what would make it go red,
+and has it ever gone red?"
+
+If you run monitors, how do you test that yours can still fail? A monitor cannot fail on clean
+data, so the usual mutation approach does not apply. Extracting the predicate and testing that
+is the best I have, and I am not convinced it is enough.
+
+#testing #devops #softwarequality #observability
+
+---

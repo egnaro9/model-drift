@@ -1,0 +1,77 @@
+1/ A verification gate of mine had been passing for weeks while printing, every run:
+
+"not run: semantic invalidation, recorded pins were not compared to your current inputs"
+
+That's the gate's strongest check. It had never run.
+
+2/ The gate told me. In plain text. In the same block as the passes.
+
+I read it as a pass. I was checking the exit code.
+
+3/ Here's what makes it worth writing down: the gate is GOOD.
+
+It separates `ran:` from `not run:` precisely so an unperformed check can't read as a performed
+one.
+
+It was honest. The result was still worthless.
+
+4/ Honesty in a report only works if someone compares the two lists.
+
+5/ Then the fix nearly became the bug.
+
+Enabling the check meant declaring my current inputs. The obvious move: copy the values out of
+the certificate.
+
+One minute. Warning gone. All green.
+
+6/ It would also have compared a document to itself.
+
+Passing the day I wrote it. Passing forever after. Including every day the thing it describes
+had changed.
+
+A check that cannot fail has never passed.
+
+7/ So I derived them from live code instead:
+
+FAMILIES['machine'].taskset_hash()
+
+Matched. And that match means something, because it was computed rather than copied.
+
+Edit a task → hash moves → gate goes red.
+
+8/ I also left 3 keys undeclared.
+
+One is recorded `null`. The gate refuses a declaration against a null pin, and its comment is
+the best line in that repo: reading an unpinned input as "matching yours" would launder the
+claim.
+
+9/ The other two describe the subject at certification time. I can't read what it runs today, so
+declaring them would assert something I never checked.
+
+Report says "4 compared, 4 matched."
+
+Six was available and would have looked better.
+
+10/ Then I mutated the file one key at a time to prove the check could fail:
+
+mutate agent_id      → drift
+mutate family        → drift
+mutate taskset_hash  → drift
+mutate prompt_hash   → drift
+add the null-pin key → unrecorded
+
+11/ The only lines that convinced me of anything were the ones that failed.
+
+Green says the check agrees with the world today. Red-under-mutation says it's attached to the
+world at all.
+
+12/ Two questions I keep now:
+
+What did this NOT check?
+And of the check itself: could it ever have failed?
+
+If the answer involves comparing a thing to a copy of itself, you built a mirror.
+
+Full writeup: [dev.to link]
+
+---

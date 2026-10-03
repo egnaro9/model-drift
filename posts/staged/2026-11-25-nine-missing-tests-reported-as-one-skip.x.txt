@@ -1,0 +1,50 @@
+1/ Went to fix a stale test-count badge. README said 30. Running the suite said 33.
+
+The files define 36.
+
+2/ The summary said "33 passed, 1 skipped".
+
+One skip. I assumed one test.
+
+It was nine. A module-level `pytest.importorskip` skips the whole file and reports it as a
+single skip.
+
+3/ Nine tests absent. One line of output. No indication of magnitude.
+
+If they'd been nine separate skips I'd have seen "9 skipped" and looked immediately.
+
+4/ How long had they been skipped?
+
+They need an optional extra. CI installs a different one.
+
+`git log -p` on that workflow line: one change ever, the commit that created the repo.
+
+Never run. Not once.
+
+5/ And they weren't peripheral.
+
+They're the cross-repo integration tests. The only ones covering "this agent is really wired to
+that retrieval pipeline."
+
+The calculator input guard had 10 tests. The thing that made it a system had 9, and none ran.
+
+6/ I don't think that's carelessness, I think it's structural.
+
+The test needing an optional dep / a DB / a second service is the one most likely to be
+excluded. It's also the one covering what you can't verify any other way.
+
+7/ They pass. `9 passed in 0.37s`.
+
+One line of CI config. 33 to 42.
+
+So the badge I was fixing from 30 to 33 was wrong in BOTH directions: too low for what exists,
+too high for what CI checked.
+
+8/ A skip is reported in the same breath as a pass, in the same summary line, in a tone that
+says move on.
+
+It's the only outcome that means "we don't know" while reading like "fine".
+
+Full writeup: [dev.to link]
+
+---

@@ -1,0 +1,58 @@
+1/ Audited the test counts across 10 of my repos.
+
+Recorded: 290. Actual: 683 passing.
+
+9 of 10 per-repo figures were wrong.
+
+2/ The arithmetic isn't the problem.
+
+I had automated checks whose entire job was catching this. 28 of 97 of them had recorded their
+own error message as their expected result.
+
+3/ A command that fails, with the failure saved as the baseline, matches that baseline forever.
+
+It reports agreement. Every single run.
+
+One had been pinning a repo's HEAD to a date three months stale.
+
+4/ Three smaller versions of the same shape, same day:
+
+A build tool printed "up-to-date", skipped the test task, served a cached report. I parsed it
+and got the right answer for the wrong reason.
+
+5/ A suite with an optional dep fails at COLLECTION on a base install. Reports zero tests rather
+than failing.
+
+Nothing fails when nothing runs.
+
+6/ A badge said 198 where execution says 361.
+
+7/ Nothing crashed. Every signal was green.
+
+The green wasn't false. It was empty.
+
+8/ Then I wrote a check to count the broken checks. Took three tries.
+
+Attempt 1 matched the pattern in its own prose.
+Attempt 2 matched it inside its own command.
+Attempt 3 finally excluded itself.
+
+9/ Attempt 4 was the best one.
+
+Repairing the last file drove the count to zero. `grep -c` exits non-zero on zero matches.
+
+So it went red at the exact moment it should have gone green, and would have become the 28th
+instance of the thing it documents.
+
+10/ The question I ask now isn't "does this pass".
+
+It's "what would make this go red, and has it ever gone red?"
+
+11/ Which is hard for monitors, because a monitor can't fail on clean data by design. You can't
+mutation-test it like a function.
+
+Pulling the predicate out and testing the predicate is the best I've got. Not sure it's enough.
+
+Full writeup: [dev.to link]
+
+---
