@@ -38,7 +38,16 @@ UA = "drift-notes-cadence-read/1.0"
 # readings a minute apart; WINDOW_DAYS stops this workflow nagging forever once
 # the test is long over.
 MIN_GAP_MINUTES = 45
-WINDOW_DAYS = 8
+# The youngest article on this account ever observed with a non-zero
+# page_views_count was 10 days old (survey 2026-10-03, 21 of 23 populated).
+# Past this, a zero is an anomaly rather than a lag.
+POPULATION_LAG_H = 12 * 24
+# 16, not 8. The primary read was re-registered at T+14d on 2026-10-03 because
+# page_views_count does not populate on this account before ~10 days (21 of 23
+# articles populate; the youngest ever observed at a non-zero count was 10 days
+# old). At 8 days this recorder CLOSED ITS WINDOW BEFORE THE FIELD COULD EVER
+# POPULATE, so no arm of this experiment could have yielded a view count, ever.
+WINDOW_DAYS = 16
 
 ARMS = {
     "A": "2026-09-30-the-grader-reads-the-first-number",
@@ -145,17 +154,41 @@ def collect(articles: List[dict], readings: List[dict], now: datetime) -> List[d
         # ever pointed at the public endpoint, or dev.to renames the field, the
         # readings would still be written with views: null and the series would
         # look populated while holding nothing. Refuse instead.
-        if not isinstance(art.get("page_views_count"), int):
+        pv = art.get("page_views_count")
+        if not isinstance(pv, int):
             raise Refused(
                 f"arm {arm} ({slug}) has no integer page_views_count; this is the "
                 "authenticated field, so either the endpoint or the field changed")
+        # A zero is NOT refused during the lag window, because refusing would
+        # stop the series collecting for ~10 days and lose the early reactions
+        # and comments too. Instead every reading says whether it HOLDS a view
+        # count, so a later reader cannot mistake 0 for a measurement. That was
+        # the actual failure: the guard above checks the TYPE, isinstance(0, int)
+        # is True, and the series looked populated while holding nothing for
+        # three days.
+        populated = pv > 0
+        # Past the point where this account demonstrably populates, a zero is a
+        # real anomaly rather than a lag, and so is a zero alongside a reaction
+        # that late: a reaction cannot happen without a view.
+        if not populated and eh > POPULATION_LAG_H:
+            raise Refused(
+                f"arm {arm} ({slug}) still reports page_views_count=0 at "
+                f"{eh:.0f}h, past the {POPULATION_LAG_H/24:.0f}d point where "
+                f"every other article on this account has populated "
+                f"(reactions={art.get('public_reactions_count')}). Either the "
+                "field stopped populating or this article is being treated "
+                "differently; do not record another zero as if it were a count")
         out.append({
             "arm": arm,
             "slug": slug,
             "t": now.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
             "published_at": art["published_at"],
             "elapsed_h": eh,
-            "views": art.get("page_views_count"),
+            "views": pv,
+            # Say what the reading holds. A bare 0 is indistinguishable from
+            # "not yet populated", and that ambiguity is what made 14 green
+            # readings carry no primary measurement.
+            "views_populated": populated,
             "reactions": art.get("public_reactions_count"),
             "comments": art.get("comments_count"),
         })

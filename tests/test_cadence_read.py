@@ -202,7 +202,34 @@ def test_collect_refuses_a_null_view_count():
         collect([a], [], at(48))
 
 
-def test_collect_accepts_a_genuine_zero_view_count():
-    """Zero views is a real measurement and must not be mistaken for missing."""
+def test_a_zero_inside_the_lag_window_is_recorded_but_flagged_unpopulated():
+    """A zero at 48h is NOT a measurement on this account, and the series must
+    say so. Surveyed 2026-10-03: 21 of 23 articles populate page_views_count,
+    and the youngest ever observed non-zero was 10 days old. The previous
+    version of this test asserted the opposite ("zero views is a real
+    measurement"), which is what licensed 14 green readings that carried no
+    primary measurement at all. Recording continues, because refusing would
+    also lose the reactions and comments that ARE live from hour zero."""
     got = collect([art(A_SLUG, views=0)], [], at(48))
     assert got[0]["views"] == 0
+    assert got[0]["views_populated"] is False
+
+
+def test_a_nonzero_count_is_flagged_populated():
+    got = collect([art(A_SLUG, views=46)], [], at(48))
+    assert got[0]["views"] == 46
+    assert got[0]["views_populated"] is True
+
+
+def test_collect_refuses_a_zero_past_the_population_lag():
+    """Past the point where every other article on this account has populated,
+    a zero is an anomaly rather than a lag, and recording another one would put
+    a non-measurement into the series under the primary measure's name."""
+    with pytest.raises(Refused):
+        collect([art(A_SLUG, views=0)], [], at(13 * 24))
+
+
+def test_a_nonzero_count_past_the_lag_is_still_fine():
+    """The refusal must key on the zero, not on the age."""
+    got = collect([art(A_SLUG, views=46)], [], at(13 * 24))
+    assert got[0]["views_populated"] is True
