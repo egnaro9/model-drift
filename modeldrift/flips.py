@@ -1,4 +1,17 @@
-"""Which tasks flipped — and whether the probe or the models are to blame.
+"""Which tasks flipped, and whether the probe or the models are to blame.
+
+OUTAGE POINTS ARE DROPPED FIRST, since 2026-10-05. Before that this module compared
+RAW consecutive points, so a provider outage read as every task breaking at once and
+then recovering a run later. 268 of the board's 895 recorded flips were manufactured
+that way by 19 untrusted points, and every single one was on a Gemini model:
+gemini-3.5-flash showed 153 flips and has 15, gemini-3.1-flash-lite showed 78 and has
+6. One transition into an outage flipped 29 tasks in a single step, at reliability 0.2
+against a floor of 0.5.
+
+board.py had the filter two files away and said why in a comment: an outage run is not
+sampling noise, it is the outage. This module simply never called it. The operator's
+own record already carried this failure twice on Gemini in other detectors, which is
+what makes the third one worth the note rather than a quiet patch.
 
 An aggregate delta cannot tell these three apart, and they need different
 responses:
@@ -24,6 +37,8 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 from typing import Any, Optional
+
+from .policy import trusted_points
 
 # A task failing on at least this many distinct providers in one day is treated
 # as an accusation against the probe rather than against the models.
@@ -73,7 +88,8 @@ def analyze(series: dict[str, list[dict]],
       probe_alarms     — tasks failing across >= N providers on the same day
     """
     repeat, once = [], []
-    for model_id, points in series.items():
+    for model_id, raw_points in series.items():
+        points = trusted_points(raw_points)
         if model_id.startswith("mock:"):
             continue
         for row in flips_for_model(points):
@@ -82,7 +98,8 @@ def analyze(series: dict[str, list[dict]],
 
     # Cross-provider: for each day, which tasks failed on how many providers.
     by_day: dict[str, dict[str, set]] = defaultdict(lambda: defaultdict(set))
-    for model_id, points in series.items():
+    for model_id, raw_points in series.items():
+        points = trusted_points(raw_points)
         if model_id.startswith("mock:"):
             continue
         prov = _provider(model_id)

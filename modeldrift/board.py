@@ -25,17 +25,13 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Sequence
 
-from .policy import REL_FLOOR  # re-exported: callers and tests use board.REL_FLOOR
+# trusted_points moved to policy.py when flips.py became a second consumer.
+# Re-exported here because callers and tests import it from board.
+from .policy import REL_FLOOR, trusted_points  # noqa: F401
 from .report import (ModelStatus, min_detectable_change, noise_floor,
                      pooled_noise_floor, results_md)
 
 
-
-
-def trusted_points(pts: Sequence[dict]) -> List[dict]:
-    """The accuracy-bearing subset of a series: reliability missing or >= floor."""
-    return [p for p in pts
-            if p.get("reliability") is None or p["reliability"] >= REL_FLOOR]
 
 
 def statuses_from_series(series: Dict[str, List[dict]],

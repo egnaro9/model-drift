@@ -24,3 +24,21 @@ lived only in the dashboard JS, so RESULTS.md published a Google outage as
 three Gemini regressions (-37.1 and -94.3 pts) while the chart above it
 correctly showed nothing.
 """
+
+
+def trusted_points(pts):
+    """The accuracy-bearing subset of a series: reliability missing or >= REL_FLOOR.
+
+    MOVED HERE 2026-10-05, from board.py, because a second consumer appeared and the
+    module docstring above already names the trap: a predicate living in board could
+    not be imported by a module board does not import, and the workaround is how a
+    single source of truth quietly becomes two.
+
+    flips.py was that second consumer and it had no filter at all. It compared raw
+    consecutive points, so a provider outage read as every task breaking at once and
+    then recovering: 268 of the board's 895 recorded flips were manufactured by 19
+    outage points, every one of them on a Gemini model. gemini-3.1-flash-lite showed
+    78 flips and has 6.
+    """
+    return [p for p in pts
+            if p.get("reliability") is None or p["reliability"] >= REL_FLOOR]
