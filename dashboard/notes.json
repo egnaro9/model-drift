@@ -1,5 +1,29 @@
 [
   {
+    "date": "2026-10-05",
+    "run_key": [
+      "anthropic:claude-fable-5@2026-10-05",
+      "anthropic:claude-sonnet-5@2026-10-05",
+      "xai:grok-4-fast@2026-10-05",
+      "xai:grok-4.3@2026-10-05"
+    ],
+    "title": "Regression: Grok 4.3 -5.7 pts",
+    "metric": "accuracy",
+    "models": [
+      "anthropic:claude-fable-5",
+      "anthropic:claude-sonnet-5",
+      "xai:grok-4.3",
+      "xai:grok-4-fast"
+    ],
+    "summary": "4 model(s) regressed against the previous run; worst was Grok 4.3 at -5.7 pts. Auto-logged — confirm it's real before writing it up.",
+    "body": [
+      {
+        "p": "Auto-logged when the scheduled probe flagged a run-over-run regression. Before this becomes a post, check the run log and the Reliability metric — a rate limit or provider outage can look exactly like a regression. If it holds up, the written explanation goes here."
+      }
+    ],
+    "stub": true
+  },
+  {
     "date": "2026-10-04",
     "run_key": [
       "groq:gpt-oss-120b@2026-10-04"
