@@ -1,5 +1,5 @@
 {
- "models_with_enough_history": 17,
+ "models_with_enough_history": 20,
  "one_offs": [
   {
    "flips": 1,
@@ -9,315 +9,9 @@
   },
   {
    "flips": 1,
-   "latest": "broke on 2026-08-09",
-   "model": "google:gemini-3.1-pro",
-   "task": "compare-decimals"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-09",
-   "model": "google:gemini-3.1-pro",
-   "task": "count-r"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-21",
-   "model": "google:gemini-3.1-pro",
-   "task": "days-feb-2024"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-09",
-   "model": "google:gemini-3.1-pro",
-   "task": "extract-year"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-09",
-   "model": "google:gemini-3.1-pro",
-   "task": "fact-element"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-21",
-   "model": "google:gemini-3.1-pro",
-   "task": "fmt-csv-nospace"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-09",
-   "model": "google:gemini-3.1-pro",
-   "task": "fmt-list"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-08",
-   "model": "google:gemini-3.1-pro",
-   "task": "if-json"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-09",
-   "model": "google:gemini-3.1-pro",
-   "task": "if-no-preamble"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-09",
-   "model": "google:gemini-3.1-pro",
-   "task": "if-one-word"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-09",
-   "model": "google:gemini-3.1-pro",
-   "task": "math-order"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-09",
-   "model": "google:gemini-3.1-pro",
-   "task": "math-percent"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-21",
-   "model": "google:gemini-3.1-pro",
-   "task": "multi-step-math"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-21",
-   "model": "google:gemini-3.1-pro",
-   "task": "no-overrefuse"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-08",
-   "model": "google:gemini-3.1-pro",
-   "task": "nth-char"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-09",
-   "model": "google:gemini-3.1-pro",
-   "task": "nth-word"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-09",
-   "model": "google:gemini-3.1-pro",
-   "task": "reason-older"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-21",
-   "model": "google:gemini-3.1-pro",
-   "task": "sort-numeric"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-08",
-   "model": "google:gemini-3.1-pro",
-   "task": "unit-minutes"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-08",
-   "model": "google:gemini-3.1-pro",
-   "task": "vowel-json"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
+   "latest": "recovered on 2026-07-26",
    "model": "google:gemini-3.5-flash",
-   "task": "compare-negatives"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "json-word-count"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "needle-extract"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "no-overrefuse-kill"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "nth-char"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "sort-magnitude"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "compare-decimals"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-16",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "count-r"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "count-s-mississippi"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "days-feb-2024"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "extract-year"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "fact-element"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "fmt-csv-nospace"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "fmt-exact-token"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "fmt-list"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "fmt-repeat-join"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "fmt-uppercase"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-09",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "if-json"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-09",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "if-one-word"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "json-word-count"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "math-order"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "multi-step-math"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "needle-extract"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "no-overrefuse"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "no-overrefuse-kill"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "nth-char"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "reason-older"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "reverse-str"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "sort-magnitude"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "sort-numeric"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "unit-minutes"
-  },
-  {
-   "flips": 1,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "vowel-json"
+   "task": "logic-syllogism"
   }
  ],
  "probe_alarms": [
@@ -346,18 +40,6 @@
    "task": "logic-syllogism"
   },
   {
-   "day": "2026-07-31",
-   "n_providers": 5,
-   "providers": [
-    "anthropic",
-    "google",
-    "meta",
-    "openai",
-    "xai"
-   ],
-   "task": "fact-planet"
-  },
-  {
    "day": "2026-08-04",
    "n_providers": 5,
    "providers": [
@@ -392,42 +74,6 @@
     "xai"
    ],
    "task": "logic-syllogism"
-  },
-  {
-   "day": "2026-08-09",
-   "n_providers": 5,
-   "providers": [
-    "anthropic",
-    "google",
-    "meta",
-    "openai",
-    "xai"
-   ],
-   "task": "fact-planet"
-  },
-  {
-   "day": "2026-08-14",
-   "n_providers": 5,
-   "providers": [
-    "anthropic",
-    "google",
-    "meta",
-    "openai",
-    "xai"
-   ],
-   "task": "fact-element"
-  },
-  {
-   "day": "2026-08-16",
-   "n_providers": 5,
-   "providers": [
-    "anthropic",
-    "google",
-    "meta",
-    "openai",
-    "xai"
-   ],
-   "task": "fact-element"
   },
   {
    "day": "2026-07-25",
@@ -533,11 +179,11 @@
    "n_providers": 4,
    "providers": [
     "anthropic",
-    "google",
     "meta",
-    "openai"
+    "openai",
+    "xai"
    ],
-   "task": "fact-element"
+   "task": "fact-planet"
   },
   {
    "day": "2026-07-31",
@@ -560,17 +206,6 @@
     "openai"
    ],
    "task": "logic-syllogism"
-  },
-  {
-   "day": "2026-07-31",
-   "n_providers": 4,
-   "providers": [
-    "google",
-    "meta",
-    "openai",
-    "xai"
-   ],
-   "task": "nth-word"
   },
   {
    "day": "2026-08-01",
@@ -775,11 +410,11 @@
    "n_providers": 4,
    "providers": [
     "anthropic",
-    "google",
     "meta",
-    "openai"
+    "openai",
+    "xai"
    ],
-   "task": "fact-element"
+   "task": "fact-planet"
   },
   {
    "day": "2026-08-09",
@@ -802,17 +437,6 @@
     "openai"
    ],
    "task": "logic-syllogism"
-  },
-  {
-   "day": "2026-08-09",
-   "n_providers": 4,
-   "providers": [
-    "anthropic",
-    "google",
-    "meta",
-    "xai"
-   ],
-   "task": "nth-char"
   },
   {
    "day": "2026-08-10",
@@ -885,66 +509,11 @@
    "n_providers": 4,
    "providers": [
     "anthropic",
-    "google",
-    "meta",
-    "xai"
-   ],
-   "task": "constraint-no-e"
-  },
-  {
-   "day": "2026-08-14",
-   "n_providers": 4,
-   "providers": [
-    "anthropic",
-    "google",
-    "meta",
-    "openai"
-   ],
-   "task": "fact-planet"
-  },
-  {
-   "day": "2026-08-14",
-   "n_providers": 4,
-   "providers": [
-    "anthropic",
-    "google",
-    "meta",
-    "openai"
-   ],
-   "task": "float-subtract"
-  },
-  {
-   "day": "2026-08-14",
-   "n_providers": 4,
-   "providers": [
-    "anthropic",
-    "google",
-    "meta",
-    "openai"
-   ],
-   "task": "logic-syllogism"
-  },
-  {
-   "day": "2026-08-14",
-   "n_providers": 4,
-   "providers": [
-    "anthropic",
-    "google",
-    "meta",
-    "xai"
-   ],
-   "task": "nth-char"
-  },
-  {
-   "day": "2026-08-14",
-   "n_providers": 4,
-   "providers": [
-    "google",
     "meta",
     "openai",
     "xai"
    ],
-   "task": "nth-word"
+   "task": "fact-element"
   },
   {
    "day": "2026-08-15",
@@ -973,113 +542,102 @@
    "n_providers": 4,
    "providers": [
     "anthropic",
-    "google",
     "meta",
+    "openai",
     "xai"
    ],
-   "task": "constraint-no-e"
+   "task": "fact-element"
   },
   {
-   "day": "2026-08-16",
+   "day": "2026-09-23",
    "n_providers": 4,
    "providers": [
     "anthropic",
     "google",
-    "meta",
-    "openai"
-   ],
-   "task": "fact-planet"
-  },
-  {
-   "day": "2026-08-16",
-   "n_providers": 4,
-   "providers": [
-    "anthropic",
-    "google",
-    "meta",
+    "groq",
     "openai"
    ],
    "task": "float-subtract"
   },
   {
-   "day": "2026-08-16",
+   "day": "2026-09-23",
    "n_providers": 4,
    "providers": [
     "anthropic",
     "google",
-    "meta",
+    "openai",
+    "xai"
+   ],
+   "task": "logic-syllogism"
+  },
+  {
+   "day": "2026-09-24",
+   "n_providers": 4,
+   "providers": [
+    "anthropic",
+    "google",
+    "groq",
     "openai"
    ],
-   "task": "logic-syllogism"
+   "task": "float-subtract"
   },
   {
-   "day": "2026-08-16",
+   "day": "2026-09-25",
    "n_providers": 4,
    "providers": [
     "anthropic",
     "google",
-    "meta",
-    "xai"
+    "groq",
+    "openai"
    ],
-   "task": "nth-char"
+   "task": "float-subtract"
   },
   {
-   "day": "2026-08-16",
-   "n_providers": 4,
-   "providers": [
-    "google",
-    "meta",
-    "openai",
-    "xai"
-   ],
-   "task": "nth-word"
-  },
-  {
-   "day": "2026-08-20",
+   "day": "2026-09-26",
    "n_providers": 4,
    "providers": [
     "anthropic",
     "google",
-    "openai",
-    "xai"
+    "groq",
+    "openai"
    ],
-   "task": "fact-element"
+   "task": "float-subtract"
   },
   {
-   "day": "2026-08-21",
+   "day": "2026-09-27",
    "n_providers": 4,
    "providers": [
     "anthropic",
     "google",
-    "openai",
-    "xai"
+    "groq",
+    "openai"
    ],
-   "task": "fact-element"
+   "task": "float-subtract"
   },
   {
-   "day": "2026-08-21",
+   "day": "2026-09-28",
    "n_providers": 4,
    "providers": [
     "anthropic",
     "google",
-    "openai",
-    "xai"
+    "groq",
+    "openai"
    ],
-   "task": "logic-syllogism"
+   "task": "float-subtract"
   },
   {
-   "day": "2026-08-24",
+   "day": "2026-09-29",
    "n_providers": 4,
    "providers": [
     "anthropic",
     "google",
-    "openai",
-    "xai"
+    "groq",
+    "openai"
    ],
-   "task": "fact-element"
+   "task": "float-subtract"
   },
   {
-   "day": "2026-08-24",
+   "day": "2026-09-29",
    "n_providers": 4,
    "providers": [
     "anthropic",
@@ -1090,18 +648,18 @@
    "task": "logic-syllogism"
   },
   {
-   "day": "2026-08-25",
+   "day": "2026-09-30",
    "n_providers": 4,
    "providers": [
     "anthropic",
     "google",
-    "openai",
-    "xai"
+    "groq",
+    "openai"
    ],
-   "task": "fact-element"
+   "task": "float-subtract"
   },
   {
-   "day": "2026-08-25",
+   "day": "2026-09-30",
    "n_providers": 4,
    "providers": [
     "anthropic",
@@ -1112,29 +670,40 @@
    "task": "logic-syllogism"
   },
   {
-   "day": "2026-08-26",
+   "day": "2026-10-01",
    "n_providers": 4,
    "providers": [
     "anthropic",
     "google",
-    "openai",
-    "xai"
+    "groq",
+    "openai"
    ],
-   "task": "fact-element"
+   "task": "float-subtract"
   },
   {
-   "day": "2026-08-26",
+   "day": "2026-10-02",
    "n_providers": 4,
    "providers": [
     "anthropic",
     "google",
-    "openai",
-    "xai"
+    "groq",
+    "openai"
    ],
-   "task": "fact-planet"
+   "task": "float-subtract"
   },
   {
-   "day": "2026-08-26",
+   "day": "2026-10-03",
+   "n_providers": 4,
+   "providers": [
+    "anthropic",
+    "google",
+    "groq",
+    "openai"
+   ],
+   "task": "float-subtract"
+  },
+  {
+   "day": "2026-10-03",
    "n_providers": 4,
    "providers": [
     "anthropic",
@@ -1145,29 +714,18 @@
    "task": "logic-syllogism"
   },
   {
-   "day": "2026-08-27",
+   "day": "2026-10-04",
    "n_providers": 4,
    "providers": [
     "anthropic",
     "google",
-    "openai",
-    "xai"
+    "groq",
+    "openai"
    ],
-   "task": "fact-element"
+   "task": "float-subtract"
   },
   {
-   "day": "2026-08-31",
-   "n_providers": 4,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai",
-    "xai"
-   ],
-   "task": "fact-element"
-  },
-  {
-   "day": "2026-08-31",
+   "day": "2026-10-04",
    "n_providers": 4,
    "providers": [
     "anthropic",
@@ -1178,70 +736,15 @@
    "task": "logic-syllogism"
   },
   {
-   "day": "2026-09-02",
+   "day": "2026-10-05",
    "n_providers": 4,
    "providers": [
     "anthropic",
     "google",
-    "openai",
-    "xai"
+    "groq",
+    "openai"
    ],
-   "task": "fact-element"
-  },
-  {
-   "day": "2026-09-03",
-   "n_providers": 4,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai",
-    "xai"
-   ],
-   "task": "fact-element"
-  },
-  {
-   "day": "2026-09-04",
-   "n_providers": 4,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai",
-    "xai"
-   ],
-   "task": "fact-element"
-  },
-  {
-   "day": "2026-09-08",
-   "n_providers": 4,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai",
-    "xai"
-   ],
-   "task": "fact-element"
-  },
-  {
-   "day": "2026-09-08",
-   "n_providers": 4,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai",
-    "xai"
-   ],
-   "task": "fact-planet"
-  },
-  {
-   "day": "2026-09-08",
-   "n_providers": 4,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai",
-    "xai"
-   ],
-   "task": "logic-syllogism"
+   "task": "float-subtract"
   },
   {
    "day": "2026-07-25",
@@ -1422,16 +925,6 @@
     "meta"
    ],
    "task": "constraint-no-e"
-  },
-  {
-   "day": "2026-07-31",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "meta"
-   ],
-   "task": "count-r"
   },
   {
    "day": "2026-07-31",
@@ -1448,20 +941,10 @@
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "days-feb-2024"
-  },
-  {
-   "day": "2026-07-31",
-   "n_providers": 3,
-   "providers": [
-    "google",
     "meta",
     "openai"
    ],
-   "task": "if-one-word"
+   "task": "fact-element"
   },
   {
    "day": "2026-07-31",
@@ -1481,17 +964,17 @@
     "openai",
     "xai"
    ],
-   "task": "sort-magnitude"
+   "task": "nth-word"
   },
   {
    "day": "2026-07-31",
    "n_providers": 3,
    "providers": [
-    "anthropic",
-    "google",
-    "meta"
+    "meta",
+    "openai",
+    "xai"
    ],
-   "task": "vowel-json"
+   "task": "sort-magnitude"
   },
   {
    "day": "2026-08-01",
@@ -1757,11 +1240,11 @@
    "day": "2026-08-09",
    "n_providers": 3,
    "providers": [
-    "google",
+    "anthropic",
     "meta",
-    "xai"
+    "openai"
    ],
-   "task": "count-r"
+   "task": "fact-element"
   },
   {
    "day": "2026-08-09",
@@ -1777,21 +1260,11 @@
    "day": "2026-08-09",
    "n_providers": 3,
    "providers": [
-    "google",
-    "meta",
-    "openai"
-   ],
-   "task": "nth-word"
-  },
-  {
-   "day": "2026-08-09",
-   "n_providers": 3,
-   "providers": [
     "anthropic",
-    "google",
-    "meta"
+    "meta",
+    "xai"
    ],
-   "task": "vowel-json"
+   "task": "nth-char"
   },
   {
    "day": "2026-08-10",
@@ -1937,51 +1410,61 @@
    "day": "2026-08-14",
    "n_providers": 3,
    "providers": [
-    "google",
+    "anthropic",
     "meta",
     "xai"
    ],
-   "task": "count-r"
+   "task": "constraint-no-e"
   },
   {
    "day": "2026-08-14",
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "days-feb-2024"
-  },
-  {
-   "day": "2026-08-14",
-   "n_providers": 3,
-   "providers": [
-    "google",
     "meta",
     "openai"
    ],
-   "task": "if-one-word"
-  },
-  {
-   "day": "2026-08-14",
-   "n_providers": 3,
-   "providers": [
-    "google",
-    "meta",
-    "openai"
-   ],
-   "task": "sort-magnitude"
+   "task": "fact-planet"
   },
   {
    "day": "2026-08-14",
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
-    "meta"
+    "meta",
+    "openai"
    ],
-   "task": "vowel-json"
+   "task": "float-subtract"
+  },
+  {
+   "day": "2026-08-14",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "meta",
+    "openai"
+   ],
+   "task": "logic-syllogism"
+  },
+  {
+   "day": "2026-08-14",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "meta",
+    "xai"
+   ],
+   "task": "nth-char"
+  },
+  {
+   "day": "2026-08-14",
+   "n_providers": 3,
+   "providers": [
+    "meta",
+    "openai",
+    "xai"
+   ],
+   "task": "nth-word"
   },
   {
    "day": "2026-08-15",
@@ -2038,50 +1521,60 @@
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
-    "meta"
-   ],
-   "task": "count-r"
-  },
-  {
-   "day": "2026-08-16",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
+    "meta",
     "xai"
    ],
-   "task": "days-feb-2024"
-  },
-  {
-   "day": "2026-08-16",
-   "n_providers": 3,
-   "providers": [
-    "google",
-    "meta",
-    "openai"
-   ],
-   "task": "if-one-word"
-  },
-  {
-   "day": "2026-08-16",
-   "n_providers": 3,
-   "providers": [
-    "google",
-    "meta",
-    "openai"
-   ],
-   "task": "sort-magnitude"
+   "task": "constraint-no-e"
   },
   {
    "day": "2026-08-16",
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
-    "meta"
+    "meta",
+    "openai"
    ],
-   "task": "vowel-json"
+   "task": "fact-planet"
+  },
+  {
+   "day": "2026-08-16",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "meta",
+    "openai"
+   ],
+   "task": "float-subtract"
+  },
+  {
+   "day": "2026-08-16",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "meta",
+    "openai"
+   ],
+   "task": "logic-syllogism"
+  },
+  {
+   "day": "2026-08-16",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "meta",
+    "xai"
+   ],
+   "task": "nth-char"
+  },
+  {
+   "day": "2026-08-16",
+   "n_providers": 3,
+   "providers": [
+    "meta",
+    "openai",
+    "xai"
+   ],
+   "task": "nth-word"
   },
   {
    "day": "2026-08-17",
@@ -2138,90 +1631,30 @@
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "count-s-mississippi"
-  },
-  {
-   "day": "2026-08-20",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "days-feb-2024"
-  },
-  {
-   "day": "2026-08-20",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "float-subtract"
-  },
-  {
-   "day": "2026-08-20",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "logic-syllogism"
-  },
-  {
-   "day": "2026-08-20",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "nth-char"
-  },
-  {
-   "day": "2026-08-21",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "days-feb-2024"
-  },
-  {
-   "day": "2026-08-21",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "fact-planet"
-  },
-  {
-   "day": "2026-08-21",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "float-subtract"
-  },
-  {
-   "day": "2026-08-21",
-   "n_providers": 3,
-   "providers": [
-    "google",
     "openai",
     "xai"
    ],
-   "task": "nth-word"
+   "task": "fact-element"
+  },
+  {
+   "day": "2026-08-21",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-element"
+  },
+  {
+   "day": "2026-08-21",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "logic-syllogism"
   },
   {
    "day": "2026-08-22",
@@ -2248,188 +1681,68 @@
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
+    "openai",
     "xai"
    ],
-   "task": "days-feb-2024"
+   "task": "fact-element"
   },
   {
    "day": "2026-08-24",
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "fact-planet"
-  },
-  {
-   "day": "2026-08-24",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "float-subtract"
-  },
-  {
-   "day": "2026-08-24",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
+    "openai",
     "xai"
    ],
-   "task": "nth-char"
-  },
-  {
-   "day": "2026-08-24",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "sort-magnitude"
+   "task": "logic-syllogism"
   },
   {
    "day": "2026-08-25",
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
+    "openai",
     "xai"
    ],
-   "task": "constraint-no-e"
+   "task": "fact-element"
   },
   {
    "day": "2026-08-25",
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
+    "openai",
     "xai"
    ],
-   "task": "days-feb-2024"
+   "task": "logic-syllogism"
   },
   {
-   "day": "2026-08-25",
+   "day": "2026-08-26",
    "n_providers": 3,
    "providers": [
-    "google",
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-element"
+  },
+  {
+   "day": "2026-08-26",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
     "openai",
     "xai"
    ],
    "task": "fact-planet"
   },
   {
-   "day": "2026-08-25",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "float-subtract"
-  },
-  {
-   "day": "2026-08-25",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "nth-char"
-  },
-  {
    "day": "2026-08-26",
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "count-s-mississippi"
-  },
-  {
-   "day": "2026-08-26",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "days-feb-2024"
-  },
-  {
-   "day": "2026-08-26",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "float-subtract"
-  },
-  {
-   "day": "2026-08-27",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "constraint-no-e"
-  },
-  {
-   "day": "2026-08-27",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "count-s-mississippi"
-  },
-  {
-   "day": "2026-08-27",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "days-feb-2024"
-  },
-  {
-   "day": "2026-08-27",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "float-subtract"
-  },
-  {
-   "day": "2026-08-27",
-   "n_providers": 3,
-   "providers": [
-    "google",
     "openai",
     "xai"
-   ],
-   "task": "if-one-word"
-  },
-  {
-   "day": "2026-08-27",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
    ],
    "task": "logic-syllogism"
   },
@@ -2437,11 +1750,11 @@
    "day": "2026-08-27",
    "n_providers": 3,
    "providers": [
-    "google",
+    "anthropic",
     "openai",
     "xai"
    ],
-   "task": "nth-word"
+   "task": "fact-element"
   },
   {
    "day": "2026-08-28",
@@ -2488,40 +1801,20 @@
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "days-feb-2024"
-  },
-  {
-   "day": "2026-08-31",
-   "n_providers": 3,
-   "providers": [
-    "google",
     "openai",
     "xai"
    ],
-   "task": "fact-planet"
+   "task": "fact-element"
   },
   {
    "day": "2026-08-31",
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "float-subtract"
-  },
-  {
-   "day": "2026-08-31",
-   "n_providers": 3,
-   "providers": [
-    "google",
     "openai",
     "xai"
    ],
-   "task": "nth-word"
+   "task": "logic-syllogism"
   },
   {
    "day": "2026-09-01",
@@ -2538,330 +1831,60 @@
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "constraint-no-e"
-  },
-  {
-   "day": "2026-09-02",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "days-feb-2024"
-  },
-  {
-   "day": "2026-09-02",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "float-subtract"
-  },
-  {
-   "day": "2026-09-02",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "logic-syllogism"
-  },
-  {
-   "day": "2026-09-03",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "constraint-no-e"
-  },
-  {
-   "day": "2026-09-03",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "count-s-mississippi"
-  },
-  {
-   "day": "2026-09-03",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "days-feb-2024"
-  },
-  {
-   "day": "2026-09-03",
-   "n_providers": 3,
-   "providers": [
-    "google",
     "openai",
     "xai"
-   ],
-   "task": "fact-planet"
-  },
-  {
-   "day": "2026-09-03",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "float-subtract"
-  },
-  {
-   "day": "2026-09-03",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "if-json"
-  },
-  {
-   "day": "2026-09-03",
-   "n_providers": 3,
-   "providers": [
-    "google",
-    "openai",
-    "xai"
-   ],
-   "task": "if-one-word"
-  },
-  {
-   "day": "2026-09-03",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "logic-syllogism"
-  },
-  {
-   "day": "2026-09-03",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "nth-char"
-  },
-  {
-   "day": "2026-09-03",
-   "n_providers": 3,
-   "providers": [
-    "google",
-    "openai",
-    "xai"
-   ],
-   "task": "nth-word"
-  },
-  {
-   "day": "2026-09-04",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "days-feb-2024"
-  },
-  {
-   "day": "2026-09-04",
-   "n_providers": 3,
-   "providers": [
-    "google",
-    "openai",
-    "xai"
-   ],
-   "task": "fact-planet"
-  },
-  {
-   "day": "2026-09-04",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "float-subtract"
-  },
-  {
-   "day": "2026-09-04",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "logic-syllogism"
-  },
-  {
-   "day": "2026-09-05",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "constraint-no-e"
-  },
-  {
-   "day": "2026-09-05",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "count-r"
-  },
-  {
-   "day": "2026-09-05",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "days-feb-2024"
-  },
-  {
-   "day": "2026-09-05",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
    ],
    "task": "fact-element"
   },
   {
-   "day": "2026-09-05",
+   "day": "2026-09-03",
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "float-subtract"
-  },
-  {
-   "day": "2026-09-05",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "logic-syllogism"
-  },
-  {
-   "day": "2026-09-05",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
+    "openai",
     "xai"
-   ],
-   "task": "nth-char"
-  },
-  {
-   "day": "2026-09-06",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "constraint-no-e"
-  },
-  {
-   "day": "2026-09-06",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "xai"
-   ],
-   "task": "days-feb-2024"
-  },
-  {
-   "day": "2026-09-06",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
    ],
    "task": "fact-element"
   },
   {
-   "day": "2026-09-06",
+   "day": "2026-09-04",
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
-    "openai"
+    "openai",
+    "xai"
    ],
-   "task": "fact-planet"
-  },
-  {
-   "day": "2026-09-06",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "float-subtract"
-  },
-  {
-   "day": "2026-09-06",
-   "n_providers": 3,
-   "providers": [
-    "anthropic",
-    "google",
-    "openai"
-   ],
-   "task": "logic-syllogism"
+   "task": "fact-element"
   },
   {
    "day": "2026-09-08",
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
+    "openai",
     "xai"
    ],
-   "task": "days-feb-2024"
+   "task": "fact-element"
   },
   {
    "day": "2026-09-08",
    "n_providers": 3,
    "providers": [
     "anthropic",
-    "google",
-    "openai"
+    "openai",
+    "xai"
    ],
-   "task": "float-subtract"
+   "task": "fact-planet"
+  },
+  {
+   "day": "2026-09-08",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "logic-syllogism"
   },
   {
    "day": "2026-09-09",
@@ -2942,90 +1965,340 @@
     "xai"
    ],
    "task": "logic-syllogism"
+  },
+  {
+   "day": "2026-09-13",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-planet"
+  },
+  {
+   "day": "2026-09-13",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "logic-syllogism"
+  },
+  {
+   "day": "2026-09-23",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-element"
+  },
+  {
+   "day": "2026-09-23",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-planet"
+  },
+  {
+   "day": "2026-09-24",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-element"
+  },
+  {
+   "day": "2026-09-24",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "google",
+    "openai"
+   ],
+   "task": "logic-syllogism"
+  },
+  {
+   "day": "2026-09-25",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-element"
+  },
+  {
+   "day": "2026-09-25",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "google",
+    "openai"
+   ],
+   "task": "logic-syllogism"
+  },
+  {
+   "day": "2026-09-26",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-element"
+  },
+  {
+   "day": "2026-09-26",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "google",
+    "openai"
+   ],
+   "task": "logic-syllogism"
+  },
+  {
+   "day": "2026-09-27",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-element"
+  },
+  {
+   "day": "2026-09-27",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "google",
+    "openai"
+   ],
+   "task": "logic-syllogism"
+  },
+  {
+   "day": "2026-09-28",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "groq",
+    "xai"
+   ],
+   "task": "constraint-no-e"
+  },
+  {
+   "day": "2026-09-28",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-element"
+  },
+  {
+   "day": "2026-09-28",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "google",
+    "openai"
+   ],
+   "task": "logic-syllogism"
+  },
+  {
+   "day": "2026-09-29",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "groq",
+    "xai"
+   ],
+   "task": "constraint-no-e"
+  },
+  {
+   "day": "2026-09-30",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-element"
+  },
+  {
+   "day": "2026-10-01",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-element"
+  },
+  {
+   "day": "2026-10-01",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "google",
+    "openai"
+   ],
+   "task": "logic-syllogism"
+  },
+  {
+   "day": "2026-10-02",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-element"
+  },
+  {
+   "day": "2026-10-02",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "google",
+    "openai"
+   ],
+   "task": "logic-syllogism"
+  },
+  {
+   "day": "2026-10-03",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-element"
+  },
+  {
+   "day": "2026-10-04",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-element"
+  },
+  {
+   "day": "2026-10-05",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "openai",
+    "xai"
+   ],
+   "task": "fact-element"
+  },
+  {
+   "day": "2026-10-05",
+   "n_providers": 3,
+   "providers": [
+    "anthropic",
+    "google",
+    "openai"
+   ],
+   "task": "logic-syllogism"
   }
  ],
  "repeat_offenders": [
   {
-   "flips": 31,
-   "latest": "broke on 2026-09-12",
+   "flips": 37,
+   "latest": "broke on 2026-10-05",
    "model": "xai:grok-4-fast",
    "task": "nth-char"
   },
   {
-   "flips": 26,
-   "latest": "recovered on 2026-09-12",
-   "model": "xai:grok-4.3",
-   "task": "days-feb-2024"
-  },
-  {
-   "flips": 25,
-   "latest": "broke on 2026-09-12",
+   "flips": 33,
+   "latest": "broke on 2026-10-05",
    "model": "xai:grok-4.3",
    "task": "extract-year"
   },
   {
-   "flips": 23,
-   "latest": "broke on 2026-09-12",
-   "model": "xai:grok-4-fast",
-   "task": "logic-syllogism"
+   "flips": 32,
+   "latest": "recovered on 2026-10-05",
+   "model": "xai:grok-4.3",
+   "task": "days-feb-2024"
   },
   {
-   "flips": 22,
-   "latest": "recovered on 2026-09-12",
+   "flips": 31,
+   "latest": "broke on 2026-10-05",
    "model": "anthropic:claude-sonnet-5",
    "task": "count-s-mississippi"
   },
   {
-   "flips": 22,
-   "latest": "recovered on 2026-09-11",
-   "model": "xai:grok-4.3",
-   "task": "count-r"
-  },
-  {
-   "flips": 20,
-   "latest": "broke on 2026-09-12",
-   "model": "xai:grok-4.3",
-   "task": "constraint-no-e"
-  },
-  {
-   "flips": 20,
-   "latest": "recovered on 2026-09-12",
-   "model": "xai:grok-4.3",
-   "task": "count-s-mississippi"
-  },
-  {
-   "flips": 19,
-   "latest": "broke on 2026-09-07",
+   "flips": 29,
+   "latest": "broke on 2026-10-05",
    "model": "anthropic:claude-fable-5",
    "task": "nth-char"
   },
   {
-   "flips": 19,
-   "latest": "recovered on 2026-09-08",
+   "flips": 29,
+   "latest": "broke on 2026-10-05",
+   "model": "xai:grok-4.3",
+   "task": "count-r"
+  },
+  {
+   "flips": 28,
+   "latest": "recovered on 2026-10-05",
+   "model": "xai:grok-4-fast",
+   "task": "logic-syllogism"
+  },
+  {
+   "flips": 25,
+   "latest": "recovered on 2026-09-30",
    "model": "xai:grok-4-fast",
    "task": "nth-word"
   },
   {
-   "flips": 16,
-   "latest": "broke on 2026-09-11",
-   "model": "anthropic:claude-fable-5",
-   "task": "float-subtract"
-  },
-  {
-   "flips": 16,
-   "latest": "broke on 2026-09-12",
-   "model": "xai:grok-4-fast",
-   "task": "fact-planet"
-  },
-  {
-   "flips": 14,
-   "latest": "broke on 2026-09-12",
+   "flips": 24,
+   "latest": "broke on 2026-10-03",
    "model": "anthropic:claude-sonnet-5",
    "task": "fact-planet"
   },
   {
-   "flips": 14,
-   "latest": "recovered on 2026-09-11",
+   "flips": 24,
+   "latest": "recovered on 2026-10-03",
+   "model": "xai:grok-4.3",
+   "task": "count-s-mississippi"
+  },
+  {
+   "flips": 23,
+   "latest": "recovered on 2026-09-30",
+   "model": "xai:grok-4.3",
+   "task": "constraint-no-e"
+  },
+  {
+   "flips": 22,
+   "latest": "broke on 2026-09-25",
+   "model": "anthropic:claude-fable-5",
+   "task": "float-subtract"
+  },
+  {
+   "flips": 17,
+   "latest": "recovered on 2026-09-24",
+   "model": "xai:grok-4-fast",
+   "task": "fact-planet"
+  },
+  {
+   "flips": 16,
+   "latest": "recovered on 2026-09-23",
    "model": "xai:grok-4.3",
    "task": "fact-planet"
   },
@@ -3036,22 +2309,46 @@
    "task": "count-r"
   },
   {
-   "flips": 10,
-   "latest": "recovered on 2026-09-01",
+   "flips": 12,
+   "latest": "broke on 2026-09-20",
+   "model": "anthropic:claude-opus-4-8",
+   "task": "constraint-no-e"
+  },
+  {
+   "flips": 12,
+   "latest": "recovered on 2026-09-22",
    "model": "anthropic:claude-sonnet-5",
    "task": "fact-capital"
   },
   {
-   "flips": 10,
-   "latest": "recovered on 2026-08-30",
+   "flips": 12,
+   "latest": "recovered on 2026-10-05",
+   "model": "google:gemini-3.5-flash",
+   "task": "float-subtract"
+  },
+  {
+   "flips": 12,
+   "latest": "recovered on 2026-10-04",
    "model": "xai:grok-4-fast",
    "task": "sort-magnitude"
   },
   {
+   "flips": 11,
+   "latest": "broke on 2026-09-30",
+   "model": "xai:grok-4.5",
+   "task": "fact-element"
+  },
+  {
+   "flips": 10,
+   "latest": "recovered on 2026-10-03",
+   "model": "xai:grok-4.3",
+   "task": "nth-char"
+  },
+  {
    "flips": 9,
-   "latest": "recovered on 2026-09-12",
-   "model": "anthropic:claude-opus-4-8",
-   "task": "constraint-no-e"
+   "latest": "broke on 2026-10-05",
+   "model": "xai:grok-4-fast",
+   "task": "math-order"
   },
   {
    "flips": 8,
@@ -3060,28 +2357,22 @@
    "task": "sort-magnitude"
   },
   {
-   "flips": 8,
-   "latest": "recovered on 2026-08-22",
-   "model": "xai:grok-4-fast",
-   "task": "math-order"
-  },
-  {
    "flips": 7,
-   "latest": "broke on 2026-09-08",
-   "model": "google:gemini-3.5-flash",
-   "task": "if-no-preamble"
-  },
-  {
-   "flips": 7,
-   "latest": "broke on 2026-09-10",
-   "model": "xai:grok-4.5",
-   "task": "fact-element"
+   "latest": "broke on 2026-10-05",
+   "model": "xai:grok-4.3",
+   "task": "fmt-list"
   },
   {
    "flips": 6,
-   "latest": "recovered on 2026-09-08",
-   "model": "google:gemini-3.5-flash",
-   "task": "if-one-word"
+   "latest": "recovered on 2026-09-23",
+   "model": "google:gemini-3.1-pro",
+   "task": "count-s-mississippi"
+  },
+  {
+   "flips": 6,
+   "latest": "broke on 2026-10-04",
+   "model": "groq:gpt-oss-120b",
+   "task": "needle-extract"
   },
   {
    "flips": 6,
@@ -3096,75 +2387,51 @@
    "task": "fact-element"
   },
   {
-   "flips": 6,
-   "latest": "recovered on 2026-09-12",
-   "model": "xai:grok-4.3",
-   "task": "fmt-list"
-  },
-  {
-   "flips": 6,
-   "latest": "recovered on 2026-08-26",
-   "model": "xai:grok-4.3",
-   "task": "nth-char"
-  },
-  {
    "flips": 5,
-   "latest": "broke on 2026-08-08",
-   "model": "google:gemini-3.1-pro",
-   "task": "count-s-mississippi"
+   "latest": "recovered on 2026-10-01",
+   "model": "groq:gpt-oss-20b",
+   "task": "compare-decimals"
   },
   {
-   "flips": 5,
-   "latest": "broke on 2026-08-21",
+   "flips": 4,
+   "latest": "recovered on 2026-09-21",
+   "model": "anthropic:claude-fable-5",
+   "task": "fact-element"
+  },
+  {
+   "flips": 4,
+   "latest": "recovered on 2026-09-29",
+   "model": "anthropic:claude-opus-4-8",
+   "task": "fact-element"
+  },
+  {
+   "flips": 4,
+   "latest": "recovered on 2026-09-13",
+   "model": "anthropic:claude-sonnet-5",
+   "task": "sort-magnitude"
+  },
+  {
+   "flips": 4,
+   "latest": "recovered on 2026-08-07",
    "model": "google:gemini-3.1-pro",
    "task": "float-subtract"
   },
   {
-   "flips": 5,
-   "latest": "broke on 2026-08-21",
+   "flips": 4,
+   "latest": "recovered on 2026-08-07",
    "model": "google:gemini-3.1-pro",
    "task": "json-word-count"
   },
   {
-   "flips": 5,
-   "latest": "broke on 2026-08-21",
+   "flips": 4,
+   "latest": "recovered on 2026-08-07",
    "model": "google:gemini-3.1-pro",
    "task": "no-overrefuse-kill"
   },
   {
-   "flips": 5,
-   "latest": "broke on 2026-08-26",
-   "model": "google:gemini-3.5-flash",
-   "task": "fact-capital"
-  },
-  {
-   "flips": 5,
-   "latest": "broke on 2026-09-06",
-   "model": "google:gemini-3.5-flash",
-   "task": "if-json"
-  },
-  {
-   "flips": 5,
-   "latest": "broke on 2026-09-02",
-   "model": "google:gemini-3.5-flash",
-   "task": "multi-step-math"
-  },
-  {
-   "flips": 5,
-   "latest": "broke on 2026-08-25",
-   "model": "google:gemini-3.5-flash",
-   "task": "nth-word"
-  },
-  {
-   "flips": 5,
-   "latest": "broke on 2026-08-31",
-   "model": "google:gemini-3.5-flash",
-   "task": "sort-numeric"
-  },
-  {
    "flips": 4,
-   "latest": "broke on 2026-08-20",
-   "model": "google:gemini-3.5-flash",
+   "latest": "recovered on 2026-09-23",
+   "model": "xai:grok-4.3",
    "task": "logic-syllogism"
   },
   {
@@ -3172,228 +2439,6 @@
    "latest": "recovered on 2026-09-04",
    "model": "xai:grok-4.5",
    "task": "if-no-preamble"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-09-12",
-   "model": "anthropic:claude-sonnet-5",
-   "task": "sort-magnitude"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-09-03",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "compare-negatives"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-27",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "constraint-no-e"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-09-03",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "fact-capital"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-24",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "if-no-preamble"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-09-04",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "math-percent"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-09-05",
-   "model": "google:gemini-3.1-flash-lite",
-   "task": "nth-word"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-21",
-   "model": "google:gemini-3.1-pro",
-   "task": "compare-negatives"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-21",
-   "model": "google:gemini-3.1-pro",
-   "task": "constraint-no-e"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-21",
-   "model": "google:gemini-3.1-pro",
-   "task": "fact-capital"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-09",
-   "model": "google:gemini-3.1-pro",
-   "task": "fact-planet"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-21",
-   "model": "google:gemini-3.1-pro",
-   "task": "fmt-exact-token"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-09",
-   "model": "google:gemini-3.1-pro",
-   "task": "fmt-repeat-join"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-09",
-   "model": "google:gemini-3.1-pro",
-   "task": "fmt-uppercase"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-21",
-   "model": "google:gemini-3.1-pro",
-   "task": "needle-extract"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-21",
-   "model": "google:gemini-3.1-pro",
-   "task": "sort-magnitude"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "compare-decimals"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "constraint-no-e"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "count-r"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "count-s-mississippi"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "days-feb-2024"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "extract-year"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "fact-element"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "fact-planet"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-05",
-   "model": "google:gemini-3.5-flash",
-   "task": "float-subtract"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "fmt-csv-nospace"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "fmt-exact-token"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "fmt-list"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "fmt-repeat-join"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "fmt-uppercase"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "math-order"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "math-percent"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "no-overrefuse"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "reason-older"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "reverse-str"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "unit-minutes"
-  },
-  {
-   "flips": 3,
-   "latest": "broke on 2026-08-14",
-   "model": "google:gemini-3.5-flash",
-   "task": "vowel-json"
   },
   {
    "flips": 2,
@@ -3415,12 +2460,6 @@
   },
   {
    "flips": 2,
-   "latest": "recovered on 2026-09-11",
-   "model": "anthropic:claude-fable-5",
-   "task": "fact-element"
-  },
-  {
-   "flips": 2,
    "latest": "recovered on 2026-08-06",
    "model": "anthropic:claude-fable-5",
    "task": "multi-step-math"
@@ -3445,9 +2484,9 @@
   },
   {
    "flips": 2,
-   "latest": "recovered on 2026-08-08",
-   "model": "anthropic:claude-opus-4-8",
-   "task": "fact-element"
+   "latest": "recovered on 2026-09-14",
+   "model": "anthropic:claude-sonnet-5",
+   "task": "constraint-no-e"
   },
   {
    "flips": 2,
@@ -3457,15 +2496,105 @@
   },
   {
    "flips": 2,
-   "latest": "recovered on 2026-09-05",
+   "latest": "recovered on 2026-09-23",
    "model": "google:gemini-3.1-flash-lite",
+   "task": "if-json"
+  },
+  {
+   "flips": 2,
+   "latest": "recovered on 2026-09-23",
+   "model": "google:gemini-3.1-flash-lite",
+   "task": "if-no-preamble"
+  },
+  {
+   "flips": 2,
+   "latest": "recovered on 2026-09-23",
+   "model": "google:gemini-3.1-flash-lite",
+   "task": "if-one-word"
+  },
+  {
+   "flips": 2,
+   "latest": "recovered on 2026-08-07",
+   "model": "google:gemini-3.1-pro",
+   "task": "compare-negatives"
+  },
+  {
+   "flips": 2,
+   "latest": "recovered on 2026-07-31",
+   "model": "google:gemini-3.1-pro",
+   "task": "constraint-no-e"
+  },
+  {
+   "flips": 2,
+   "latest": "recovered on 2026-09-23",
+   "model": "google:gemini-3.1-pro",
+   "task": "fact-capital"
+  },
+  {
+   "flips": 2,
+   "latest": "recovered on 2026-07-31",
+   "model": "google:gemini-3.1-pro",
    "task": "fact-planet"
   },
   {
    "flips": 2,
-   "latest": "recovered on 2026-08-21",
+   "latest": "recovered on 2026-09-23",
    "model": "google:gemini-3.1-pro",
-   "task": "reverse-str"
+   "task": "fmt-exact-token"
+  },
+  {
+   "flips": 2,
+   "latest": "recovered on 2026-07-31",
+   "model": "google:gemini-3.1-pro",
+   "task": "fmt-repeat-join"
+  },
+  {
+   "flips": 2,
+   "latest": "recovered on 2026-07-31",
+   "model": "google:gemini-3.1-pro",
+   "task": "fmt-uppercase"
+  },
+  {
+   "flips": 2,
+   "latest": "recovered on 2026-09-23",
+   "model": "google:gemini-3.1-pro",
+   "task": "if-json"
+  },
+  {
+   "flips": 2,
+   "latest": "recovered on 2026-08-07",
+   "model": "google:gemini-3.1-pro",
+   "task": "needle-extract"
+  },
+  {
+   "flips": 2,
+   "latest": "recovered on 2026-09-23",
+   "model": "google:gemini-3.1-pro",
+   "task": "nth-char"
+  },
+  {
+   "flips": 2,
+   "latest": "recovered on 2026-08-07",
+   "model": "google:gemini-3.1-pro",
+   "task": "sort-magnitude"
+  },
+  {
+   "flips": 2,
+   "latest": "recovered on 2026-09-23",
+   "model": "google:gemini-3.1-pro",
+   "task": "unit-minutes"
+  },
+  {
+   "flips": 2,
+   "latest": "recovered on 2026-09-23",
+   "model": "google:gemini-3.1-pro",
+   "task": "vowel-json"
+  },
+  {
+   "flips": 2,
+   "latest": "recovered on 2026-08-07",
+   "model": "google:gemini-3.5-flash",
+   "task": "if-no-preamble"
   },
   {
    "flips": 2,
@@ -3523,9 +2652,9 @@
   },
   {
    "flips": 2,
-   "latest": "recovered on 2026-08-08",
+   "latest": "recovered on 2026-09-24",
    "model": "xai:grok-4.3",
-   "task": "logic-syllogism"
+   "task": "if-no-preamble"
   },
   {
    "flips": 2,
