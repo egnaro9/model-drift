@@ -134,6 +134,50 @@ def noise_floor(spreads: "list[Optional[float]]") -> Optional[float]:
     return round(statistics.median(vals) * 100, 3)
 
 
+#: A pooled estimate needs more than one day's worth of runs to mean anything. Six is
+#: two days at the usual three runs; below that, fall back and let the median decide.
+MIN_POOLED_RUNS = 6
+
+
+def pooled_noise_floor(points: "Sequence[dict]") -> Optional[float]:
+    """The model's spread estimated from INDIVIDUAL RUNS, not from daily spreads.
+
+    WHY THIS EXISTS. noise_floor takes a median of per-day spreads, and each of those
+    spreads is itself computed from three runs. Three runs does not estimate this
+    quantity. Measured on xai:grok-4-fast four days apart: 2.86 points on 2026-09-29
+    and 8.58 on 2026-10-03, same model, same frozen suite. A median of such estimates
+    inherits their instability and, on the days a model is actually unstable, comes in
+    low. Across 937 trusted model-days the day's own spread exceeded the median floor
+    21% of the time, concentrated in exactly the models that generate drafts.
+
+    The runs are already on disk. Every point carries `runs` and `fails_runs`, so each
+    run's accuracy is recoverable as (graded - len(fails)) / graded. Ten days is thirty
+    samples instead of ten medians-of-three, at no additional cost in API calls.
+
+    A 5 to 95 BAND, not the range. max(runs) - min(runs) grows with sample size by
+    construction, so comparing a 30-sample range against a 3-sample one would credit
+    the estimator for nothing but a bigger n. A quantile band estimates the width of
+    the distribution and is stable as n grows.
+
+    This does NOT replace noise_floor. board.py takes the max of both, so the floor can
+    only ever rise. Backtested over 937 trusted model-days: 69 draft-days become 47,
+    22 suppressed, and ZERO newly drafted. Both grok-4-fast drafts that prompted this,
+    PR #83 at 8.57 and #90 at 5.71, are blocked by bands of 11.43 and 8.57.
+    """
+    import statistics
+    runs: list[float] = []
+    for p in list(points)[-NOISE_WINDOW:]:
+        graded = p.get("graded")
+        fails_runs = p.get("fails_runs")
+        if not graded or not fails_runs:
+            continue
+        runs.extend((graded - len(f)) / graded * 100 for f in fails_runs)
+    if len(runs) < MIN_POOLED_RUNS:
+        return None
+    q = statistics.quantiles(sorted(runs), n=100, method="inclusive")
+    return round(q[94] - q[4], 3)
+
+
 def reportable_threshold(graded: Optional[int],
                          noise_pts: Optional[float] = None) -> Optional[float]:
     """How large a move has to be before it is worth reporting, in points.

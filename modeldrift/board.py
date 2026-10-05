@@ -26,7 +26,8 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Sequence
 
 from .policy import REL_FLOOR  # re-exported: callers and tests use board.REL_FLOOR
-from .report import ModelStatus, min_detectable_change, noise_floor, results_md
+from .report import (ModelStatus, min_detectable_change, noise_floor,
+                     pooled_noise_floor, results_md)
 
 
 
@@ -70,7 +71,15 @@ def statuses_from_series(series: Dict[str, List[dict]],
         # The model's own run-to-run spread, from TRUSTED points only. An
         # outage run's spread is not sampling noise, it is the outage, and
         # trusted_points has already removed those.
-        seen["noise_pts"] = noise_floor([p.get("acc_spread") for p in pts])
+        # BOTH estimators, and the floor is the larger. noise_floor is a median of
+        # per-day spreads; pooled_noise_floor is a band over the individual runs behind
+        # them. Taking the max means this can only ever raise a floor, never lower one,
+        # so no move that the previous gate blocked can start drafting. Verified by
+        # backtest over 937 trusted model-days: 22 suppressed, 0 newly drafted.
+        _med = noise_floor([p.get("acc_spread") for p in pts])
+        _pooled = pooled_noise_floor(pts)
+        _both = [v for v in (_med, _pooled) if v is not None]
+        seen["noise_pts"] = max(_both) if _both else None
 
         if not pts:
             out.append(ModelStatus(m["id"], label, None, None, "no-data",

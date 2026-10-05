@@ -177,3 +177,114 @@ def test_unknown_floor_still_reports():
     """A row predating graded_total must not be silently suppressed; the evidence
     line says the floor is UNKNOWN instead."""
     assert clears_floor(2.0, None) is True
+
+
+# ----------------------------------------- pooled_noise_floor, added 2026-10-05
+#
+# The median-of-daily-spreads floor is built from three-run estimates, and three runs
+# does not estimate this quantity: grok-4-fast measured 2.86 points of spread on
+# 2026-09-29 and 8.58 on 2026-10-03, same model, same frozen suite. These tests pin the
+# pooled estimator and, more importantly, pin that it can never LOWER a floor.
+
+def _pt(graded, fails_per_run):
+    return {"graded": graded, "runs": len(fails_per_run), "fails_runs": fails_per_run}
+
+
+def test_pooled_floor_is_none_below_the_minimum_sample():
+    """Fewer than MIN_POOLED_RUNS runs is not an estimate, and returning a number
+    anyway would be the whole defect this function exists to fix, one layer in."""
+    from modeldrift.report import pooled_noise_floor, MIN_POOLED_RUNS
+    pts = [_pt(35, [[], ["a"]])]                       # 2 runs
+    assert pooled_noise_floor(pts) is None
+    assert MIN_POOLED_RUNS >= 6
+
+
+def test_pooled_floor_sees_spread_that_daily_medians_hide():
+    """Every DAY is internally consistent, so every per-day spread is 0 and the median
+    floor is 0. The model still moves between days. The pooled band sees it."""
+    import statistics
+    from modeldrift.report import noise_floor, pooled_noise_floor
+    pts = ([_pt(35, [[], [], []]) for _ in range(5)] +          # 3 days at 100%
+           [_pt(35, [["a"]*7]*3) for _ in range(5)])            # 3 days at 80%
+    assert noise_floor([0.0] * 10) == 0.0
+    pooled = pooled_noise_floor(pts)
+    assert pooled is not None and pooled > 10, pooled
+
+
+def test_pooled_floor_is_a_band_not_a_range():
+    """max - min grows with n by construction, so it would credit the estimator for
+    nothing but a bigger sample. One extreme run must not set the floor on its own."""
+    from modeldrift.report import pooled_noise_floor
+    steady = [_pt(35, [[], [], []]) for _ in range(9)]
+    with_outlier = steady + [_pt(35, [["x"] * 35])]      # one run at 0%
+    assert pooled_noise_floor(steady) == 0.0
+    assert pooled_noise_floor(with_outlier) < 50.0
+
+
+def test_board_floor_never_falls_below_the_median_floor():
+    """THE property the whole change rests on, driven through board.py itself.
+
+    The first version of this test computed max() on its own values and asserted the
+    result, which is a test of the `max` builtin. Replacing board.py's
+    `max(_med, _pooled)` with plain `_pooled` passed all 368 tests. A test that cannot
+    fail is the defect this repository exists to catch, so it has to drive the real
+    line: a series where the pooled band is NARROWER than the median floor, where
+    taking the pooled value alone would silently lower the gate.
+    """
+    from modeldrift.board import statuses_from_series
+    from modeldrift.report import noise_floor, pooled_noise_floor
+    # THE REALISTIC WAY THE TWO DISAGREE, and it is not contrived. The two estimators
+    # read different subsets: noise_floor needs `acc_spread`, pooled_noise_floor needs
+    # `fails_runs`. Older rows predate per-point run emission and carry the first
+    # without the second, which board.py's own docstring already notes. So a history of
+    # noisy days with no per-run detail, plus a few recent quiet days that have it,
+    # leaves the median high and the pooled band near zero.
+    pts = []
+    for i in range(7):                      # noisy, spread recorded, no per-run detail
+        pts.append({"acc": 30 / 35, "acc_spread": 5 / 35, "reliability": 1.0,
+                    "graded": 35, "t": f"2026-09-{i + 10:02d}T00:00:00Z"})
+    for i in range(3):                      # quiet, and the only days pooled can see
+        q = _pt(35, [[], [], []])
+        q.update(acc=1.0, acc_spread=0.0, reliability=1.0,
+                 t=f"2026-09-{i + 17:02d}T00:00:00Z")
+        pts.append(q)
+    med, pooled = noise_floor([p["acc_spread"] for p in pts]), pooled_noise_floor(pts)
+    assert pooled is not None and pooled < med, (
+        f"fixture does not exercise the property: pooled={pooled} med={med}")
+
+    st = statuses_from_series({"m:x": pts}, [{"id": "m:x", "label": "m"}])
+    assert st[0].noise_pts == med, (
+        f"board lowered the floor to {st[0].noise_pts}; the median was {med}. "
+        "max(median, pooled) is what keeps this change from creating false positives.")
+
+
+def test_board_raises_the_floor_when_the_pooled_band_is_wider():
+    """The mirror, and it was missing. Dropping pooled_noise_floor from board.py
+    entirely passed all 368 tests, so nothing held the benefit of this change, only its
+    safety. This is the grok-4-fast shape: every DAY internally consistent, so every
+    per-day spread is 0 and the median floor is 0, while the model moves between days.
+    """
+    from modeldrift.board import statuses_from_series
+    from modeldrift.report import noise_floor, pooled_noise_floor
+    pts = []
+    for i in range(5):                       # five days pinned at 100%
+        q = _pt(35, [[], [], []])
+        q.update(acc=1.0, acc_spread=0.0, reliability=1.0,
+                 t=f"2026-09-{i + 10:02d}T00:00:00Z")
+        pts.append(q)
+    for i in range(5):                       # five days pinned at 80%, still spread 0
+        q = _pt(35, [["x"] * 7] * 3)
+        q.update(acc=28 / 35, acc_spread=0.0, reliability=1.0,
+                 t=f"2026-09-{i + 15:02d}T00:00:00Z")
+        pts.append(q)
+
+    med, pooled = noise_floor([p["acc_spread"] for p in pts]), pooled_noise_floor(pts)
+    assert med == 0.0, f"fixture broken: median should be 0, got {med}"
+    assert pooled is not None and pooled > 10, (
+        f"fixture does not exercise the property: pooled={pooled}")
+
+    st = statuses_from_series({"m:x": pts}, [{"id": "m:x", "label": "m"}])
+    assert st[0].noise_pts == pooled, (
+        f"board reported {st[0].noise_pts}; the pooled band was {pooled} and the median "
+        "was 0. Without pooled the gate would compare a real 20-point move against a "
+        "floor of 2.86 and draft it, which is what this change exists to stop.")
