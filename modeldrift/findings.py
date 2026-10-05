@@ -49,6 +49,10 @@ class Finding:
     # Date of the run this describes, for findings that have one. Harness
     # findings span many days and leave it None.
     when: Optional[str] = None
+    # {"model": registry id, "move_pts": float} when a confirming probe could settle
+    # this finding, None when it could not. Only score moves qualify: re-running the
+    # suite measures accuracy, so it can test a claimed accuracy move and nothing else.
+    confirm: Optional[Dict[str, Any]] = None
 
     def fingerprint(self) -> str:
         """Identity of the *event*, not of the day it was noticed.
@@ -131,6 +135,7 @@ def regressions_and_recoveries(statuses: Sequence[ModelStatus]) -> List[Finding]
             kind=kind,
             about=ABOUT_MODELS,
             subject=s.id,
+            confirm={"model": s.id, "move_pts": round(move_pts, 3)},
             headline=f"{s.label} {_pts(s.delta)} to {s.latest * 100:.1f}%",
             run_key=[f"{s.id}@{s.when}"],
             when=s.when,
@@ -428,6 +433,13 @@ def main(argv: Optional[List[str]] = None) -> int:
             fh.write(f"drafts={' '.join(written)}\n")
             fh.write(f"count={len(written)}\n")
             fh.write(f"headline={fresh[0].headline}\n")
+            # WHAT A CONFIRMING RUN CAN TEST, and it is not everything. A score
+            # regression can be re-probed and compared against a fresh spread. A task
+            # flip or a harness finding cannot: re-running accuracy says nothing about
+            # whether a task flipped. Emitting only the testable ones keeps the gate
+            # from claiming to have confirmed something it never looked at.
+            fh.write("confirmable=" + json.dumps(
+                [f.confirm for f in fresh if f.confirm]) + "\n")
     return 0
 
 

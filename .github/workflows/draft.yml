@@ -41,10 +41,99 @@ jobs:
         if: steps.find.outputs.count != ''
         run: python -m modeldrift.publish --posts posts --out posts/index.json
 
+
+      # CONFIRM BEFORE DRAFTING, added 2026-10-05.
+      #
+      # WHY. Three findings have been put through a confirming run in this project's
+      # life. All three died. #72 was merged three minutes after it opened and retired
+      # six minutes later, when three fresh probes put the model's spread at 8.57
+      # against the 4.3 it had reported. #83 and #90 sat open for days and died the
+      # same way. Confirming was manual, so it happened three times in eleven days,
+      # and the thing that settles a finding ran less often than the thing that
+      # produces one.
+      #
+      # The floor is an ESTIMATE from stored history. This is a MEASUREMENT taken now.
+      # The estimate decides what is worth the cost of measuring; the measurement
+      # decides what gets written up.
+      #
+      # FAIL CLOSED. A probe that errors, lacks a key, or returns fewer than two usable
+      # runs sets survived=false and NO pull request opens. A confirm that could not run
+      # has not confirmed, and the opposite reading is the defect this repository exists
+      # to catch.
+      #
+      # SCOPE, stated because it is a real limit. Only score moves are confirmable.
+      # Re-running the suite measures accuracy, so it can test a claimed accuracy move
+      # and nothing else. A task flip carries confirmable=null and passes this gate
+      # untested, which is honest rather than silent: the PR body says so.
+      - name: Confirm the finding before it becomes a pull request
+        id: confirm
+        if: steps.find.outputs.count != '' && steps.find.outputs.count != '0'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          CONFIRMABLE: ${{ steps.find.outputs.confirmable }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, pathlib, sys
+          from modeldrift.providers import load_registry
+          from modeldrift.run import probe_repeated
+
+          RUNS = 3
+          items = json.loads(os.environ.get("CONFIRMABLE") or "[]")
+          out = pathlib.Path(os.environ["GITHUB_OUTPUT"])
+          summary = pathlib.Path(os.environ["GITHUB_STEP_SUMMARY"])
+
+          if not items:
+              # Nothing a probe can settle. Not a pass and not a failure: the finding
+              # goes forward UNCONFIRMED and the PR body has to say so.
+              summary.write_text("### Confirm: nothing testable\n\n"
+                                 "No score move in this batch, so no confirming probe "
+                                 "was possible. The draft is UNCONFIRMED.\n", "utf-8")
+              out.write_text("survived=true\nconfirmed=none\n", "utf-8")
+              raise SystemExit(0)
+
+          registry = {m.id: m for m in load_registry(os.environ.get("REGISTRY", "modeldrift/models.json"))}
+          lines, survived = ["### Confirm", "", "| model | move | fresh spread | verdict |",
+                             "|---|---|---|---|"], True
+          for it in items:
+              mid, move = it["model"], float(it["move_pts"])
+              m = registry.get(mid)
+              if m is None or not m.available:
+                  lines.append(f"| {mid} | {move:.2f} | n/a | NOT CONFIRMABLE HERE |")
+                  survived = False
+                  continue
+              try:
+                  r = probe_repeated(m, RUNS)
+              except Exception as e:                      # noqa: BLE001
+                  lines.append(f"| {mid} | {move:.2f} | error | PROBE FAILED: {type(e).__name__} |")
+                  survived = False
+                  continue
+              used, spread = r.get("_runs"), r.get("_acc_spread")
+              if not used or used < 2 or spread is None:
+                  lines.append(f"| {mid} | {move:.2f} | {used} usable run(s) | NOT MEASURED |")
+                  survived = False
+                  continue
+              spread_pts = spread * 100
+              ok = move > spread_pts
+              lines.append(f"| {mid} | {move:.2f} | {spread_pts:.2f} | "
+                           f"{'SURVIVES' if ok else 'inside the spread, dropped'} |")
+              survived = survived and ok
+
+          lines += ["", f"**Verdict: {'draft proceeds' if survived else 'no pull request'}**"]
+          summary.write_text("\n".join(lines) + "\n", "utf-8")
+          with out.open("a", encoding="utf-8") as fh:
+              fh.write(f"survived={'true' if survived else 'false'}\n")
+              fh.write(f"confirmed={len(items)}\n")
+          PY
+
       # A draft is worthless if it cannot be read on a phone, and a PR body is
       # where it will be read. The whole post goes in the body, not just a link.
       - name: Open a pull request with the draft
-        if: steps.find.outputs.count != '' && steps.find.outputs.count != '0'
+        if: steps.find.outputs.count != '' && steps.find.outputs.count != '0' && steps.confirm.outputs.survived == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -61,6 +150,17 @@ jobs:
             echo "The daily probe found something. This is a **draft**: its front"
             echo "matter says \`status: draft\`, so it is not on the site and will"
             echo "not be indexed."
+            echo
+            if [ "${{ steps.confirm.outputs.confirmed }}" = "none" ]; then
+              echo "> **UNCONFIRMED.** Nothing in this batch was a score move, so no"
+              echo "> confirming probe could test it. A re-run measures accuracy and"
+              echo "> says nothing about whether a task flipped. Treat this as a lead."
+            else
+              echo "> **CONFIRMED.** ${{ steps.confirm.outputs.confirmed }} finding(s)"
+              echo "> were re-probed before this PR opened, and the move exceeded the"
+              echo "> spread measured in that fresh run. See the Confirm table in the"
+              echo "> job summary for the numbers."
+            fi
             echo
             echo "**To publish:** fill in *What I might have wrong* (a post with"
             echo "nothing to argue with does not open a thread), change"
