@@ -11,7 +11,14 @@ dependencies = []
 license = {text = "MIT"}
 
 [project.optional-dependencies]
-dev = ["pytest>=7"]
+# PyYAML is a TEST dependency only, and runtime dependencies stay at zero.
+# tests/test_confirm_gate.py reads draft.yml structurally, by step name and by the
+# PR step's `if` condition, rather than grepping it, so that editing the workflow
+# edits what the tests assert. Hand-rolling that parse would be worse than one dev
+# dependency. It was missing on 2026-10-05 and CI failed at collection on 024b3ba:
+# the tests passed locally only because the venv had yaml via something else, which
+# is the local-does-not-match-CI trap.
+dev = ["pytest>=7", "pyyaml>=6"]
 
 [project.scripts]
 model-drift = "modeldrift.run:main"
