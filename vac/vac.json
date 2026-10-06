@@ -19,12 +19,12 @@
   "version": {
    "suite_version": "2026-07-v3",
    "suite_hash": "e76f17b6c56e",
-   "board_commit": "9b54122"
+   "board_commit": "d6286ed"
   }
  },
  "protocol": {
   "issuer": "egnaro9/model-drift",
-  "issuer_commit": "9b54122",
+  "issuer_commit": "d6286ed",
   "task": "drift standings board over the frozen probe suite: standings, narrative, and flip analysis derived from the committed per-run rows",
   "hashes": {
    "suite_hash": "e76f17b6c56e",
@@ -53,7 +53,7 @@
   },
   {
    "path": "narrative.json",
-   "sha256": "58122fc454f35bc1392ef6be5cac487772c551fd0b19b98581b2e1aa3538b0d7"
+   "sha256": "90095963021de4d657fe9ee6e36e03d898fa1480f68dc13c19ca0e2f6c1db3c3"
   },
   {
    "path": "standings.json",
@@ -116,10 +116,10 @@
   ]
  },
  "replay": {
-  "issuer_commit": "9b54122",
+  "issuer_commit": "d6286ed",
   "commands": [
    "git clone https://github.com/egnaro9/model-drift issuer",
-   "git -C issuer checkout 9b54122",
+   "git -C issuer checkout d6286ed",
    "rm -rf issuer/vac",
    "( cd issuer && python3 emit_vac.py )",
    "for f in RESULTS.md flips.json drift_board.json models.json narrative.json standings.json suite-fingerprint.json vac.json; do cmp issuer/vac/$f $f || exit 1; done",
