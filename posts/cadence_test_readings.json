@@ -436,6 +436,28 @@
       "views_populated": true,
       "reactions": 1,
       "comments": 0
+    },
+    {
+      "arm": "A",
+      "slug": "2026-09-30-the-grader-reads-the-first-number",
+      "t": "2026-10-06T17:16:17Z",
+      "published_at": "2026-09-30T15:55:43.676Z",
+      "elapsed_h": 145.343,
+      "views": 0,
+      "views_populated": false,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "B",
+      "slug": "2026-10-02-the-gate-could-not-see-what-it-was-gating",
+      "t": "2026-10-06T17:16:17Z",
+      "published_at": "2026-10-03T14:37:55.752Z",
+      "elapsed_h": 74.639,
+      "views": 6,
+      "views_populated": true,
+      "reactions": 1,
+      "comments": 0
     }
   ]
 }
