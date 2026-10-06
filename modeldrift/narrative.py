@@ -370,7 +370,7 @@ def narrate(metrics: dict, registry: Sequence[dict], limit: int = 3) -> dict:
         if out:
             sentences.append(out)
 
-    labs = len({r.group for r in clean if r.group})
+    labs = len({_lab(r.group) for r in clean if r.group})
     lead = (f"A frozen, deterministically-graded suite against "
             f"<strong>{_pl(len(clean), 'model')} across {_pl(labs, 'lab')}</strong>.")
     # When some models didn't report cleanly, say so *before* any superlative.
@@ -388,6 +388,22 @@ def narrate(metrics: dict, registry: Sequence[dict], limit: int = 3) -> dict:
     return {"sentences": sentences, "html": html, "text": _strip(html),
             "models": len(rows), "clean": len(clean), "updated": stamp,
             "claims_fired": len(sentences)}
+
+
+def _lab(group: str) -> str:
+    """The originating lab, with any host qualifier stripped.
+
+    `group` is a LEGEND ROW, not a lab. A model one lab trained and another lab
+    hosts gets its own row so the chart can plot it separately, which is why the
+    registry carries both "OpenAI" and "OpenAI (Groq)". Counting rows and calling
+    the result "labs" published **"17 models across 6 labs"** on 2026-10-05 when
+    the board reached five: OpenAI was counted twice, once direct and once via
+    Groq. The figure also went out in a resume, a dev.to bio and CITATION.cff.
+
+    The suffix is the convention the registry already uses, so this strips it
+    rather than adding a second field that could drift from the first.
+    """
+    return group.split(" (", 1)[0].strip()
 
 
 def _pl(n: int, noun: str) -> str:

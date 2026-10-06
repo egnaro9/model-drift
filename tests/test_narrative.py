@@ -475,3 +475,40 @@ def test_one_dark_model_takes_a_singular_verb():
     'is left out', not 'are left out'. Chosen to go red on the shipped text."""
     text = narrate(*_one_lab_board())["text"]
     assert "1 of the 3 tracked models did not return a clean run and is left out" in text, text
+
+
+def _two_hosts_one_lab_board():
+    """The live board's real shape since Groq-hosted gpt-oss joined: OpenAI is
+    reachable directly AND through Groq, so the registry carries two legend rows
+    for one lab. Synthetic rather than read from drift_board.json so it cannot
+    quietly stop testing if the roster changes."""
+    pt = lambda acc: {"t": "2026-10-05T12:00:00Z", "acc": acc, "latency_ms": 500.0,
+                      "out_chars": 40.0, "reliability": 1.0, "refusal_rate": 0.0}
+    metrics = {"series": {"openai:a": [pt(0.94)], "groq:oss": [pt(0.85)],
+                          "anthropic:c": [pt(0.90)]}}
+    registry = [
+        {"id": "openai:a", "label": "A", "group": "OpenAI", "tier": "flagship"},
+        {"id": "groq:oss", "label": "OSS", "group": "OpenAI (Groq)", "tier": "mid"},
+        {"id": "anthropic:c", "label": "C", "group": "Anthropic", "tier": "mid"},
+    ]
+    return metrics, registry
+
+
+def test_one_lab_on_two_hosts_is_counted_once():
+    """Shipped wrong: on 2026-10-05 the public page said 'across 6 labs' when the
+    board reached five, because OpenAI was counted twice, once direct and once via
+    Groq. group is a legend row; the lab is group minus its host qualifier."""
+    text = narrate(*_two_hosts_one_lab_board())["text"]
+    assert "3 models across 2 labs" in text, text
+    assert "3 labs" not in text, text
+
+
+def test_the_host_qualifier_is_the_only_thing_stripped():
+    """The mirror, so the test above cannot pass by collapsing everything into
+    one lab. Two genuinely different labs must still count as two."""
+    from modeldrift.narrative import _lab
+    assert _lab("OpenAI (Groq)") == "OpenAI"
+    assert _lab("Qwen (Groq)") == "Qwen"
+    assert _lab("xAI") == "xAI"
+    assert len({_lab(g) for g in ["OpenAI", "OpenAI (Groq)", "Qwen (Groq)",
+                                  "Anthropic", "Google", "xAI"]}) == 5

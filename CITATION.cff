@@ -14,7 +14,7 @@ repository-code: "https://github.com/egnaro9/model-drift"
 url: "https://erikhill.dev"
 abstract: >-
   Is My Model Drifting? A public LLM regression tracker: a frozen, hash-
-  fingerprinted suite run daily against 16 models across 5 labs, scoring
+  fingerprinted suite run daily against 17 models across 5 labs, scoring
   accuracy, latency, verbosity, reliability and refusal rate. Deterministic
   grading, no LLM judge.
 keywords:
