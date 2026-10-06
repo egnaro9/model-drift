@@ -10,4 +10,4 @@ I build deterministic evaluation and verification tooling for LLM systems, and I
 
 ---
 
-Full note, with the evidence: https://erikhill.dev/notes/2026-10-21-the-guard-and-its-sibling/ 4/4
+Full note, with the evidence: https://erikhill.dev/notes/2026-10-14-the-guard-and-its-sibling/ 4/4

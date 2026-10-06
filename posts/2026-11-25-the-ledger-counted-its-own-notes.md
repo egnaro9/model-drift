@@ -1,11 +1,11 @@
 ---
 title: "The ledger counted its own notes as work"
-date: 2026-12-02
+date: 2026-11-25
 kind: defect-class
 about: infrastructure
 subject: estate/dedup-ledger
 fingerprint: defect-class:estate/dedup-ledger:29-narration-rows
-destination: https://erikhill.dev/notes/2026-12-02-the-ledger-counted-its-own-notes/
+destination: https://erikhill.dev/notes/2026-11-25-the-ledger-counted-its-own-notes/
 status: draft
 ---
 

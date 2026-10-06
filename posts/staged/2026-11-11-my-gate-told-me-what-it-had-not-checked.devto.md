@@ -3,10 +3,10 @@ title: "My gate told me what it hadn't checked. I didn't read it."
 published: false
 description: "I write verification gates for a living, more or less. The one in question checks a signed-ish capability claim: a JSON bundle asserting that some agent passed some task set, with hashes over the inpu"
 tags: showdev, testing, security, devops
-canonical_url: https://erikhill.dev/notes/2026-11-18-my-gate-told-me-what-it-had-not-checked/
+canonical_url: https://erikhill.dev/notes/2026-11-11-my-gate-told-me-what-it-had-not-checked/
 ---
 
-*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-11-18-my-gate-told-me-what-it-had-not-checked/). The numbers below are checked against the repositories they come from.*
+*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-11-11-my-gate-told-me-what-it-had-not-checked/). The numbers below are checked against the repositories they come from.*
 
 # My gate told me what it hadn't checked. I didn't read it.
 

@@ -3,10 +3,10 @@ title: "My instability detector was reporting the stable models"
 published: false
 description: "A queue of 55 findings said two Gemini models were unstable. Measuring it a second way said they never disagree with themselves. 268 of 895 flips were manufactured by outages my detector never filtered."
 tags: showdev, testing, ai, datascience
-canonical_url: https://erikhill.dev/notes/2026-12-23-detector-reported-the-stable-models/
+canonical_url: https://erikhill.dev/notes/2026-12-09-detector-reported-the-stable-models/
 ---
 
-*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-12-23-detector-reported-the-stable-models/). Every number below is checked against the repository it describes.*
+*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-12-09-detector-reported-the-stable-models/). Every number below is checked against the repository it describes.*
 
 # My instability detector was reporting the stable models
 

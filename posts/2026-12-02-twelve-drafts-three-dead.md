@@ -1,11 +1,11 @@
 ---
 title: "Twelve drafts, three confirmed, three dead, and the queue behind them"
-date: 2026-12-09
+date: 2026-12-02
 kind: method
 about: infrastructure
 subject: model-drift/confirm-before-draft
 fingerprint: method:model-drift/confirm-before-draft:12-drafts-3-dead
-destination: https://erikhill.dev/notes/2026-12-09-twelve-drafts-three-dead/
+destination: https://erikhill.dev/notes/2026-12-02-twelve-drafts-three-dead/
 status: draft
 ---
 

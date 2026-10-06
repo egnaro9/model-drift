@@ -1,11 +1,11 @@
 ---
 title: "My instability detector was reporting the stable models"
-date: 2026-12-23
+date: 2026-12-09
 kind: probe-alarm
 about: infrastructure
 subject: model-drift/flips-outage-filter
 fingerprint: probe-alarm:model-drift/flips-outage-filter:268-of-895
-destination: https://erikhill.dev/notes/2026-12-23-detector-reported-the-stable-models/
+destination: https://erikhill.dev/notes/2026-12-09-detector-reported-the-stable-models/
 status: draft
 ---
 

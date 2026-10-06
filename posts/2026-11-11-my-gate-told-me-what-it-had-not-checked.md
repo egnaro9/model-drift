@@ -1,11 +1,11 @@
 ---
 title: "My gate told me what it hadn't checked. I didn't read it."
-date: 2026-11-18
+date: 2026-11-11
 kind: gate-defect
 about: harness
 subject: egnaro9/vac-gate
 fingerprint: gate-defect:egnaro9/vac-gate:1a9dc23
-destination: https://erikhill.dev/notes/2026-11-18-my-gate-told-me-what-it-had-not-checked/
+destination: https://erikhill.dev/notes/2026-11-11-my-gate-told-me-what-it-had-not-checked/
 status: draft
 ---
 

@@ -3,10 +3,10 @@ title: "The ledger counted its own notes as work"
 published: false
 description: "I audited an append-only ledger before switching a pipeline back on. 1010 lines, zero parse errors. Counting the rows that said an action was taken gave 322. The real number was 293."
 tags: showdev, datascience, python, debugging
-canonical_url: https://erikhill.dev/notes/2026-12-02-the-ledger-counted-its-own-notes/
+canonical_url: https://erikhill.dev/notes/2026-11-25-the-ledger-counted-its-own-notes/
 ---
 
-*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-12-02-the-ledger-counted-its-own-notes/). The numbers below are checked against the repository they come from.*
+*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-11-25-the-ledger-counted-its-own-notes/). The numbers below are checked against the repository they come from.*
 
 I have an automated pipeline that does a thing many times, and writes one JSON line per thing
 it did to an append-only file. That file has two jobs. It is the audit record, and it is the

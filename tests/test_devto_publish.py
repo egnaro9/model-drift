@@ -8,11 +8,25 @@ import sys, pathlib, pytest
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "tools"))
 import devto_publish as D
 
-SLUG = "2026-10-28-the-clone-is-part-of-the-check"
+# Derived, not pinned. This used to read
+# SLUG = "2026-10-28-the-clone-is-part-of-the-check", and the 2026-10-06 cascade
+# that moved every draft up one week renamed that file out from under it. The
+# test was right to go red, but it went red for the filename rather than for the
+# behaviour it guards, which is the pinned-filename time bomb in another costume.
+# Any post on disk exercises title_of equally well, so take one and read the
+# expected title from the same file instead of restating it here.
+import re as _re
+_POST = sorted(pathlib.Path(__file__).resolve().parent.parent.glob("posts/2026-*.md"))[0]
+SLUG = _POST.stem
+EXPECTED_TITLE = _re.search(r'^title:\s*"?(.+?)"?\s*$', _POST.read_text(encoding="utf-8"), _re.M).group(1)
 
 
 def test_reads_the_title_from_front_matter():
-    assert D.title_of(SLUG).startswith("A shallow clone does not fail")
+    """title_of() must return the front-matter title for a real post. Both sides
+    come from the same file, so this survives a rename and still fails if
+    title_of stops parsing front matter."""
+    assert D.title_of(SLUG) == EXPECTED_TITLE
+    assert EXPECTED_TITLE, "fixture post has an empty title; the test would pass vacuously"
 
 
 def test_refuses_a_slug_with_no_post():

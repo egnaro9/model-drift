@@ -1,11 +1,11 @@
 ---
 title: "A check that cannot fail has never passed"
-date: 2026-11-11
+date: 2026-11-04
 kind: defect-class
 about: harness
 subject: harness/staleness-checks
 fingerprint: defect-class:harness/staleness-checks:d39bc74
-destination: https://erikhill.dev/notes/2026-11-11-a-check-that-cannot-fail/
+destination: https://erikhill.dev/notes/2026-11-04-a-check-that-cannot-fail/
 status: draft
 ---
 

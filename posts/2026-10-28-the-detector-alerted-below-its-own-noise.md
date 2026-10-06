@@ -1,11 +1,11 @@
 ---
 title: "My regression detector alerted on 4.3 points. The model moves 8.57 between runs."
-date: 2026-11-04
+date: 2026-10-28
 kind: defect-class
 about: harness
 subject: model-drift/noise-floor
 fingerprint: defect-class:model-drift/noise-floor:2026-09-23
-destination: https://erikhill.dev/notes/2026-11-04-the-detector-alerted-below-its-own-noise/
+destination: https://erikhill.dev/notes/2026-10-28-the-detector-alerted-below-its-own-noise/
 status: draft
 ---
 

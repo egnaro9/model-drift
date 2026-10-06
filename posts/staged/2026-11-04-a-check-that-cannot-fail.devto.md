@@ -3,10 +3,10 @@ title: "A check that cannot fail has never passed"
 published: false
 description: "version Yesterday I went to verify a number in my own portfolio: ten repositories, a recorded total of 290 tests. I ran every suite. The real number is 683 passing, and nine of the ten per-repo figure"
 tags: showdev, testing, devops, python
-canonical_url: https://erikhill.dev/notes/2026-11-11-a-check-that-cannot-fail/
+canonical_url: https://erikhill.dev/notes/2026-11-04-a-check-that-cannot-fail/
 ---
 
-*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-11-11-a-check-that-cannot-fail/). The numbers below are checked against the repositories they come from.*
+*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-11-04-a-check-that-cannot-fail/). The numbers below are checked against the repositories they come from.*
 
 # A check that cannot fail has never passed
 

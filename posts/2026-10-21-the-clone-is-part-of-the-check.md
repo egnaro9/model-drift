@@ -1,12 +1,13 @@
 ---
 title: "A shallow clone does not fail your history check. It answers it."
-published: false
-description: "I committed a new check at 18:44:13 and the run that caught it failing started at 18:44:22. Nine seconds. It had passed locally, 282 tests green. In CI it accused my own commit of "
-tags: showdev, testing, ai
-canonical_url: https://erikhill.dev/notes/2026-10-28-the-clone-is-part-of-the-check/
+date: 2026-10-21
+kind: defect-class
+about: harness
+subject: estate/instrument-environment
+fingerprint: defect-class:estate/instrument-environment:2026-09-23
+destination: https://erikhill.dev/notes/2026-10-21-the-clone-is-part-of-the-check/
+status: draft
 ---
-
-*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-10-28-the-clone-is-part-of-the-check/). The numbers below are checked against the repository they come from.*
 
 # A shallow clone does not fail your history check. It answers it.
 

@@ -10,4 +10,4 @@ I build deterministic evaluation and verification tooling for LLM systems, and I
 
 ---
 
-Full note, with the evidence: https://erikhill.dev/notes/2026-11-04-the-detector-alerted-below-its-own-noise/ 4/4
+Full note, with the evidence: https://erikhill.dev/notes/2026-10-28-the-detector-alerted-below-its-own-noise/ 4/4

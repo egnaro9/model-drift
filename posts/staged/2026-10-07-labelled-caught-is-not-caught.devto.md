@@ -1,13 +1,12 @@
 ---
 title: "Our mutation score said 42 of 46 caught. It meant 42 of 46 labelled."
-date: 2026-10-14
-kind: evidence-gap
-about: harness
-subject: evalmut/dogfood-witness
-fingerprint: evidence-gap:evalmut/dogfood-witness:4212cb4
-destination: https://erikhill.dev/notes/2026-10-14-labelled-caught-is-not-caught/
-status: draft
+published: false
+description: "evalmut takes an eval case your grader already passes, plants a known defect in the output, and reruns the grader. If the grader still passes a provably wrong output, that is a hol"
+tags: showdev, testing, ai
+canonical_url: https://erikhill.dev/notes/2026-10-07-labelled-caught-is-not-caught/
 ---
+
+*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-10-07-labelled-caught-is-not-caught/). The numbers below are checked against the repository they come from.*
 
 # Our mutation score said 42 of 46 caught. It meant 42 of 46 labelled.
 

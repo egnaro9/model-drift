@@ -3,10 +3,10 @@ title: "My regression detector alerted on 4.3 points. The model moves 8.57 betwe
 published: false
 description: "On 2026-09-23 my drift tracker reported Grok 4.3 down 4.3 points, to 91.4%. The pipeline drafted it automatically, as designed: a finding clears a threshold, a note gets written, a"
 tags: showdev, testing, ai
-canonical_url: https://erikhill.dev/notes/2026-11-04-the-detector-alerted-below-its-own-noise/
+canonical_url: https://erikhill.dev/notes/2026-10-28-the-detector-alerted-below-its-own-noise/
 ---
 
-*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-11-04-the-detector-alerted-below-its-own-noise/). The numbers below are checked against the repository they come from.*
+*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-10-28-the-detector-alerted-below-its-own-noise/). The numbers below are checked against the repository they come from.*
 
 # My regression detector alerted on 4.3 points. The model moves 8.57 between runs.
 

@@ -3,10 +3,10 @@ title: "Twelve drafts, three confirmed, three dead, and the queue behind them"
 published: false
 description: "My drift detector opened twelve pull requests in eleven days. Three have been through a confirming run. All three died, and the queue behind them is 55 deep."
 tags: showdev, testing, ai, datascience
-canonical_url: https://erikhill.dev/notes/2026-12-09-twelve-drafts-three-dead/
+canonical_url: https://erikhill.dev/notes/2026-12-02-twelve-drafts-three-dead/
 ---
 
-*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-12-09-twelve-drafts-three-dead/). Every number below is checked against the repository and the pull request history it describes.*
+*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-12-02-twelve-drafts-three-dead/). Every number below is checked against the repository and the pull request history it describes.*
 
 # Twelve drafts, three confirmed, three dead, and the queue behind them
 

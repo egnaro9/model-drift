@@ -3,10 +3,10 @@ title: "Nine missing tests reported as "1 skipped""
 published: false
 description: "I was correcting a stale badge on one of my repos. The README claimed 30 tests; running the suite gave 33. Fine, bump the number, move on. Except the file defines 36. Three tests existed that pytest n"
 tags: showdev, testing, python, cicd
-canonical_url: https://erikhill.dev/notes/2026-11-25-nine-missing-tests-reported-as-one-skip/
+canonical_url: https://erikhill.dev/notes/2026-11-18-nine-missing-tests-reported-as-one-skip/
 ---
 
-*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-11-25-nine-missing-tests-reported-as-one-skip/). The numbers below are checked against the repositories they come from.*
+*Originally published at [erikhill.dev](https://erikhill.dev/notes/2026-11-18-nine-missing-tests-reported-as-one-skip/). The numbers below are checked against the repositories they come from.*
 
 # Nine missing tests reported as "1 skipped"
 
