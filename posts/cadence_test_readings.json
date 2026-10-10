@@ -524,6 +524,248 @@
       "views_populated": true,
       "reactions": 1,
       "comments": 0
+    },
+    {
+      "arm": "A",
+      "slug": "2026-09-30-the-grader-reads-the-first-number",
+      "t": "2026-10-07T16:37:28Z",
+      "published_at": "2026-09-30T15:55:43.676Z",
+      "elapsed_h": 168.696,
+      "views": 0,
+      "views_populated": false,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "B",
+      "slug": "2026-10-02-the-gate-could-not-see-what-it-was-gating",
+      "t": "2026-10-07T16:37:28Z",
+      "published_at": "2026-10-03T14:37:55.752Z",
+      "elapsed_h": 97.992,
+      "views": 6,
+      "views_populated": true,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "A",
+      "slug": "2026-09-30-the-grader-reads-the-first-number",
+      "t": "2026-10-07T22:03:38Z",
+      "published_at": "2026-09-30T15:55:43.676Z",
+      "elapsed_h": 174.132,
+      "views": 0,
+      "views_populated": false,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "B",
+      "slug": "2026-10-02-the-gate-could-not-see-what-it-was-gating",
+      "t": "2026-10-07T22:03:38Z",
+      "published_at": "2026-10-03T14:37:55.752Z",
+      "elapsed_h": 103.429,
+      "views": 6,
+      "views_populated": true,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "A",
+      "slug": "2026-09-30-the-grader-reads-the-first-number",
+      "t": "2026-10-08T02:02:34Z",
+      "published_at": "2026-09-30T15:55:43.676Z",
+      "elapsed_h": 178.114,
+      "views": 0,
+      "views_populated": false,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "B",
+      "slug": "2026-10-02-the-gate-could-not-see-what-it-was-gating",
+      "t": "2026-10-08T02:02:34Z",
+      "published_at": "2026-10-03T14:37:55.752Z",
+      "elapsed_h": 107.411,
+      "views": 6,
+      "views_populated": true,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "A",
+      "slug": "2026-09-30-the-grader-reads-the-first-number",
+      "t": "2026-10-08T09:07:36Z",
+      "published_at": "2026-09-30T15:55:43.676Z",
+      "elapsed_h": 185.198,
+      "views": 0,
+      "views_populated": false,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "B",
+      "slug": "2026-10-02-the-gate-could-not-see-what-it-was-gating",
+      "t": "2026-10-08T09:07:36Z",
+      "published_at": "2026-10-03T14:37:55.752Z",
+      "elapsed_h": 114.495,
+      "views": 6,
+      "views_populated": true,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "A",
+      "slug": "2026-09-30-the-grader-reads-the-first-number",
+      "t": "2026-10-08T16:36:14Z",
+      "published_at": "2026-09-30T15:55:43.676Z",
+      "elapsed_h": 192.675,
+      "views": 0,
+      "views_populated": false,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "B",
+      "slug": "2026-10-02-the-gate-could-not-see-what-it-was-gating",
+      "t": "2026-10-08T16:36:14Z",
+      "published_at": "2026-10-03T14:37:55.752Z",
+      "elapsed_h": 121.972,
+      "views": 6,
+      "views_populated": true,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "A",
+      "slug": "2026-09-30-the-grader-reads-the-first-number",
+      "t": "2026-10-08T22:10:35Z",
+      "published_at": "2026-09-30T15:55:43.676Z",
+      "elapsed_h": 198.248,
+      "views": 0,
+      "views_populated": false,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "B",
+      "slug": "2026-10-02-the-gate-could-not-see-what-it-was-gating",
+      "t": "2026-10-08T22:10:35Z",
+      "published_at": "2026-10-03T14:37:55.752Z",
+      "elapsed_h": 127.544,
+      "views": 6,
+      "views_populated": true,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "A",
+      "slug": "2026-09-30-the-grader-reads-the-first-number",
+      "t": "2026-10-09T02:16:08Z",
+      "published_at": "2026-09-30T15:55:43.676Z",
+      "elapsed_h": 202.34,
+      "views": 0,
+      "views_populated": false,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "B",
+      "slug": "2026-10-02-the-gate-could-not-see-what-it-was-gating",
+      "t": "2026-10-09T02:16:08Z",
+      "published_at": "2026-10-03T14:37:55.752Z",
+      "elapsed_h": 131.637,
+      "views": 6,
+      "views_populated": true,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "A",
+      "slug": "2026-09-30-the-grader-reads-the-first-number",
+      "t": "2026-10-09T09:13:47Z",
+      "published_at": "2026-09-30T15:55:43.676Z",
+      "elapsed_h": 209.301,
+      "views": 0,
+      "views_populated": false,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "B",
+      "slug": "2026-10-02-the-gate-could-not-see-what-it-was-gating",
+      "t": "2026-10-09T09:13:47Z",
+      "published_at": "2026-10-03T14:37:55.752Z",
+      "elapsed_h": 138.598,
+      "views": 6,
+      "views_populated": true,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "A",
+      "slug": "2026-09-30-the-grader-reads-the-first-number",
+      "t": "2026-10-09T16:18:50Z",
+      "published_at": "2026-09-30T15:55:43.676Z",
+      "elapsed_h": 216.385,
+      "views": 0,
+      "views_populated": false,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "B",
+      "slug": "2026-10-02-the-gate-could-not-see-what-it-was-gating",
+      "t": "2026-10-09T16:18:50Z",
+      "published_at": "2026-10-03T14:37:55.752Z",
+      "elapsed_h": 145.682,
+      "views": 6,
+      "views_populated": true,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "A",
+      "slug": "2026-09-30-the-grader-reads-the-first-number",
+      "t": "2026-10-09T20:59:54Z",
+      "published_at": "2026-09-30T15:55:43.676Z",
+      "elapsed_h": 221.07,
+      "views": 0,
+      "views_populated": false,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "B",
+      "slug": "2026-10-02-the-gate-could-not-see-what-it-was-gating",
+      "t": "2026-10-09T20:59:54Z",
+      "published_at": "2026-10-03T14:37:55.752Z",
+      "elapsed_h": 150.366,
+      "views": 6,
+      "views_populated": true,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "A",
+      "slug": "2026-09-30-the-grader-reads-the-first-number",
+      "t": "2026-10-10T00:57:54Z",
+      "published_at": "2026-09-30T15:55:43.676Z",
+      "elapsed_h": 225.036,
+      "views": 0,
+      "views_populated": false,
+      "reactions": 1,
+      "comments": 0
+    },
+    {
+      "arm": "B",
+      "slug": "2026-10-02-the-gate-could-not-see-what-it-was-gating",
+      "t": "2026-10-10T00:57:54Z",
+      "published_at": "2026-10-03T14:37:55.752Z",
+      "elapsed_h": 154.333,
+      "views": 6,
+      "views_populated": true,
+      "reactions": 1,
+      "comments": 0
     }
   ]
 }

@@ -6,7 +6,7 @@ about: harness
 subject: evalmut/dogfood-witness
 fingerprint: evidence-gap:evalmut/dogfood-witness:4212cb4
 destination: https://erikhill.dev/notes/2026-10-07-labelled-caught-is-not-caught/
-status: draft
+status: published
 ---
 
 # Our mutation score said 42 of 46 caught. It meant 42 of 46 labelled.
