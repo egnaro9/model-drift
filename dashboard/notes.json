@@ -1,5 +1,27 @@
 [
   {
+    "date": "2026-10-10",
+    "run_key": [
+      "anthropic:claude-opus-4-8@2026-10-10",
+      "anthropic:claude-sonnet-5@2026-10-10",
+      "groq:gpt-oss-20b@2026-10-10"
+    ],
+    "title": "Regression: Claude Opus 4.8 -5.7 pts",
+    "metric": "accuracy",
+    "models": [
+      "anthropic:claude-opus-4-8",
+      "anthropic:claude-sonnet-5",
+      "groq:gpt-oss-20b"
+    ],
+    "summary": "3 model(s) regressed against the previous run; worst was Claude Opus 4.8 at -5.7 pts. Auto-logged — confirm it's real before writing it up.",
+    "body": [
+      {
+        "p": "Auto-logged when the scheduled probe flagged a run-over-run regression. Before this becomes a post, check the run log and the Reliability metric — a rate limit or provider outage can look exactly like a regression. If it holds up, the written explanation goes here."
+      }
+    ],
+    "stub": true
+  },
+  {
     "date": "2026-10-09",
     "run_key": [
       "xai:grok-4.5@2026-10-09"
