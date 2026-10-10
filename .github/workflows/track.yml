@@ -26,7 +26,14 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - run: pip install -e .
+      # evalhistory and a driver are needed only for the direct database write that
+      # replaced the retired eval-history HTTP API. modeldrift imports them lazily,
+      # inside the write, so the probe still runs anywhere; this is the one place
+      # that needs them installed.
+      - run: |
+          pip install -e .
+          pip install 'evalhistory @ git+https://github.com/egnaro9/eval-history' \
+                      'psycopg[binary]>=3.1'
 
       # Before spending ~1,700 calls scoring the models, check the providers are
       # actually serving the models we asked for. A silently-swapped backend
@@ -53,6 +60,11 @@ jobs:
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           EVAL_HISTORY_WRITE_KEY: ${{ secrets.EVAL_HISTORY_WRITE_KEY }}
+          # Writes straight to the database eval-history's daily export reads. The HTTP
+          # API this used to post to was retired on 2026-08-30 and nothing has been
+          # recorded since, which every run printed and nobody acted on. Never echoed
+          # and never an argument: a connection string on a command line lands in the log.
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: python -m modeldrift.run
 
       - name: Report — update standings, alert only on a regression

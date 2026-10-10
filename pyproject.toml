@@ -18,7 +18,18 @@ license = {text = "MIT"}
 # dependency. It was missing on 2026-10-05 and CI failed at collection on 024b3ba:
 # the tests passed locally only because the venv had yaml via something else, which
 # is the local-does-not-match-CI trap.
-dev = ["pytest>=7", "pyyaml>=6"]
+# evalhistory is a dev dependency for the same reason pyyaml is: tests/test_record_direct.py
+# drives the REAL ingest against a real (sqlite) database instead of mocking it. A test
+# whose input and output are both stubs measures that two stubs agree. It is also a
+# cross-repo contract: eval-history owns RunIn, this repo builds the body, and a new
+# required field should go red here rather than in a weekly job nobody watches.
+# Runtime dependencies are still zero: modeldrift.run imports it lazily, inside the
+# write, so the probe runs on a machine that has neither it nor a database driver.
+dev = [
+    "pytest>=7",
+    "pyyaml>=6",
+    "evalhistory @ git+https://github.com/egnaro9/eval-history",
+]
 
 [project.scripts]
 model-drift = "modeldrift.run:main"

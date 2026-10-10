@@ -145,7 +145,7 @@ The tracker runs daily on a free cron and a small spend. The dashboard shows **"
 Built on the pieces it needed already: [eval-history](https://github.com/egnaro9/eval-history) stores the runs and computes the run-to-run comparison; the scoring mirrors [rag-eval-lab](https://github.com/egnaro9/rag-eval-lab). stdlib `urllib` only. No SDKs, no dependencies.
 
 ```bash
-pip install -e ".[dev]" && pytest -q     # 361 tests, stdlib only
+pip install -e ".[dev]" && pytest -q     # 394 tests
 ```
 
 ## Field notes

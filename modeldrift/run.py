@@ -242,6 +242,42 @@ def _post(api: str, key: str, payload: dict) -> Optional[str]:
         return None
 
 
+def _store_direct(url: str, payload: dict) -> Optional[str]:
+    """Write a run straight into eval-history's database, bypassing the HTTP API.
+
+    The hosted API was retired on 2026-08-30 when Render dropped its free tier, so
+    `_post` has had nowhere to post since. `--api` defaulted to empty and every probe
+    printed "probed but not recorded", which was honest and correct and also meant this
+    repository stopped contributing rows for 41 days. The database itself was never
+    lost: it lives on Neon and eval-history's daily export reads it.
+
+    Imports are local so the probe still runs on a machine with neither evalhistory nor
+    a database driver installed, which is the normal case for `python -m modeldrift.run`.
+    """
+    body = {k: v for k, v in payload.items() if not k.startswith("_")}
+    body["source"] = "ci"
+    try:
+        from evalhistory.app import ingest
+        from evalhistory.db import make_engine
+        from evalhistory.schemas import RunIn
+        from sqlalchemy.orm import Session
+    except ImportError as e:
+        print(f"    (DATABASE_URL is set but eval-history is not installed: {e})")
+        print("     pip install 'evalhistory @ git+https://github.com/egnaro9/eval-history'"
+              " 'psycopg[binary]>=3.1'")
+        return None
+    # Do NOT build the engine by hand. make_engine rewrites the scheme to
+    # postgresql+psycopg, which is what CI installs; SQLAlchemy 2 would otherwise
+    # default to psycopg2 and fail with a ModuleNotFoundError naming the wrong problem.
+    try:
+        with Session(make_engine(url)) as db:
+            return str(ingest(db, RunIn.model_validate(body)).id)
+    except Exception as e:                       # noqa: BLE001 - report, never raise
+        print(f"    (could not record in eval-history: {type(e).__name__}: {e})")
+        return None
+
+
+
 def update_metrics_file(path: str, results: List[dict], stamp: str, cap: int = 104) -> None:
     """Accumulate the extra metrics (latency, verbosity, per-capability) into a small time-series
     JSON the dashboard reads directly. Kept in the repo and read from raw.githubusercontent —
@@ -356,6 +392,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 0
 
     key = os.environ.get("EVAL_HISTORY_WRITE_KEY", "").strip()
+    # The DB path needs no write key: the key authenticated the retired HTTP API.
+    db_url = os.environ.get("DATABASE_URL", "").strip()
     models = [m for m in load_registry(args.registry) if m.available]
     skipped = [m for m in load_registry(args.registry) if not m.available]
 
@@ -387,16 +425,23 @@ def main(argv: Optional[List[str]] = None) -> int:
         # don't record it, or the chart shows a fake crash. Partial runs still count.
         if result["_errors"] >= len(SUITE):
             dark.append(m)
-        if key and result["_errors"] >= len(SUITE):
+        if (key or db_url) and result["_errors"] >= len(SUITE):
             print("      (every call failed — not recorded; fix the key/quota, not the model)")
+        elif db_url:
+            # Preferred when configured. A write that was asked for and did not happen
+            # is the failure mode that cost this project 41 days of history, so it says
+            # which row it stored rather than returning quietly.
+            rid = _store_direct(db_url, result)
+            if rid:
+                print(f"      stored {rid}")
         elif key and not args.api.strip():
             print("      (no --api / $EVAL_HISTORY_API — probed but not recorded)")
         elif key and ("/eval-history" in args.api or args.api.rstrip("/").endswith(".json")):
             print("      (--api is the read-only archive — probed but not recorded)")
         elif key:
             _post(args.api, key, result)
-    if not key:
-        print("\n  EVAL_HISTORY_WRITE_KEY unset — probed but not recorded (set it to build history).")
+    if not key and not db_url:
+        print("\n  neither DATABASE_URL nor EVAL_HISTORY_WRITE_KEY is set — probed but not\n  recorded. Set DATABASE_URL to build history; the HTTP API it used before is gone.")
 
     # latency + verbosity go to the repo-local time series the dashboard reads
     stamp = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
