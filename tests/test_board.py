@@ -11,6 +11,7 @@ Two disciplines pinned here, both paid for elsewhere in this repo:
     divergence between the board's two stores fails CI by name instead of
     quietly publishing two disagreeing tables.
 """
+import datetime
 import json
 import pytest
 import pathlib
@@ -145,6 +146,44 @@ def test_committed_results_md_rerenders_from_the_committed_rows():
     assert derived == (ROOT / "RESULTS.md").read_text(encoding="utf-8")
 
 
+
+# The store-agreement check below is a MONITOR: it reads two live stores and cannot fail
+# on clean data, so it cannot be mutation-tested and a green run proves very little about
+# the matching rule itself. The rule is therefore extracted here and exercised directly by
+# test_nearest_shared_probe_* with fixtures, which CAN fail on demand.
+def _nearest_shared_probe(points, runs, window_s):
+    """Pair the newest upstream row with the committed point nearest it in time.
+
+    `points` are committed board points ({"t", "acc"}), `runs` are upstream rows
+    ({"created_at", "faithfulness"}) newest first. Returns (point, run, gap_seconds),
+    with point None when nothing lands inside `window_s`. gap is None only when there
+    was nothing to measure at all.
+    """
+    def ts(value):
+        return datetime.datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+
+    points = [p for p in points if isinstance(p, dict) and p.get("t")]
+    runs = [r for r in runs if isinstance(r, dict) and r.get("created_at")]
+    if not points or not runs:
+        return None, None, None
+    run = runs[0]
+    try:
+        t_up = ts(run["created_at"])
+    except (TypeError, ValueError):
+        return None, None, None
+    best, gap = None, None
+    for point in points:
+        try:
+            d = abs((ts(point["t"]) - t_up).total_seconds())
+        except (TypeError, ValueError):
+            continue
+        if gap is None or d < gap:
+            best, gap = point, d
+    if best is None or gap > window_s:
+        return None, run, gap
+    return best, run, gap
+
+
 def test_eval_history_agrees_with_the_committed_series():
     """The upstream evaluation record and the committed rows describe the same runs.
 
@@ -158,11 +197,14 @@ def test_eval_history_agrees_with_the_committed_series():
         is a companion to CI-side validation, not a substitute for it.
       * model absent upstream     -> skip that model (newly added, never probed).
       * model absent locally      -> skip that model.
-      * upstream ahead of commit  -> compare like-for-like by run DATE, never newest-to-newest.
-        The probe posts to eval-history immediately and the commit lands afterwards, so
-        upstream is routinely a day ahead. Comparing the two newest rows reports that
-        ordinary lag as a store disagreement, which is a false alarm, not a defect.
-      * no upstream run for the committed date -> skip that model.
+      * upstream ahead of commit  -> match the committed point to the upstream row NEAREST
+        IN TIME within 300s, never newest-to-newest and never by calendar date. The probe
+        posts to eval-history immediately and the commit lands afterwards, so upstream is
+        routinely a day ahead; comparing the two newest rows reports that ordinary lag as a
+        store disagreement. A DATE join has the opposite failure: on a day with two probes
+        it pairs the board's last with the archive's first, which are different runs.
+      * no upstream row inside the window -> that model is recorded in `unmatched` and
+        named in the assertion output. It is never dropped silently.
       * failed / sub-floor runs   -> NOT excluded. This compares what each store recorded,
         not what is trustworthy. An outage must appear identically in both; filtering it
         here would hide exactly the disagreement the test exists to find.
@@ -196,24 +238,63 @@ def test_eval_history_agrees_with_the_committed_series():
     if not probe and not any(series.get(m["id"]) for m in registry):
         pytest.skip("neither store has any runs yet")
 
-    compared, mismatches = 0, []
+    # ANCHOR ON THE ARCHIVE, THEN MATCH THE NEAREST COMMITTED POINT WITHIN A WINDOW.
+    #
+    # Two separate defects were here. The join was on calendar DATE, so on any day
+    # holding more than one probe it paired the board's LAST point with the archive's
+    # FIRST row: two probes of a nondeterministic model, whose disagreement is not a
+    # store disagreement. The committed board already holds 5 points on 2026-07-19 and
+    # 2 on 2026-07-31, so this was structural; it surfaced on 2026-10-10 when a manual
+    # dispatch at 06:41Z and the cron at 15:15Z landed on the same date.
+    #
+    # The deeper one was the ANCHOR. The old code only ever looked at pts[-1], the
+    # board's newest point, and eval-history is the sparser, lagging store: on
+    # 2026-10-10 it holds only the 05:53 probe while the board holds both 06:41 and
+    # 15:15. Anchored on the board's newest, the 15:15 run has no counterpart and never
+    # will, so the check could only fail or skip. Anchored on the archive's newest row,
+    # the comparison is the most recent probe BOTH stores actually saw, which is the
+    # question this test is asking.
+    #
+    # THE WINDOW IS NOT INGEST JITTER, which is why 300s was wrong. The board stamps
+    # every model with one shared run timestamp (06:41:20Z for all of them) while the
+    # archive stamps each model at its own probe moment (05:53:35, 05:56:04, 05:58:40
+    # ...). Same probe, two clocks, and the gap grows with the number of models probed
+    # serially: ~0.8h on 2026-10-10, median 1.1h across all 927 archive rows. The
+    # ceiling is set from the other side: probes run roughly daily, the largest
+    # archive-anchored gap in the whole history is 20h, and a window at or above half
+    # the probe interval could pair a row with the NEXT day's run. 4h clears the real
+    # lag with margin and stays far below 12h.
+    _WINDOW_S = 4 * 3600
+
+    def _ts(value):
+        return datetime.datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+
+    compared, mismatches, unmatched = 0, [], []
     for m in registry:
-        pts = series.get(m["id"]) or []
+        pts = [p for p in (series.get(m["id"]) or []) if isinstance(p, dict) and p.get("t")]
         if not pts:
             continue
         try:
-            runs = upstream_runs(m["id"])
+            runs = upstream_runs(m["id"])            # newest first
         except Exception:                                   # noqa: BLE001
             continue
-        day = str(pts[-1].get("t"))[:10]
-        up = next((r for r in runs if str(r.get("created_at"))[:10] == day), None)
-        if up is None:
+        best, up, gap = _nearest_shared_probe(pts, runs, _WINDOW_S)
+        if best is None:
+            # SAY SO. "The stores agree" and "nothing was compared" are different
+            # results and only one of them is a pass, so an unmatched model is carried
+            # to the assertions below instead of vanishing at a bare `continue`.
+            if up is not None:
+                unmatched.append(
+                    f"{m['id']}: newest upstream row {up.get('created_at')} has no "
+                    f"committed point within {_WINDOW_S}s"
+                    + (f"; nearest is {gap:.0f}s away" if gap is not None else ""))
             continue
         compared += 1
-        local, remote = round(pts[-1]["acc"], 4), round(up["faithfulness"], 4)
+        local, remote = round(best["acc"], 4), round(up["faithfulness"], 4)
         if local != remote:
             mismatches.append(
-                f"{m['id']} on {day}: committed {local} vs eval-history {remote}")
+                f"{m['id']}: committed {best.get('t')} = {local} vs eval-history "
+                f"{up.get('created_at')} = {remote} ({gap:.0f}s apart)")
 
     if not compared:
         # Distinguish "nothing lined up today" from "this can never line up
@@ -240,9 +321,12 @@ def test_eval_history_agrees_with_the_committed_series():
                 f"committed board reaches {newest_local}. The write path was retired "
                 f"with Render, so there is no second store to agree with. This check "
                 f"resumes if a live store is restored.")
-    assert compared, "no model could be compared; the agreement check did not actually run"
+    assert compared, (
+        "no model could be compared; the agreement check did not actually run.\n  "
+        + "\n  ".join(unmatched or ["(no models had committed points at all)"]))
     assert not mismatches, (
-        "the two stores disagree on the newest run:\n  " + "\n  ".join(mismatches))
+        "the two stores disagree on the newest run:\n  " + "\n  ".join(mismatches)
+        + ("\n  also unmatched: " + "; ".join(unmatched) if unmatched else ""))
 
 
 def test_committed_narrative_rederives_from_the_committed_rows():
@@ -294,3 +378,58 @@ def test_rederive_is_a_pure_function_of_the_board(tmp_path):
     assert (tmp_path / "RESULTS.md").read_text() == (ROOT / "RESULTS.md").read_text()
     assert ((tmp_path / "dashboard/narrative.json").read_text()
             == (ROOT / "dashboard/narrative.json").read_text())
+
+
+# --- the matching rule, tested directly, no network -------------------------------
+#
+# The monitor above reads two live stores, so it is green whenever they happen to agree
+# and silent about whether the RULE is right. These fixtures are the 2026-10-10 shape
+# that put main red, reduced to the smallest thing that reproduces it.
+
+_WINDOW = 4 * 3600
+
+# Board stamps every model with one shared run timestamp; the archive stamps each model
+# at its own probe moment, ~45min earlier. Two probes landed on 2026-10-10 and the
+# archive only ever received the first.
+_TWO_PROBES = [{"t": "2026-10-10T06:41:20Z", "acc": 0.8857},
+               {"t": "2026-10-10T15:15:46Z", "acc": 0.9143}]
+_ARCHIVE_SAW_THE_FIRST = [{"created_at": "2026-10-10T05:53:35.000000Z", "faithfulness": 0.8857}]
+
+
+def test_nearest_shared_probe_pairs_the_run_both_stores_saw():
+    """The regression that put main red on 2026-10-10.
+
+    A calendar-date join took the board's NEWEST point (15:15, acc 0.9143) and the
+    archive's only row (05:53, 0.8857) and called the difference a store disagreement.
+    They are two different probes of a nondeterministic model. The 06:41 point is the
+    one the archive actually saw, and it agrees exactly.
+    """
+    point, run, gap = _nearest_shared_probe(_TWO_PROBES, _ARCHIVE_SAW_THE_FIRST, _WINDOW)
+    assert point is not None, f"the shared probe was not matched at all (gap {gap})"
+    assert point["t"] == "2026-10-10T06:41:20Z", (
+        f"paired the wrong probe: {point['t']}. Taking the board's newest point is the "
+        f"bug, not the fix.")
+    assert round(point["acc"], 4) == round(run["faithfulness"], 4), (
+        "the stores agree on this probe; a mismatch here means the pairing is wrong")
+
+
+def test_nearest_shared_probe_will_not_reach_into_another_days_run():
+    """The other side of the window, so it cannot be satisfied by widening it.
+
+    Probes run roughly daily. A window at or past half that interval would happily pair
+    an archive row with the NEXT day's committed point and report agreement between two
+    runs that have nothing to do with each other.
+    """
+    far = [{"t": "2026-10-11T15:15:46Z", "acc": 0.9143}]
+    point, run, gap = _nearest_shared_probe(far, _ARCHIVE_SAW_THE_FIRST, _WINDOW)
+    assert point is None, f"matched across {gap:.0f}s, which is a different day's run"
+    assert run is not None and gap is not None, (
+        "an unmatched model must still report the row and the distance, or the monitor "
+        "cannot name what it failed to compare")
+
+
+def test_nearest_shared_probe_reports_rather_than_vanishes():
+    """A model with no committed points must come back as 'nothing to compare', not as
+    a silent success. compared==0 with no explanation is how a skip becomes a pass."""
+    assert _nearest_shared_probe([], _ARCHIVE_SAW_THE_FIRST, _WINDOW) == (None, None, None)
+    assert _nearest_shared_probe(_TWO_PROBES, [], _WINDOW) == (None, None, None)
