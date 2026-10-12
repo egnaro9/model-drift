@@ -1,0 +1,19 @@
+On Sunday night I added a third outside rubric to a tool I had been building for a week, expecting it to be the control case. Inspect AI's BoolQ task uses a scorer anchored at both ends and hard to fool.
+
+The reply was "No. The passage does not support Yes." The target was Yes. The shipped scorer rejected it. The library's two general-purpose scorers, the ones most custom tasks use, marked it correct: includes() because the target is a substring, match() because the sentence happens to end with the word.
+
+Same material, ten real BoolQ rows, seven completions each:
+pattern, as shipped: 20/20 detected, 20/50 false alarms
+includes(): 10/20 detected, 0/50 false alarms
+match(), end: 10/20 detected, 10/50 false alarms
+
+The shipped scorer's false alarms are every correct answer that disobeyed "Include nothing else", which is a documented choice. The other two accepting a wrong answer that mentions the right one is nobody's choice. Under my tool's default policy (zero false alarms) the loose scorer counts as covering the defect and the shipped one does not. The policy did what it says. It also decided something for me, which is the point of printing both columns.
+
+The tool is deadcheck. It takes a rubric as code and material with constructed ground truth, and reports separation, coverage and the residual, with a calibration floor from naive probes that include a coin flip. Its own certificate for its own example rubric says UNDERPOWERED, and I left that red rather than widen a keyword list.
+
+It went public this week and I would like it broken: forge a certificate the registry accepts, clear the calibration floor without measuring the class, keep a defect through a mechanical rewrite, or show that an adapter misreads its upstream. A reproducible script in an issue gets a test named after it.
+
+Full note, with the evidence table: https://erikhill.dev/notes/2026-10-14-two-scorers-passed-a-wrong-answer/
+Repo: https://github.com/egnaro9/deadcheck
+
+I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC.
