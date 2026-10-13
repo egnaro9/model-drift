@@ -33,9 +33,43 @@ jobs:
         with: { python-version: "3.12" }
       - run: pip install -e .
 
+      # A finding still sitting in an OPEN draft is not offered again. Its ledger
+      # entry rides in the draft's own commit and reaches main only on merge, so
+      # without this the same finding opened a fresh, identical PR every day (nine
+      # copies of one if-json flip, 2026-10-06 to 10-13) and, with --max 1, kept
+      # every other finding from being drafted at all. A draft that is CLOSED is
+      # no longer open, so an unmerged finding is still offered again, as designed.
+      # Branch names are never interpolated into a command line; they only become
+      # file names under a directory the next step reads.
+      - name: Ledgers of drafts still open
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          dir="$RUNNER_TEMP/pending"
+          mkdir -p "$dir"
+          # Same-repo PRs only. A fork PR reports a bare branch name, so one named
+          # after a CLOSED draft branch still on origin would otherwise make this
+          # read that branch's ledger and hold its finding back indefinitely.
+          gh pr list --state open --limit 200 --json headRefName,isCrossRepository \
+            --jq '.[] | select(.isCrossRepository | not) | .headRefName | select(startswith("draft/"))' \
+            > "$RUNNER_TEMP/open_drafts.txt"
+          n=0
+          while IFS= read -r b; do
+            [ -n "$b" ] || continue
+            safe="$(printf '%s' "$b" | tr -c 'A-Za-z0-9._-' '_')"
+            if git show "origin/$b:posts/.drafted.json" > "$dir/$safe.json" 2>/dev/null; then
+              n=$((n + 1))
+            else
+              rm -f "$dir/$safe.json"
+              echo "::warning::could not read posts/.drafted.json on open draft $b; its finding may be offered again"
+            fi
+          done < "$RUNNER_TEMP/open_drafts.txt"
+          echo "read the ledgers of $n open draft(s)"
+
       - name: Is there anything worth writing up?
         id: find
-        run: python -m modeldrift.findings --out posts --ledger posts/.drafted.json
+        run: python -m modeldrift.findings --out posts --ledger posts/.drafted.json --pending-dir "$RUNNER_TEMP/pending"
 
       - name: Regenerate the published index
         if: steps.find.outputs.count != ''
@@ -167,9 +201,10 @@ jobs:
             echo "\`status: draft\` to \`status: published\`, and merge. To discard,"
             echo "close this PR AND delete the branch; the ledger entry marking this"
             echo "finding as seen rides in the same commit as the draft, so it only"
-            echo "reaches main if you merge. An unmerged draft will be offered again,"
-            echo "which is the intended behaviour: a draft nobody merged is a finding"
-            echo "nobody recorded."
+            echo "reaches main if you merge. While this PR stays open the daily run"
+            echo "skips this finding. Once it is closed unmerged, the finding will be"
+            echo "offered again, which is the intended behaviour: a draft nobody"
+            echo "merged is a finding nobody recorded."
             echo
             echo "---"
             echo

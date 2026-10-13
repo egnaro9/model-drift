@@ -22,7 +22,8 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Sequence
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
 from .flips import analyze as analyze_flips
 from .policy import REL_FLOOR
@@ -289,19 +290,58 @@ def current(findings: Sequence[Finding], as_of: str,
     return out
 
 
-def unseen(findings: Sequence[Finding], ledger_path: str) -> List[Finding]:
+def unseen(findings: Sequence[Finding], ledger_path: str,
+           pending: Iterable[str] = ()) -> List[Finding]:
     """Findings whose event has not already been drafted.
 
     The ledger stores fingerprints, not dates. A frozen standing re-derives the
     same fingerprint every run and is therefore silently dropped, which is the
     behaviour that the 19-times-logged regression needed and did not have.
+
+    ``pending`` holds fingerprints carried by drafts that are still OPEN. They
+    count as seen for this run only and are never written to the ledger. The
+    ledger entry rides in the draft's own commit and reaches main only on merge,
+    so without this a finding re-derived every day opened a fresh, identical
+    pull request every day while the first sat unreviewed: nine copies of one
+    if-json flip between 2026-10-06 and 2026-10-13, and with --max 1 each copy
+    also kept every other finding from being drafted at all. Closing a draft
+    unmerged still offers it again, because a closed draft is no longer pending.
     """
     try:
         with open(ledger_path, encoding="utf-8") as fh:
             seen = set(json.load(fh))
     except (FileNotFoundError, json.JSONDecodeError):
         seen = set()
+    seen |= set(pending)
     return [f for f in findings if f.fingerprint() not in seen]
+
+
+def pending_fingerprints(pending_dir: Optional[str]) -> Tuple[set, List[str]]:
+    """Fingerprints from the ledgers of open drafts, plus what could not be read.
+
+    Each file is a copy of ``posts/.drafted.json`` taken from an open draft
+    branch. An unreadable copy is reported, not swallowed, and contributes
+    nothing: the cost is a duplicate draft, which is the old behaviour, never a
+    finding silently suppressed.
+    """
+    keys: set = set()
+    problems: List[str] = []
+    if not pending_dir:
+        return keys, problems
+    d = Path(pending_dir)
+    if not d.is_dir():
+        return keys, problems
+    for p in sorted(d.glob("*.json")):
+        try:
+            data = json.loads(p.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as e:
+            problems.append(f"{p.name}: {type(e).__name__}")
+            continue
+        if not isinstance(data, list) or not all(isinstance(k, str) for k in data):
+            problems.append(f"{p.name}: not a list of fingerprints")
+            continue
+        keys.update(data)
+    return keys, problems
 
 
 def record(findings: Sequence[Finding], ledger_path: str) -> None:
@@ -343,6 +383,10 @@ def main(argv: Optional[List[str]] = None) -> int:
                     help="most drafts to write in one run; the rest are named, never dropped silently")
     ap.add_argument("--sources", default="posts/sources.json",
                     help="other instruments that emit findings.json; missing file means local only")
+    ap.add_argument("--pending-dir", default=None,
+                    help="directory of .drafted.json copies taken from OPEN draft "
+                         "pull requests; their findings are skipped this run and "
+                         "never written to --ledger")
     ap.add_argument("--seed-ledger", action="store_true",
                     help="record every current finding as already-seen without writing "
                          "drafts, to establish a baseline against historical backlog")
@@ -370,9 +414,14 @@ def main(argv: Optional[List[str]] = None) -> int:
     all_found = detect(series, statuses) + external
     found = current(all_found, day, a.window_days)
     stale = len(all_found) - len(found)
-    fresh = unseen(found, a.ledger)
+    pending, pending_problems = pending_fingerprints(a.pending_dir)
+    for p_ in pending_problems:
+        print(f"  PENDING LEDGER UNREADABLE: {p_}")
+    fresh = unseen(found, a.ledger, pending)
+    waiting = [f for f in unseen(found, a.ledger) if f not in fresh]
     print(f"{len(all_found)} finding(s); {stale} older than {a.window_days} days "
-          f"and not this week's news; {len(fresh)} of the rest not yet drafted")
+          f"and not this week's news; {len(fresh)} of the rest not yet drafted"
+          + (f"; {len(waiting)} already in an open draft" if waiting else ""))
     for f in found:
         mark = " " if f in fresh else "·"
         print(f"  {mark} [{f.about:14}] {f.kind:14} {f.headline}")

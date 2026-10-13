@@ -12,7 +12,8 @@ import re
 
 from modeldrift.draft import render, share_text, slugify
 from modeldrift.findings import (ABOUT_INFRA, ABOUT_MODELS, Finding, detect,
-                                 dark_providers, harness_alarms, record,
+                                 dark_providers, harness_alarms,
+                                 pending_fingerprints, record,
                                  regressions_and_recoveries, unseen)
 from modeldrift.report import ModelStatus
 
@@ -123,6 +124,50 @@ def test_a_genuinely_new_run_is_still_drafted(tmp_path):
     record(regressions_and_recoveries([old]), ledger)
     new = _status("openai:x", "X", 0.70, -0.10, "regressed", when="2026-09-29")
     assert len(unseen(regressions_and_recoveries([new]), ledger)) == 1
+
+
+def test_a_finding_in_an_open_draft_is_not_offered_again(tmp_path):
+    """Nine identical PRs for one if-json flip, 2026-10-06 to 10-13: the ledger
+    entry lives on the unmerged draft branch, so main never learned it. A key
+    carried by an OPEN draft counts as seen, and is still never recorded."""
+    s = _status("openai:x", "X", 0.80, -0.10, "regressed")
+    found = regressions_and_recoveries([s])
+    ledger = tmp_path / "seen.json"
+    pending_dir = tmp_path / "pending"
+    pending_dir.mkdir()
+    (pending_dir / "draft_2026-10-13_1.json").write_text(
+        json.dumps([f.fingerprint() for f in found]), encoding="utf-8")
+    keys, problems = pending_fingerprints(str(pending_dir))
+    assert problems == []
+    assert unseen(found, str(ledger), keys) == []
+    assert not ledger.exists(), "a pending key must never be written to the ledger"
+
+
+def test_a_closed_draft_is_offered_again(tmp_path):
+    """The mirror: once the draft is closed it is no longer pending, and an
+    unmerged finding comes back, which is the designed behaviour."""
+    s = _status("openai:x", "X", 0.80, -0.10, "regressed")
+    found = regressions_and_recoveries([s])
+    ledger = str(tmp_path / "seen.json")
+    keys, _ = pending_fingerprints(str(tmp_path / "no-such-dir"))
+    assert unseen(found, ledger, keys) == found
+    keys, _ = pending_fingerprints(None)
+    assert unseen(found, ledger, keys) == found
+
+
+def test_an_unreadable_open_draft_ledger_is_reported_not_trusted(tmp_path):
+    """A bad copy contributes nothing and says so. The cost is a duplicate
+    draft, never a finding silently suppressed."""
+    s = _status("openai:x", "X", 0.80, -0.10, "regressed")
+    found = regressions_and_recoveries([s])
+    d = tmp_path / "pending"
+    d.mkdir()
+    (d / "a.json").write_text("{not json", encoding="utf-8")
+    (d / "b.json").write_text(json.dumps({"not": "a list"}), encoding="utf-8")
+    keys, problems = pending_fingerprints(str(d))
+    assert keys == set()
+    assert len(problems) == 2
+    assert unseen(found, str(tmp_path / "seen.json"), keys) == found
 
 
 def test_the_ledger_survives_a_corrupt_file(tmp_path):
@@ -288,3 +333,34 @@ def test_a_card_summary_carries_no_markdown_syntax(tmp_path):
     s = build_index(str(tmp_path))[0]["summary"]
     assert "`" not in s and "**" not in s and "](" not in s, s
     assert "fact-element" in s and "60 times" in s and "the board" in s
+
+
+def test_main_skips_an_open_draft_and_never_records_its_key(tmp_path, monkeypatch):
+    """End to end through main(): the finding held by an open draft is neither
+    drafted nor written to the ledger, and the next finding takes its slot.
+    unseen() alone cannot show this, because it never writes; these two
+    mutants passed the earlier tests: recording the pending keys too, and
+    ignoring --pending-dir when choosing what to draft."""
+    import pathlib
+    import modeldrift.findings as F
+    root = pathlib.Path(__file__).resolve().parents[1]
+    held = regressions_and_recoveries([_status("openai:x", "X", 0.80, -0.10, "regressed")])
+    nxt = regressions_and_recoveries([_status("openai:y", "Y", 0.70, -0.10, "regressed")])
+    monkeypatch.setattr(F, "detect", lambda series, statuses: held + nxt)
+    monkeypatch.delenv("GITHUB_OUTPUT", raising=False)
+    pending = tmp_path / "pending"
+    pending.mkdir()
+    (pending / "draft_x.json").write_text(
+        json.dumps([f.fingerprint() for f in held]), encoding="utf-8")
+    ledger = tmp_path / "ledger.json"
+    out = tmp_path / "out"
+    rc = F.main(["--board", str(root / "dashboard" / "drift_board.json"),
+                 "--registry", str(root / "modeldrift" / "models.json"),
+                 "--sources", str(tmp_path / "no-sources.json"),
+                 "--out", str(out), "--ledger", str(ledger),
+                 "--pending-dir", str(pending), "--window-days", "100000"])
+    assert rc == 0
+    recorded = set(json.loads(ledger.read_text(encoding="utf-8")))
+    assert recorded == {f.fingerprint() for f in nxt}
+    assert not recorded & {f.fingerprint() for f in held}
+    assert len(list(out.glob("*.md"))) == 1
