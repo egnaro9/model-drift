@@ -54,6 +54,23 @@ ARMS = {
     "B": "2026-10-02-the-gate-could-not-see-what-it-was-gating",
 }
 
+# An arm whose PRIMARY measure dev.to has demonstrably not counted. Declared here,
+# with the evidence, never inferred at run time: the refusal below exists so that
+# an unexplained zero stops the series, and only a written, checked reason may
+# let an arm past it. Declaring an arm does not make its zero a count. Its
+# readings say views_unmeasurable with the reason, keep views_populated False,
+# and still carry the reactions and comments that ARE live. A later non-zero
+# view count is recorded as populated and drops the flag.
+VIEWS_UNMEASURABLE: Dict[str, str] = {
+    "A": ("dev.to never counted a view on this article. page_views_count=0 at 308h "
+          "on the authenticated API, and 0 readers on the article's own stats page "
+          "(both checked 2026-10-13), while Jean-Sebastien Beaulieu reacted on "
+          "2026-10-01, which cannot happen without a read. The external canonical "
+          "is not the cause: three other external-canonical articles on this "
+          "account populate. Arm A has no view measurement; its reactions and "
+          "comments still are measurements."),
+}
+
 
 class Refused(Exception):
     pass
@@ -139,8 +156,13 @@ def load(path: Path) -> dict:
     return json.loads(path.read_text())
 
 
-def collect(articles: List[dict], readings: List[dict], now: datetime) -> List[dict]:
-    """The new readings this run should append. Pure, so the tests can drive it."""
+def collect(articles: List[dict], readings: List[dict], now: datetime,
+            unmeasurable: Optional[Dict[str, str]] = None) -> List[dict]:
+    """The new readings this run should append. Pure, so the tests can drive it.
+
+    ``unmeasurable`` defaults to VIEWS_UNMEASURABLE; tests pass their own."""
+    if unmeasurable is None:
+        unmeasurable = VIEWS_UNMEASURABLE
     out: List[dict] = []
     for arm, slug in sorted(ARMS.items()):
         art = match_article(articles, slug)
@@ -170,7 +192,13 @@ def collect(articles: List[dict], readings: List[dict], now: datetime) -> List[d
         # Past the point where this account demonstrably populates, a zero is a
         # real anomaly rather than a lag, and so is a zero alongside a reaction
         # that late: a reaction cannot happen without a view.
-        if not populated and eh > POPULATION_LAG_H:
+        # A declaration answers a zero that has never been anything else. Once
+        # this arm's series holds a real count, a later zero is an anomaly again
+        # and gets the refusal, not the declaration's explanation.
+        ever_counted = any(r.get("arm") == arm and r.get("views_populated")
+                           for r in readings + out)
+        declared = None if (populated or ever_counted) else unmeasurable.get(arm)
+        if not populated and eh > POPULATION_LAG_H and declared is None:
             raise Refused(
                 f"arm {arm} ({slug}) still reports page_views_count=0 at "
                 f"{eh:.0f}h, past the {POPULATION_LAG_H/24:.0f}d point where "
@@ -178,7 +206,7 @@ def collect(articles: List[dict], readings: List[dict], now: datetime) -> List[d
                 f"(reactions={art.get('public_reactions_count')}). Either the "
                 "field stopped populating or this article is being treated "
                 "differently; do not record another zero as if it were a count")
-        out.append({
+        reading = {
             "arm": arm,
             "slug": slug,
             "t": now.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
@@ -191,7 +219,12 @@ def collect(articles: List[dict], readings: List[dict], now: datetime) -> List[d
             "views_populated": populated,
             "reactions": art.get("public_reactions_count"),
             "comments": art.get("comments_count"),
-        })
+        }
+        if declared is not None:
+            # Raw value kept for fidelity; this key and views_populated=False
+            # are what stop anyone reading it as a count.
+            reading["views_unmeasurable"] = declared
+        out.append(reading)
     return out
 
 
@@ -262,7 +295,8 @@ def main() -> int:
         return 0
 
     for r in fresh:
-        print(f"{r['arm']} at {r['elapsed_h']}h: views={r['views']} "
+        note = " (not a view measurement, see views_unmeasurable)" if "views_unmeasurable" in r else ""
+        print(f"{r['arm']} at {r['elapsed_h']}h: views={r['views']}{note} "
               f"reactions={r['reactions']} comments={r['comments']}")
     if a.dry_run:
         print("dry run, nothing written")

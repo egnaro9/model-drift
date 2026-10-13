@@ -224,12 +224,61 @@ def test_a_nonzero_count_is_flagged_populated():
 def test_collect_refuses_a_zero_past_the_population_lag():
     """Past the point where every other article on this account has populated,
     a zero is an anomaly rather than a lag, and recording another one would put
-    a non-measurement into the series under the primary measure's name."""
+    a non-measurement into the series under the primary measure's name. Run with
+    NO declared arms, so the guard itself stays under test."""
     with pytest.raises(Refused):
-        collect([art(A_SLUG, views=0)], [], at(13 * 24))
+        collect([art(A_SLUG, views=0)], [], at(13 * 24), unmeasurable={})
+
+
+def test_an_undeclared_arm_with_a_late_zero_is_still_refused():
+    """Declaring arm A must not open the gate for B. Each exception is per arm
+    and carries its own evidence."""
+    with pytest.raises(Refused):
+        collect([art(B_SLUG, views=0)], [], at(13 * 24),
+                unmeasurable={"A": "declared for A only"})
+
+
+def test_a_declared_arm_records_its_live_measures_and_says_views_are_not_one():
+    """Arm A, 2026-10-13: dev.to never counted a view (API 0, stats page 0)
+    despite a reader's reaction on 10-01. The reading keeps the reactions and
+    comments, keeps views_populated False, and names why the view count is not
+    a measurement, so nobody can sum it as one."""
+    got = collect([art(A_SLUG, views=0, reactions=1)], [], at(13 * 24),
+                  unmeasurable={"A": "reason with evidence"})
+    assert got[0]["views_populated"] is False
+    assert got[0]["views_unmeasurable"] == "reason with evidence"
+    assert got[0]["reactions"] == 1
+
+
+def test_a_declared_arm_that_starts_counting_is_recorded_as_populated():
+    """The declaration answers a zero. A real count overrides it and the flag
+    is dropped, so the exception cannot hide a measurement that arrives late."""
+    got = collect([art(A_SLUG, views=7)], [], at(13 * 24),
+                  unmeasurable={"A": "reason with evidence"})
+    assert got[0]["views_populated"] is True
+    assert "views_unmeasurable" not in got[0]
+
+
+def test_the_shipped_declaration_covers_arm_a_and_nothing_else():
+    """The live list is evidence, not a switch: one arm, with the checks named."""
+    from cadence_read import VIEWS_UNMEASURABLE
+    assert set(VIEWS_UNMEASURABLE) == {"A"}
+    assert "stats page" in VIEWS_UNMEASURABLE["A"]
+    assert "2026-10-13" in VIEWS_UNMEASURABLE["A"]
 
 
 def test_a_nonzero_count_past_the_lag_is_still_fine():
     """The refusal must key on the zero, not on the age."""
     got = collect([art(A_SLUG, views=46)], [], at(13 * 24))
     assert got[0]["views_populated"] is True
+
+
+def test_a_declaration_never_outranks_a_count_the_series_already_holds():
+    """Once arm A has recorded a real count, a later zero is an anomaly again
+    and must be refused, not labelled with 'dev.to never counted a view'."""
+    prior = collect([art(A_SLUG, views=7)], [], at(13 * 24),
+                    unmeasurable={"A": "reason with evidence"})
+    assert prior[0]["views_populated"] is True
+    with pytest.raises(Refused):
+        collect([art(A_SLUG, views=0)], prior, at(13 * 24 + 1),
+                unmeasurable={"A": "reason with evidence"})
