@@ -6,7 +6,7 @@ about: infrastructure
 subject: external/inspect-includes-match
 fingerprint: grader-defect:external/inspect-includes-match:0edb141
 destination: https://erikhill.dev/notes/2026-10-14-two-scorers-passed-a-wrong-answer/
-status: draft
+status: published
 cadence_exception: the 2026-10-09 post was an off-design direct launch (fault matrix, Friday night); this is a different genre (a public tool and an invitation to break it) and the repo went public 2026-10-12
 ---
 
