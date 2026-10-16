@@ -20,6 +20,12 @@ unpublished dev.to draft of the same title is PENDING. Each run:
 - pending but older than FRESH_DAYS           -> STALE, a warning naming it for
   Erik. Auto-posting a note weeks after its moment is a content decision, not
   a retry, so this never does it on its own.
+- `crosspost_on: YYYY-MM-DD` in the post        -> that decision, made and
+  recorded. SCHEDULED until 9am Eastern that day, then it publishes even if
+  stale or inside the spacing window, because a person chose the date. It
+  lives in the post's front matter, like cadence_exception, so the choice is
+  auditable next to the claim it releases. First used 2026-10-16: Erik held
+  the 10-07 note to Monday 10-19 rather than make it a third post in one day.
 
 At most one publish per run, and only when dev.to's OWN published list shows
 nothing in the last SPACING_DAYS. The weekly rule is measured (the 2026-08-14
@@ -30,6 +36,7 @@ from __future__ import annotations
 
 import argparse, datetime as dt, os, sys
 from pathlib import Path
+from zoneinfo import ZoneInfo
 from typing import Any, Dict, List, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -40,6 +47,8 @@ from modeldrift.publish import is_post, parse_front_matter  # noqa: E402
 GRACE_HOURS = 48     # a page missing this long after its date is a broken site
 FRESH_DAYS = 7       # older pending notes are a decision for Erik, not a retry
 SPACING_DAYS = 6     # same window as publish.yml's one-post-per-week rule
+SCHEDULED_HOUR_ET = 9  # a crosspost_on date releases at this hour, Eastern
+ET = ZoneInfo("America/New_York")
 
 
 def pending(posts: str, drafts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -59,7 +68,8 @@ def pending(posts: str, drafts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         hits = [d for d in drafts if (d.get("title") or "").strip() == title]
         if not hits:
             continue
-        row = {"slug": p.stem, "title": title, "date": fm.get("date", ""), "drafts": hits}
+        row = {"slug": p.stem, "title": title, "date": fm.get("date", ""), "drafts": hits,
+               "crosspost_on": fm.get("crosspost_on", "")}
         canon = (hits[0].get("canonical_url") or "").rstrip("/")
         if len(hits) != 1:
             row["refused"] = f"{len(hits)} dev.to drafts carry this title"
@@ -91,6 +101,12 @@ def last_devto_publish(published: List[Dict[str, Any]]) -> Optional[dt.datetime]
     return max(stamps) if stamps else None
 
 
+def release_time(day: str) -> dt.datetime:
+    """9am Eastern on a crosspost_on date, as UTC. Raises ValueError if not a date."""
+    d = dt.datetime.strptime(day, "%Y-%m-%d")
+    return d.replace(hour=SCHEDULED_HOUR_ET, tzinfo=ET).astimezone(dt.timezone.utc)
+
+
 def is_live(slug: str) -> bool:
     ok, _ = D.canonical_is_live(f"https://erikhill.dev/notes/{slug}/", attempts=1, wait=0)
     return ok
@@ -107,10 +123,24 @@ def decide(rows: List[Dict[str, Any]], now: dt.datetime, last_pub: Optional[dt.d
         if "refused" in r:
             r["verdict"] = "REFUSED"
             continue
+        scheduled = bool(r.get("crosspost_on"))
+        if scheduled:
+            try:
+                due = now >= release_time(r["crosspost_on"])
+            except ValueError:
+                r["verdict"], r["refused"] = "REFUSED", f"crosspost_on {r['crosspost_on']!r} is not a date"
+                continue
+            if not due:
+                r["verdict"] = "SCHEDULED"
+                continue
         up = live(r["slug"])
         r["live"] = up
         if not up:
             r["verdict"] = "BROKEN" if age > GRACE_HOURS else "WAITING"
+        elif scheduled:
+            # A person chose this date: freshness and spacing were their call.
+            r["verdict"] = "HELD" if chosen else "PUBLISH"
+            chosen = chosen or r["verdict"] == "PUBLISH"
         elif age > FRESH_DAYS * 24:
             r["verdict"] = "STALE"
         elif chosen or not spacing_open:
@@ -127,6 +157,7 @@ NOTE = {
     "STALE": f"older than {FRESH_DAYS} days, so not auto-posted. Erik's call: publish the dev.to draft by hand or delete it",
     "HELD": f"page is live; held so dev.to gets at most one post per {SPACING_DAYS} days",
     "REFUSED": "ambiguous, refusing to guess",
+    "SCHEDULED": f"held by its crosspost_on date; publishes from {SCHEDULED_HOUR_ET}am Eastern that day",
 }
 
 
@@ -182,6 +213,8 @@ def main(argv: Optional[List[str]] = None) -> int:
             if v in ("BROKEN", "REFUSED"):
                 rc = 1
                 print(f"::error::{r['slug']}: {r.get('refused') or NOTE[v]}")
+            elif v == "SCHEDULED":
+                print(f"           releases {r['crosspost_on']} {SCHEDULED_HOUR_ET}:00 Eastern")
             else:
                 print(f"::warning::{r['slug']}: {NOTE[v]}")
             out.append(f"- {v} `{r['slug']}`: {r.get('refused') or NOTE[v]}")

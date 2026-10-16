@@ -143,3 +143,61 @@ def test_waiting_and_stale_and_held_do_not_turn_the_run_red(tmp_path, monkeypatc
     monkeypatch.setattr(C, "is_live", lambda s: True)
     monkeypatch.setattr(C.D, "main", lambda argv: pytest.fail("a stale note must not be posted"))
     assert C.main(["--posts", str(tmp_path)]) == 0
+
+
+# --- crosspost_on: a date a person chose -----------------------------------
+
+def _sched(tmp_path, slug, date, on):
+    t = note(tmp_path, slug, date=date)
+    p = tmp_path / f"{slug}.md"
+    p.write_text(p.read_text(encoding="utf-8").replace("status: published\n",
+                 f"status: published\ncrosspost_on: {on}\n"), encoding="utf-8")
+    return C.pending(str(tmp_path), [draft(slug, t)])
+
+
+def test_scheduled_before_its_date_is_not_posted(tmp_path):
+    rows = C.decide(_sched(tmp_path, "2026-10-07-a", "2026-10-07", "2026-10-19"), NOW, None, lambda s: True)
+    assert rows[0]["verdict"] == "SCHEDULED"
+
+
+def test_scheduled_on_its_date_but_before_9am_eastern_waits(tmp_path):
+    """Midnight UTC is 8pm the evening before in Eastern time."""
+    early = dt.datetime(2026, 10, 19, 12, 59, tzinfo=dt.timezone.utc)  # 8:59am EDT
+    rows = C.decide(_sched(tmp_path, "2026-10-07-a", "2026-10-07", "2026-10-19"), early, None, lambda s: True)
+    assert rows[0]["verdict"] == "SCHEDULED"
+
+
+def test_scheduled_and_due_publishes_even_if_stale_and_spacing_is_closed(tmp_path):
+    due = dt.datetime(2026, 10, 19, 13, 0, tzinfo=dt.timezone.utc)  # 9:00am EDT
+    rows = C.decide(_sched(tmp_path, "2026-10-07-a", "2026-10-07", "2026-10-19"), due,
+                    due - dt.timedelta(days=2), lambda s: True)
+    assert rows[0]["verdict"] == "PUBLISH"
+
+
+def test_scheduled_and_due_still_needs_a_live_page(tmp_path):
+    due = dt.datetime(2026, 10, 19, 15, 0, tzinfo=dt.timezone.utc)
+    rows = C.decide(_sched(tmp_path, "2026-10-07-a", "2026-10-07", "2026-10-19"), due, None, lambda s: False)
+    assert rows[0]["verdict"] == "BROKEN"
+
+
+def test_a_crosspost_on_that_is_not_a_date_is_refused(tmp_path):
+    rows = C.decide(_sched(tmp_path, "2026-10-07-a", "2026-10-07", "Monday"), NOW, None, lambda s: True)
+    assert rows[0]["verdict"] == "REFUSED"
+
+
+def test_scheduled_still_means_one_publish_per_run(tmp_path):
+    due = dt.datetime(2026, 10, 19, 15, 0, tzinfo=dt.timezone.utc)
+    rows = _sched(tmp_path, "2026-10-07-a", "2026-10-07", "2026-10-19")
+    t = note(tmp_path, "2026-10-18-b", date="2026-10-18")
+    rows = C.decide(C.pending(str(tmp_path), [rows[0]["drafts"][0], draft("2026-10-18-b", t, 2)]),
+                    due, None, lambda s: True)
+    assert [(r["slug"], r["verdict"]) for r in rows] == [("2026-10-07-a", "PUBLISH"), ("2026-10-18-b", "HELD")]
+
+
+def test_two_scheduled_notes_due_together_still_publish_one(tmp_path):
+    """The schedule waives freshness and spacing, not the one-per-run limit."""
+    due = dt.datetime(2026, 10, 19, 15, 0, tzinfo=dt.timezone.utc)
+    a = _sched(tmp_path, "2026-10-07-a", "2026-10-07", "2026-10-19")[0]["drafts"][0]
+    b = _sched(tmp_path, "2026-10-08-b", "2026-10-08", "2026-10-19")
+    rows = C.decide(C.pending(str(tmp_path), [a, b[-1]["drafts"][0]]), due, None, lambda s: True)
+    assert [(r["slug"], r["verdict"]) for r in rows] == [("2026-10-07-a", "PUBLISH"), ("2026-10-08-b", "HELD")]
