@@ -1,0 +1,48 @@
+name: crosspost
+# Finish a cross-post that publish.yml had to leave pending.
+#
+# publish.yml refuses to cross-post until erikhill.dev serves the note's page,
+# and the site builds on a schedule GitHub delivers only a fraction of. On
+# 2026-10-09 and 2026-10-14 the page came hours after publish.yml stopped
+# waiting, and because nothing retried, both dev.to cross-posts were lost. This
+# is the retry. The pending state lives on dev.to (a published note whose draft
+# is still unpublished), so there is no ledger here to drift out of step.
+#
+# Red only for a real fault: the page still missing 48 hours after the note's
+# date, an ambiguous draft, or dev.to unreadable. A wait is a warning.
+on:
+  schedule:
+    - cron: "41 */3 * * *"      # every 3 hours, off the hour; a quiet run exits in seconds
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true = report what would happen and publish nothing"
+        required: false
+        default: "false"
+
+permissions:
+  contents: read
+
+# The SAME group as publish.yml, so the two can never publish one draft at once.
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  crosspost:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with: { python-version: "3.12" }
+      - run: pip install -e ".[dev]"
+      - name: Publish one pending cross-post whose page is live
+        env:
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            python tools/crosspost_pending.py --posts posts --dry-run
+          else
+            python tools/crosspost_pending.py --posts posts
+          fi

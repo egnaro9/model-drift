@@ -58,23 +58,37 @@ jobs:
       # a way a reader of the repo can audit. The exception lives in the post's
       # front matter, not in a workflow input, so it cannot be waved through at
       # dispatch time and leaves a permanent record next to the claim it enables.
+      #
+      # A post that has to wait for the window is DEFERRED, not failed. It used to
+      # exit 1, which turned the job red every day a due draft waited (2026-10-07
+      # and 10-08) for a rule doing exactly what it was built to do. Red now means
+      # something broke; a wait is a warning and the summary says when it clears.
       - name: One post per week, unless this one is a declared exception
+        id: cadence
         if: steps.pick.outputs.slug != ''
         run: |
           set -euo pipefail
           recent=$(git log --since="6 days ago" --format=%s -- posts/ | grep -c '^publish:' || true)
           echo "posts published in the last 6 days: $recent"
-          [ "$recent" = "0" ] && exit 0
           slug='${{ steps.pick.outputs.slug }}'
-          if grep -qE '^cadence_exception:[[:space:]]*\S' "posts/$slug.md"; then
+          if [ "$recent" = "0" ]; then
+            echo "go=true" >> "$GITHUB_OUTPUT"
+          elif grep -qE '^cadence_exception:[[:space:]]*\S' "posts/$slug.md"; then
             echo "::warning::Publishing inside the weekly window by declared exception:"
             grep -E '^cadence_exception:' "posts/$slug.md"
+            echo "go=true" >> "$GITHUB_OUTPUT"
           else
-            echo "::error::A post went out in the last 6 days and $slug declares no"
-            echo "::error::cadence_exception. Refusing. His 2026-08-14 double launch got"
-            echo "::error::under 25 views each at T+24h; the same topic alone five days"
-            echo "::error::earlier got 48. Add a cadence_exception line if this is deliberate."
-            exit 1
+            echo "go=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::$slug is due but a post went out in the last 6 days. Deferred, not"
+            echo "::warning::failed: a later run publishes it once the window clears. Add a"
+            echo "::warning::cadence_exception line to the post if it must go out sooner."
+            {
+              echo "### Deferred: $slug"
+              echo ""
+              echo "A post went out in the last 6 days, so this waits for the weekly window."
+              echo "His 2026-08-14 double launch got under 25 views each at T+24h; the same"
+              echo "topic alone five days earlier got 48."
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Nothing is due
@@ -84,7 +98,7 @@ jobs:
           echo "No staged note has a date on or before today. A quiet week is a result." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish on the site
-        if: steps.pick.outputs.slug != '' && inputs.dry_run != 'true'
+        if: steps.cadence.outputs.go == 'true' && inputs.dry_run != 'true'
         run: |
           set -euo pipefail
           slug='${{ steps.pick.outputs.slug }}'
@@ -102,11 +116,15 @@ jobs:
           git commit -m "publish: $slug"
           git push
 
-      # The site repo's notes workflow rebuilds four times an hour and verifies
-      # its own deploy byte for byte. This waits for the result rather than
-      # assuming it.
+      # The site repo's notes workflow is scheduled four times an hour, but GitHub
+      # delivers a fraction of scheduled runs: on 2026-10-09 and 2026-10-14 the next
+      # site build came hours later, this timed out, and with no retry both
+      # cross-posts were simply lost. The refusal stays (a dead canonical is worse
+      # than a late post); the red goes. On timeout this hands off to crosspost.yml,
+      # which publishes once the page is up and turns red only if it never appears.
       - name: GATE, wait for the canonical to be live
-        if: steps.pick.outputs.slug != '' && inputs.dry_run != 'true'
+        id: gate
+        if: steps.cadence.outputs.go == 'true' && inputs.dry_run != 'true'
         run: |
           set -euo pipefail
           url="https://erikhill.dev/notes/${{ steps.pick.outputs.slug }}/"
@@ -114,22 +132,27 @@ jobs:
           for i in $(seq 1 60); do
             code=$(curl -s -o /dev/null -w "%{http_code}" "$url")
             echo "  attempt $i: $code"
-            [ "$code" = "200" ] && exit 0
+            if [ "$code" = "200" ]; then echo "live=true" >> "$GITHUB_OUTPUT"; exit 0; fi
             sleep 30
           done
-          echo "::error::$url never returned 200. The site build did not pick this up."
-          echo "::error::NOTHING was cross-posted. The note IS live in the repo; only the"
-          echo "::error::page is missing. Check the notes workflow in egnaro9.github.io."
-          exit 1
+          echo "live=false" >> "$GITHUB_OUTPUT"
+          echo "::warning::$url is not live after 30 minutes. Nothing was cross-posted yet."
+          echo "::warning::crosspost.yml publishes it once the page is up, and goes red if the"
+          echo "::warning::page is still missing 48 hours after the note's date."
+          {
+            echo "### Published on the repo, cross-post pending: ${{ steps.pick.outputs.slug }}"
+            echo ""
+            echo "The site had not built the page within 30 minutes. crosspost.yml retries."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Cross-post to dev.to
-        if: steps.pick.outputs.slug != '' && inputs.dry_run != 'true'
+        if: steps.gate.outputs.live == 'true' && inputs.dry_run != 'true'
         env:
           DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
         run: python tools/devto_publish.py --slug "${{ steps.pick.outputs.slug }}"
 
       - name: Hand LinkedIn back to Erik
-        if: steps.pick.outputs.slug != '' && inputs.dry_run != 'true'
+        if: steps.gate.outputs.live == 'true' && inputs.dry_run != 'true'
         run: |
           slug='${{ steps.pick.outputs.slug }}'
           {
