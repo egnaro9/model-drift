@@ -1508,6 +1508,17 @@
       "views_populated": true,
       "reactions": 1,
       "comments": 0
+    },
+    {
+      "arm": "B",
+      "slug": "2026-10-02-the-gate-could-not-see-what-it-was-gating",
+      "t": "2026-10-18T14:40:35Z",
+      "published_at": "2026-10-03T14:37:55.752Z",
+      "elapsed_h": 360.044,
+      "views": 6,
+      "views_populated": true,
+      "reactions": 1,
+      "comments": 0
     }
   ]
 }
