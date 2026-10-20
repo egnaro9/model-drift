@@ -60,6 +60,7 @@
  "repeat-flip:google:gemini-3.1-pro/json-word-count:google:gemini-3.1-pro/json-word-count",
  "repeat-flip:google:gemini-3.1-pro/needle-extract:google:gemini-3.1-pro/needle-extract",
  "repeat-flip:google:gemini-3.1-pro/no-overrefuse-kill:google:gemini-3.1-pro/no-overrefuse-kill",
+ "repeat-flip:google:gemini-3.1-pro/nth-char:google:gemini-3.1-pro/nth-char",
  "repeat-flip:google:gemini-3.1-pro/reverse-str:google:gemini-3.1-pro/reverse-str",
  "repeat-flip:google:gemini-3.1-pro/sort-magnitude:google:gemini-3.1-pro/sort-magnitude",
  "repeat-flip:google:gemini-3.5-flash/compare-decimals:google:gemini-3.5-flash/compare-decimals",
