@@ -11,7 +11,7 @@ status: draft
 
 # My instability detector was reporting the stable models
 
-I have a tracker that watches twenty LLMs against a frozen 35-task suite and
+I have a tracker that watches LLMs from five labs against a frozen 35-task suite and
 flags tasks that change their answer. It had a queue of 55 findings waiting to be
 written up. Twenty-five were on one model, `gemini-3.1-flash-lite`, and twenty
 more on `gemini-3.1-pro`.

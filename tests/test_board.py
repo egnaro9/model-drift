@@ -224,10 +224,50 @@ def test_eval_history_agrees_with_the_committed_series():
 
     _cache = {}
 
+    # Matching window; the reasoning for 4h is under ANCHOR ON THE ARCHIVE below.
+    _WINDOW_S = 4 * 3600
+
+    def _ts(value):
+        return datetime.datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+
+    # THE HORIZON. The committed rows are frozen at the commit; the archive is not.
+    # Comparing a frozen snapshot with whatever the archive holds TODAY makes the
+    # verdict a function of the wall clock: on 2026-10-19 the VAC replay ran this
+    # test at d6286ed (board ends 2026-10-05) against an archive that had resumed
+    # writing on 2026-10-10, found no shared probe, and failed. When that commit was
+    # made the archive was frozen at 2026-08-30 and the frozen-archive branch below
+    # skipped instead. Same code, different week, different verdict. So only upstream
+    # rows the committed board COULD have seen take part: created no later than that
+    # model's newest committed point plus the matching window. Rows written after the
+    # commit are not evidence for or against it. At HEAD this only drops archive rows
+    # the board has not caught up to yet, and it makes a pinned commit give the same
+    # answer next week as on the day it was made (for an append-only archive; a
+    # rewritten history still fails, as it should).
+    def _horizon(model_id):
+        pts = [p for p in (series.get(model_id) or [])
+               if isinstance(p, dict) and p.get("t")]
+        if not pts:
+            return None
+        try:
+            newest = max(_ts(p["t"]) for p in pts)
+        except (TypeError, ValueError):
+            return None
+        return newest + datetime.timedelta(seconds=_WINDOW_S)
+
     def upstream_runs(model_id):
         if "rows" not in _cache:
             _cache["rows"] = _all_upstream()
         rows = [x for x in _cache["rows"] if x.get("name") == model_id]
+        limit = _horizon(model_id)
+        if limit is not None:
+            seen = []
+            for x in rows:
+                try:
+                    if _ts(x.get("created_at")) <= limit:
+                        seen.append(x)
+                except (TypeError, ValueError):
+                    continue
+            rows = seen
         rows.sort(key=lambda x: x.get("created_at", ""), reverse=True)
         return rows[:10]
 
@@ -263,11 +303,8 @@ def test_eval_history_agrees_with_the_committed_series():
     # ceiling is set from the other side: probes run roughly daily, the largest
     # archive-anchored gap in the whole history is 20h, and a window at or above half
     # the probe interval could pair a row with the NEXT day's run. 4h clears the real
-    # lag with margin and stays far below 12h.
-    _WINDOW_S = 4 * 3600
-
-    def _ts(value):
-        return datetime.datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    # lag with margin and stays far below 12h. (_WINDOW_S and _ts are defined above
+    # upstream_runs, because the horizon filter there needs them on its first call.)
 
     compared, mismatches, unmatched = 0, [], []
     for m in registry:

@@ -62,10 +62,11 @@ The draft template opened every regression note with this:
 
 > against the live models, same questions, same graders, **temperature 0**
 
-All eighteen entries in the model registry carry `temperature: null`. The
-provider layer omits the parameter whenever it is None, which is every model on
-the board, because none of these models accept it. Nothing was pinned. Nothing
-had ever been pinned.
+Nine of the eighteen entries in the model registry carry `temperature: null`,
+and the provider layer omits the parameter for them because those models reject
+it. The other nine, the mock control among them, default to `temperature: 0`. So
+half the board had never been pinned at all, and the other half was pinned only
+as far as each provider honours a zero.
 
 That sentence is why the noise floor was invisible. A reader told a suite is
 deterministic has no reason to ask what it varies by, and I was the reader. The
@@ -147,7 +148,7 @@ every model that ever had a bad morning. That reasoning is sound. Whether ten is
 the right window, and whether the median is the right statistic, is unmeasured.
 
 **The whole thing rests on one fleet and one suite.** Thirty-five questions,
-eighteen models, one operator, one grader. I have shown that this detector
+seventeen LLMs and a mock control, one operator, one grader. I have shown that this detector
 alerted below its own noise. I have not shown that anyone else's does, and the
 interesting version of this claim is the general one.
 

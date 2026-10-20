@@ -11,14 +11,6 @@ status: draft
 
 # A check that cannot fail has never passed
 
-version
-
-
-
-
-
-
-
 Yesterday I went to verify a number in my own portfolio: ten repositories, a recorded total of
 290 tests. I ran every suite. The real number is 683 passing, and nine of the ten per-repo
 figures I had written down were wrong.

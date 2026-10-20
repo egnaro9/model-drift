@@ -1,5 +1,3 @@
-version (post 3 to 5 days after the dev.to thread)
-
 I audited the test counts across ten of my repositories this week. Recorded total: 290. Actual:
 683 passing. Nine of ten per-repo figures were wrong.
 

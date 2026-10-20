@@ -4,7 +4,7 @@
 
 [![ci](https://github.com/egnaro9/model-drift/actions/workflows/ci.yml/badge.svg)](https://github.com/egnaro9/model-drift/actions/workflows/ci.yml)
 [![python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org/)
-[![tests](https://img.shields.io/badge/tests-406-brightgreen)](tests)
+[![tests](https://img.shields.io/badge/tests-430-brightgreen)](tests)
 
 ### ▶ [Live tracker](https://egnaro9.github.io/model-drift/)
 
@@ -14,16 +14,18 @@ Model providers ship silent updates. A [peer-reviewed study](https://arxiv.org/a
 
 | Metric | What it answers | Source |
 | --- | --- | --- |
-| **Accuracy** | Did answers get worse? | eval-history (with regression alerts) |
+| **Accuracy** | Did answers get worse? | the deterministic grader; kept in `drift_board.json` and written to eval-history's database (a regression opens an issue here) |
 | **Speed** | Median call latency. Is it slower? | measured on the same calls |
 | **Verbosity** | Avg answer length. Chattier / pricier? | " |
 | **Reliability** | Share of calls that succeeded. Flaky? | " |
 | **Refusals** | Share of benign prompts refused. Over-refusing? | " |
 
-The last four are byproducts of calls already made (near-zero extra cost) and live in a repo-committed `drift_board.json` the dashboard reads from raw GitHub. Accuracy is the one that fires the automatic regression alert.
+The last four are byproducts of calls already made (near-zero extra cost). All five live in a repo-committed `drift_board.json`, which is what the dashboard charts and what the regression alert compares. Every run is also written to eval-history's database. Accuracy is the one that fires the automatic regression alert.
 
 ```
-frozen suite ──►  live model APIs  ──►  deterministic grader  ──►  eval-history  ──►  chart + "▼ regressed"
+frozen suite ──►  live model APIs  ──►  deterministic grader  ──►  drift_board.json  ──►  chart + "▼ regressed" + issue
+                                                              │
+                                                              └──►  eval-history's database  ──►  its daily archive
 ```
 
 <img src="docs/demo.gif" alt="Flip analysis separating harness failures from model regressions" width="100%">
@@ -53,13 +55,13 @@ The runner **only probes a model whose API key is present**, so you fund exactly
 | Anthropic: Fable 5 · Opus 4.8 · Sonnet 5 · Haiku 4.5 | `ANTHROPIC_API_KEY` |
 | Google: Gemini 3.1 Pro · 3.5 Flash · 3.1 Flash-Lite | `GEMINI_API_KEY` |
 | xAI: Grok 4.5 · 4.3 · 4 Fast | `XAI_API_KEY` |
-| Meta: Llama 3.3 70B · Llama 3.1 8B (open-weights; served free via Groq) | `GROQ_API_KEY` |
+| Groq: GPT-OSS 120B · GPT-OSS 20B (OpenAI open weights) · Qwen3.8 27B | `GROQ_API_KEY` |
 
-Plus `EVAL_HISTORY_WRITE_KEY` to record runs. Each provider is tracked across the tiers it actually has, **heavy → flagship → mid → mini → nano**, so you can see whether a cheap tier keeps pace with the top model (tiers are only added where a real model exists; Google and xAI have no model above their flagship on the API, so they stay at three. No padding). Edit [`models.json`](modeldrift/models.json) to change models; any OpenAI-compatible endpoint works with a `base_url`, and a model that rejects a `temperature` param (Fable 5, Opus 4.8, Sonnet 5, GPT-5 / mini / nano, Grok 4.5 / 4.3 / 4 Fast) sets `"temperature": null`. **17 models**, 35 prompts each, daily. Still **cents per run** (Fable 5 is the priciest at ~$10/$50 per 1M, but the tiny token count keeps it under a cent) on the free GitHub Actions cron.
+Plus `DATABASE_URL`, pointing at eval-history's Postgres, to record runs there (the write also needs `evalhistory` and `psycopg[binary]` installed, as the daily workflow does). Each provider is tracked across the tiers it actually has, **heavy → flagship → mid → mini → nano**, so you can see whether a cheap tier keeps pace with the top model (tiers are only added where a real model exists; Google and xAI have no model above their flagship on the API, so they stay at three. No padding). Edit [`models.json`](modeldrift/models.json) to change models; any OpenAI-compatible endpoint works with a `base_url`, and a model that rejects a `temperature` param (Fable 5, Opus 4.8, Sonnet 5, GPT-5 / mini / nano, Grok 4.5 / 4.3 / 4 Fast) sets `"temperature": null`. **17 models**, 35 prompts each, daily. Still **cents per run** (Fable 5 is the priciest at ~$10/$50 per 1M, but the tiny token count keeps it under a cent) on the free GitHub Actions cron.
 
 ```bash
 pip install -e .
-OPENAI_API_KEY=... EVAL_HISTORY_WRITE_KEY=... python -m modeldrift.run
+OPENAI_API_KEY=... DATABASE_URL=... python -m modeldrift.run
 # or with no keys at all. The deterministic mock proves the pipeline, no spend:
 python -m modeldrift.run
 ```
@@ -131,7 +133,7 @@ The portfolio pulls the result in through [a weekly job](https://github.com/egna
 The [daily workflow](.github/workflows/track.yml) runs on its own (08:17 UTC), and after each probe it:
 
 - **updates [`RESULTS.md`](RESULTS.md)**: the current standings, committed to the repo, every run;
-- **opens a GitHub issue *only when a model regressed*** week-over-week. The automatic "go look" trigger;
+- **opens a GitHub issue *only when a model regressed*** against its previous run. The automatic "go look" trigger;
 - **attaches a ready-to-post writeup** to the run when there's a regression, for you to publish by hand.
 
 That last part is deliberate. A drift post is worth making when a model *actually drifted*, "Claude dropped 8 points this week", not on a fixed clock; a weekly "nothing changed" post is spam. So the machine runs, records, and raises the alarm automatically; the outward-facing post stays a human decision, on real news. Automate the launches, never the approval.
@@ -142,10 +144,10 @@ The tracker runs daily on a free cron and a small spend. The dashboard shows **"
 
 ## What it reuses
 
-Built on the pieces it needed already: [eval-history](https://github.com/egnaro9/eval-history) stores the runs and computes the run-to-run comparison; the scoring mirrors [rag-eval-lab](https://github.com/egnaro9/rag-eval-lab). stdlib `urllib` only. No SDKs, no dependencies.
+Built on the pieces it needed already: every run is written to [eval-history](https://github.com/egnaro9/eval-history)'s database, and its daily archive publishes the run-to-run comparison; the scoring mirrors [rag-eval-lab](https://github.com/egnaro9/rag-eval-lab). stdlib `urllib` only. No SDKs, no dependencies.
 
 ```bash
-pip install -e ".[dev]" && pytest -q     # 406 tests
+pip install -e ".[dev]" && pytest -q     # 430 tests
 ```
 
 ## Field notes

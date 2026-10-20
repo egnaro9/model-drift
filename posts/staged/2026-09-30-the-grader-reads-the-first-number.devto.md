@@ -49,7 +49,7 @@ expects 30 and leads with 15. `What is 0.3 minus 0.1` expects 0.2 and leads with
 
 | claim | how it was checked |
 |---|---|
-| the grader takes the first number, not the answer | `modeldrift/suite.py:64`, `re.search(r"-?\d+(?:\.\d+)?", ...)` |
+| the grader takes the first number, not the answer | `modeldrift/suite.py:64-66`, `re.search(r"-?\d+(?:\.\d+)?", ...)` |
 | 7 of its 8 tasks lead with a number that is not the answer | enumerated over `SUITE`: math-order 3 vs 23, math-percent 15 vs 30, reason-older 30 vs 25, multi-step-math 3 vs 8, unit-minutes 2.5 vs 150, compare-negatives -0.5 vs -0.05, float-subtract 0.3 vs 0.2. Only compare-decimals leads with its own answer |
 | it bites on runs where nothing errored | `float-subtract` fails on 9 models across runs with `reliability: 1.0`, worst Claude Opus 4.8 at 60 of 60 |
 | every model had the right answer | live calls through the probe's own path: gpt-4o-mini `'0.3 minus 0.1 equals 0.2. To one decimal place, the answer is 0.2.'`; opus-4-8 `'0.3 minus 0.1 is **0.2**.'`; sonnet-5 `'0.3 minus 0.1 equals **0.2**'` |

@@ -256,9 +256,10 @@ have never been confirmed either way, and the six repeats are one finding. I
 cannot say what fraction of this detector's output is noise. I can say that
 every claim of its I have actually tested has failed.
 
-Finally, nothing on this board is pinned. No model here accepts a temperature,
-so run-to-run spread is part of the measurement rather than something I can
-switch off. Every floor in this post exists because of that, and a provider
+Finally, this board cannot be pinned. About half its models reject a
+temperature parameter, and the rest are sent 0 and are still subject to whatever
+spread the provider adds above that, so run-to-run spread is part of the
+measurement rather than something I can switch off. Every floor in this post exists because of that, and a provider
 changing their serving stack quietly would move the floor without moving
 anything I can see.
 
