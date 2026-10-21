@@ -1,5 +1,15 @@
 [
  {
+  "slug": "2026-10-21-the-guard-and-its-sibling",
+  "file": "2026-10-21-the-guard-and-its-sibling.md",
+  "title": "The guard was applied once. Its sibling read the same data without it.",
+  "date": "2026-10-21",
+  "kind": "defect-class",
+  "about": "harness",
+  "subject": "estate/guard-siblings",
+  "summary": "In one session across three repositories I fixed five separate defects. They looked unrelated while I was fixing them. Four are the same bug, and the fifth is the version of it that has no code in it at all."
+ },
+ {
   "slug": "2026-10-14-two-scorers-passed-a-wrong-answer",
   "file": "2026-10-14-two-scorers-passed-a-wrong-answer.md",
   "title": "Two eval scorers passed a wrong answer because it mentioned the right one",

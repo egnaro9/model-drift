@@ -6,7 +6,7 @@ about: harness
 subject: estate/guard-siblings
 fingerprint: defect-class:estate/guard-siblings:2026-09-22
 destination: https://erikhill.dev/notes/2026-10-21-the-guard-and-its-sibling/
-status: draft
+status: published
 ---
 
 # The guard was applied once. Its sibling read the same data without it.
