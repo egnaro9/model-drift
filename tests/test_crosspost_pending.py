@@ -13,6 +13,13 @@ import crosspost_pending as C
 NOW = dt.datetime(2026, 10, 16, 18, 0, tzinfo=dt.timezone.utc)
 
 
+def today():
+    """main() reads the real clock, not NOW. A note dated NOW went STALE on
+    2026-10-23, which turned the refusal test red and let the dry-run test pass
+    without ever reaching a PUBLISH row."""
+    return dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d")
+
+
 def note(tmp, slug, status="published", title=None, date="2026-10-14"):
     title = title or f"Title of {slug}"
     (tmp / f"{slug}.md").write_text(
@@ -116,7 +123,7 @@ def test_main_is_red_when_devto_cannot_be_read(tmp_path, monkeypatch):
 
 
 def test_main_dry_run_publishes_nothing(tmp_path, monkeypatch):
-    t = note(tmp_path, "2026-10-14-a", date=NOW.strftime("%Y-%m-%d"))
+    t = note(tmp_path, "2026-10-14-a", date=today())
     monkeypatch.setattr(C.D, "_call", lambda m, p, *a: [draft("2026-10-14-a", t)] if "unpublished" in p else [])
     monkeypatch.setattr(C, "is_live", lambda s: True)
     called = []
@@ -128,7 +135,7 @@ def test_main_dry_run_publishes_nothing(tmp_path, monkeypatch):
 def test_main_publishes_through_devto_publish_and_reports_its_refusal(tmp_path, monkeypatch):
     """The publish goes through devto_publish.main so its refusals still apply,
     and a refusal there turns this run red."""
-    t = note(tmp_path, "2026-10-14-a", date=NOW.strftime("%Y-%m-%d"))
+    t = note(tmp_path, "2026-10-14-a", date=today())
     monkeypatch.setattr(C.D, "_call", lambda m, p, *a: [draft("2026-10-14-a", t)] if "unpublished" in p else [])
     monkeypatch.setattr(C, "is_live", lambda s: True)
     calls = []
