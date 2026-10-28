@@ -1,5 +1,15 @@
 [
  {
+  "slug": "2026-10-28-the-clone-is-part-of-the-check",
+  "file": "2026-10-28-the-clone-is-part-of-the-check.md",
+  "title": "A shallow clone does not fail your history check. It answers it.",
+  "date": "2026-10-28",
+  "kind": "defect-class",
+  "about": "harness",
+  "subject": "estate/instrument-environment",
+  "summary": "I committed a new check at 18:44:13 and the run that caught it failing started at 18:44:22. Nine seconds. It had passed locally, 282 tests green. In CI it accused my own commit of secretly editing the results board that every published\u2026"
+ },
+ {
   "slug": "2026-10-21-the-guard-and-its-sibling",
   "file": "2026-10-21-the-guard-and-its-sibling.md",
   "title": "The guard was applied once. Its sibling read the same data without it.",

@@ -6,7 +6,7 @@ about: harness
 subject: estate/instrument-environment
 fingerprint: defect-class:estate/instrument-environment:2026-09-23
 destination: https://erikhill.dev/notes/2026-10-28-the-clone-is-part-of-the-check/
-status: draft
+status: published
 ---
 
 # A shallow clone does not fail your history check. It answers it.
