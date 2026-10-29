@@ -116,6 +116,7 @@
  "repeat-flip:xai:grok-4.3/float-subtract:xai:grok-4.3/float-subtract",
  "repeat-flip:xai:grok-4.3/fmt-list:xai:grok-4.3/fmt-list",
  "repeat-flip:xai:grok-4.3/if-json:xai:grok-4.3/if-json",
+ "repeat-flip:xai:grok-4.3/if-no-preamble:xai:grok-4.3/if-no-preamble",
  "repeat-flip:xai:grok-4.3/logic-syllogism:xai:grok-4.3/logic-syllogism",
  "repeat-flip:xai:grok-4.3/nth-char:xai:grok-4.3/nth-char",
  "repeat-flip:xai:grok-4.3/vowel-json:xai:grok-4.3/vowel-json",
