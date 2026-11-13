@@ -127,5 +127,6 @@
  "repeat-flip:xai:grok-4.5/if-one-word:xai:grok-4.5/if-one-word",
  "repeat-flip:xai:grok-4.5/multi-step-math:xai:grok-4.5/multi-step-math",
  "repeat-flip:xai:grok-4.5/sort-numeric:xai:grok-4.5/sort-numeric",
- "repeat-flip:xai:grok-4.5/vowel-json:xai:grok-4.5/vowel-json"
+ "repeat-flip:xai:grok-4.5/vowel-json:xai:grok-4.5/vowel-json",
+ "replay-change:vac-protocol/registry-replay:vac-protocol:replay@1c0a93c9a984ed00"
 ]
