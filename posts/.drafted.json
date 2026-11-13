@@ -91,6 +91,7 @@
  "repeat-flip:google:gemini-3.5-flash/sort-numeric:google:gemini-3.5-flash/sort-numeric",
  "repeat-flip:google:gemini-3.5-flash/unit-minutes:google:gemini-3.5-flash/unit-minutes",
  "repeat-flip:google:gemini-3.5-flash/vowel-json:google:gemini-3.5-flash/vowel-json",
+ "repeat-flip:groq:gpt-oss-120b/needle-extract:groq:gpt-oss-120b/needle-extract",
  "repeat-flip:meta:llama-3.3-70b/sort-magnitude:meta:llama-3.3-70b/sort-magnitude",
  "repeat-flip:openai:gpt-5-nano/needle-extract:openai:gpt-5-nano/needle-extract",
  "repeat-flip:xai:grok-4-fast/compare-decimals:xai:grok-4-fast/compare-decimals",
