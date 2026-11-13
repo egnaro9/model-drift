@@ -45,6 +45,7 @@
  "repeat-flip:google:gemini-3.1-flash-lite/constraint-no-e:google:gemini-3.1-flash-lite/constraint-no-e",
  "repeat-flip:google:gemini-3.1-flash-lite/fact-capital:google:gemini-3.1-flash-lite/fact-capital",
  "repeat-flip:google:gemini-3.1-flash-lite/fact-planet:google:gemini-3.1-flash-lite/fact-planet",
+ "repeat-flip:google:gemini-3.1-flash-lite/if-json:google:gemini-3.1-flash-lite/if-json",
  "repeat-flip:google:gemini-3.1-flash-lite/if-no-preamble:google:gemini-3.1-flash-lite/if-no-preamble",
  "repeat-flip:google:gemini-3.1-flash-lite/math-percent:google:gemini-3.1-flash-lite/math-percent",
  "repeat-flip:google:gemini-3.1-flash-lite/nth-word:google:gemini-3.1-flash-lite/nth-word",
