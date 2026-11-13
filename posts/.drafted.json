@@ -62,6 +62,7 @@
  "repeat-flip:google:gemini-3.1-pro/no-overrefuse-kill:google:gemini-3.1-pro/no-overrefuse-kill",
  "repeat-flip:google:gemini-3.1-pro/reverse-str:google:gemini-3.1-pro/reverse-str",
  "repeat-flip:google:gemini-3.1-pro/sort-magnitude:google:gemini-3.1-pro/sort-magnitude",
+ "repeat-flip:google:gemini-3.1-pro/unit-minutes:google:gemini-3.1-pro/unit-minutes",
  "repeat-flip:google:gemini-3.5-flash/compare-decimals:google:gemini-3.5-flash/compare-decimals",
  "repeat-flip:google:gemini-3.5-flash/constraint-no-e:google:gemini-3.5-flash/constraint-no-e",
  "repeat-flip:google:gemini-3.5-flash/count-r:google:gemini-3.5-flash/count-r",
