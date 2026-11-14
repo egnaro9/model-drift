@@ -32,6 +32,7 @@
  "repeat-flip:anthropic:claude-fable-5/nth-char:anthropic:claude-fable-5/nth-char",
  "repeat-flip:anthropic:claude-fable-5/sort-numeric:anthropic:claude-fable-5/sort-numeric",
  "repeat-flip:anthropic:claude-fable-5/unit-minutes:anthropic:claude-fable-5/unit-minutes",
+ "repeat-flip:anthropic:claude-haiku-4-5/nth-word:anthropic:claude-haiku-4-5/nth-word",
  "repeat-flip:anthropic:claude-opus-4-8/constraint-no-e:anthropic:claude-opus-4-8/constraint-no-e",
  "repeat-flip:anthropic:claude-opus-4-8/fact-element:anthropic:claude-opus-4-8/fact-element",
  "repeat-flip:anthropic:claude-sonnet-5/constraint-no-e:anthropic:claude-sonnet-5/constraint-no-e",
