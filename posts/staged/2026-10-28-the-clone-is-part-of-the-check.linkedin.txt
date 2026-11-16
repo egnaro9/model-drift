@@ -4,6 +4,4 @@ If you keep a check that reads git history: clone it shallow and run it. If it p
 
 Full note, with the evidence table: https://erikhill.dev/notes/2026-10-28-the-clone-is-part-of-the-check/
 
-I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC.
-
-https://erikhill.dev
+I build deterministic evaluation and verification tooling for LLM systems. More at https://erikhill.dev

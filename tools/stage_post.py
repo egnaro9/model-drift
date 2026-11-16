@@ -6,7 +6,7 @@ second full text is a second thing to correct when the first one is wrong.
 
 Emits, per post, into a staging directory:
   <slug>.devto.md      dev.to front matter, published:false, canonical_url set
-  <slug>.linkedin.txt  the share, one availability line, no hashtag spam
+  <slug>.linkedin.txt  the share, one closing line, no hashtag spam
   <slug>.x.txt         a thread, each part already inside 280 characters
 
 Nothing here posts anything. dev.to scheduling is UI only (the API has
@@ -28,9 +28,8 @@ X_LIMIT = 280
 # `showdev` is a commenting community rather than a scrolling one.
 DEFAULT_TAGS = ["showdev", "testing", "ai"]
 
-AVAILABILITY = ("I build deterministic evaluation and verification tooling for LLM "
-                "systems, and I am looking for my first full-time role in AI evaluation "
-                "or QA engineering. Remote US Eastern, or Charleston SC.")
+FOOTER = ("I build deterministic evaluation and verification tooling for LLM "
+          "systems. More at https://erikhill.dev")
 
 FRONT = re.compile(r"\A---\n(.*?)\n---\n", re.S)
 
@@ -149,7 +148,7 @@ def midweek(fm: Dict[str, str], body: str, url: str) -> str:
         parts += [k, ""]
     parts += ["I might be wrong about this one. If you have run the same check "
               "and got a different answer, I want to hear it.", "",
-              AVAILABILITY]
+              FOOTER]
     return "\n".join(parts)
 
 
@@ -179,8 +178,7 @@ def linkedin(fm: Dict[str, str], body: str, url: str) -> str:
     k = kicker(secs)
     if k:
         parts += [k, ""]
-    parts += [f"Full note, with the evidence table: {url}", "", AVAILABILITY,
-              "", "https://erikhill.dev"]
+    parts += [f"Full note, with the evidence table: {url}", "", FOOTER]
     return "\n".join(parts)
 
 
@@ -206,10 +204,10 @@ def x_thread(fm: Dict[str, str], body: str, url: str) -> List[str]:
         chunks.append(cur.strip())
     if k and len(k) <= X_LIMIT - 8:
         chunks.append(k)
-    # Same order as the note itself: the availability line, then the links. It
+    # Same order as the note itself: the closing line, then the links. It
     # gets its own part because it must not be truncated, and a thread part is
     # the only place on this surface where a whole sentence is guaranteed.
-    chunks.append(AVAILABILITY)
+    chunks.append(FOOTER)
     chunks.append(f"Full note, with the evidence: {url}")
 
     n = len(chunks)
@@ -233,14 +231,14 @@ def stage(path: Path, out_dir: Path, cover: Optional[str]) -> List[Path]:
         p.write_text(content, encoding="utf-8")
         written.append(p)
 
-    # Every surface carries the availability line. This is a standing
+    # Every surface carries the closing line. This is a standing
     # requirement, not a per-post choice, so it is checked on every emitted
     # artifact rather than trusted to the template.
-    MARK = "looking for my first full-time role"
+    MARK = "More at https://erikhill.dev"
     missing = [p.name for p in written if MARK not in p.read_text(encoding="utf-8")]
     if missing:
         raise SystemExit(
-            f"REFUSED: {path.stem} emitted artifact(s) with no availability line: "
+            f"REFUSED: {path.stem} emitted artifact(s) with no closing line: "
             f"{', '.join(missing)}")
 
     over = [i for i, part in enumerate(x_thread(fm, body, url), 1) if len(part) > X_LIMIT]

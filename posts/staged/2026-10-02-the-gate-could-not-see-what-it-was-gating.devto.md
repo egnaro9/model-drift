@@ -104,7 +104,7 @@ code, I would like to know what it killed that you were sure was fine.
 
 ---
 
-I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC. https://erikhill.dev
+I build deterministic evaluation and verification tooling for LLM systems. More at https://erikhill.dev
 
 The gate, its tests and the fix: https://github.com/egnaro9/egnaro9.github.io
 

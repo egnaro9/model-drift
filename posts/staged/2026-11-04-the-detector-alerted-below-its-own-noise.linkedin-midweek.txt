@@ -2,4 +2,4 @@ If you run an eval suite that reports regressions: find the threshold, and then 
 
 I might be wrong about this one. If you have run the same check and got a different answer, I want to hear it.
 
-I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC.
+I build deterministic evaluation and verification tooling for LLM systems. More at https://erikhill.dev

@@ -100,7 +100,7 @@ direction of that trade is not obvious from the code.
 
 ---
 
-I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC. https://erikhill.dev
+I build deterministic evaluation and verification tooling for LLM systems. More at https://erikhill.dev
 
 Suite, rules, pre-registration and replication: https://github.com/egnaro9/pi-eval
 

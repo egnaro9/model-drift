@@ -62,7 +62,7 @@ The claim is that this certifies a rubric can fail. The only honest way to trust
 
 A reproducible script in an issue is a finding. A finding gets a test named after it.
 
-I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC. https://erikhill.dev
+I build deterministic evaluation and verification tooling for LLM systems. More at https://erikhill.dev
 
 The tool, the three adapters and the fixture: https://github.com/egnaro9/deadcheck
 

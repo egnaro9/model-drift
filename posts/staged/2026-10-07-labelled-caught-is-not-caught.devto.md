@@ -135,7 +135,7 @@ your harness is answering for it.
 
 ---
 
-I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC. https://erikhill.dev
+I build deterministic evaluation and verification tooling for LLM systems. More at https://erikhill.dev
 
 The tool, the witness and the dogfood run: https://github.com/egnaro9/evalmut
 

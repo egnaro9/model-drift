@@ -16,14 +16,10 @@ from typing import Dict, List, Optional, Sequence
 from .findings import ABOUT_HARNESS, ABOUT_INFRA, Finding
 from .report import ModelStatus, min_detectable_change
 
-# The one line that closes an owned post. Erik is job searching and was letting
-# every post end without saying so; the post already proves the competence, the
-# line tells the reader what to do with it. Owned posts only, never a reply,
-# a pull request, or an outreach message.
-AVAILABILITY = ("I build deterministic evaluation and verification tooling for LLM "
-                "systems, and I am looking for my first full-time role in AI "
-                "evaluation or QA engineering. Remote US Eastern, or Charleston SC. "
-                "https://erikhill.dev")
+# The one line that closes an owned post. Owned posts only, never a reply, a pull
+# request, or an outreach message.
+FOOTER = ("I build deterministic evaluation and verification tooling for LLM "
+          "systems. More at https://erikhill.dev")
 
 HOME = "https://erikhill.dev"
 BOARD = "https://egnaro9.github.io/model-drift/"
@@ -179,7 +175,7 @@ def render(finding: Finding, statuses: Sequence[ModelStatus],
         "",
         "---",
         "",
-        AVAILABILITY,
+        FOOTER,
         "",
         f"Live board: {BOARD}",
         f"Suite, graders and runner: {REPO}",

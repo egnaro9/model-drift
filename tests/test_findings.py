@@ -295,11 +295,11 @@ def test_a_draft_cannot_be_published_without_something_to_argue_with():
     assert "TODO" in body.split("## What I might have wrong")[1]
 
 
-def test_an_owned_post_closes_with_exactly_one_availability_line():
+def test_an_owned_post_closes_with_exactly_one_footer_line():
     """Rule 8, and the half that matters is that it is ONE line, not a plea."""
     f = f_reg(_status("openai:x", "X", 0.80, -0.10, "regressed"))
     body = render(f, [], "2026-09-22", "v", REGISTRY)
-    assert body.count("looking for my first full-time role") == 1
+    assert body.count("More at https://erikhill.dev") == 1
     assert "open to opportunities" not in body
 
 

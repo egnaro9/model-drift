@@ -2,7 +2,7 @@ I built a detector that decides whether a day's drift run contains anything wort
 
 ---
 
-I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC. 2/3
+I build deterministic evaluation and verification tooling for LLM systems. More at https://erikhill.dev 2/3
 
 ---
 

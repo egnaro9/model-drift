@@ -6,7 +6,7 @@ If you keep a rule like this, a floor, a filter, a validity check: grep for its 
 
 ---
 
-I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC. 3/4
+I build deterministic evaluation and verification tooling for LLM systems. More at https://erikhill.dev 3/4
 
 ---
 

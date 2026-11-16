@@ -167,7 +167,7 @@ finding.
 
 ---
 
-I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC. https://erikhill.dev
+I build deterministic evaluation and verification tooling for LLM systems. More at https://erikhill.dev
 
 Live board: https://egnaro9.github.io/model-drift/
 Suite, graders and runner: https://github.com/egnaro9/model-drift

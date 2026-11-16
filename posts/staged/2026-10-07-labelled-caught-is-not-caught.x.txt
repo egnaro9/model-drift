@@ -6,7 +6,7 @@ If you publish a score from a harness that wraps someone else's library: ask wha
 
 ---
 
-I build deterministic evaluation and verification tooling for LLM systems, and I am looking for my first full-time role in AI evaluation or QA engineering. Remote US Eastern, or Charleston SC. 3/4
+I build deterministic evaluation and verification tooling for LLM systems. More at https://erikhill.dev 3/4
 
 ---
 
