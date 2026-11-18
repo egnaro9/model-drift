@@ -6,7 +6,7 @@ about: harness
 subject: egnaro9/vac-gate
 fingerprint: gate-defect:egnaro9/vac-gate:1a9dc23
 destination: https://erikhill.dev/notes/2026-11-18-my-gate-told-me-what-it-had-not-checked/
-status: draft
+status: published
 ---
 
 # My gate told me what it hadn't checked. I didn't read it.

@@ -1,5 +1,15 @@
 [
  {
+  "slug": "2026-11-18-my-gate-told-me-what-it-had-not-checked",
+  "file": "2026-11-18-my-gate-told-me-what-it-had-not-checked.md",
+  "title": "My gate told me what it hadn't checked. I didn't read it.",
+  "date": "2026-11-18",
+  "kind": "gate-defect",
+  "about": "harness",
+  "subject": "egnaro9/vac-gate",
+  "summary": "I write verification gates for a living, more or less. The one in question checks a signed-ish capability claim: a JSON bundle asserting that some agent passed some task set, with hashes over the inputs and a recipe for re-earning the\u2026"
+ },
+ {
   "slug": "2026-11-11-a-check-that-cannot-fail",
   "file": "2026-11-11-a-check-that-cannot-fail.md",
   "title": "A check that cannot fail has never passed",
