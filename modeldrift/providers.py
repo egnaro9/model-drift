@@ -51,6 +51,16 @@ class Model:
                                         # Count labs with narrative._lab(), never len(set(group)).
     tier: str = ""                      # heavy | flagship | mid | mini | nano | mock
     color: str = "#8b8b8b"              # legend/series colour
+    # How the credential behind key_env is paid for. "prepaid" means auto-reload
+    # is OFF: the balance is spent down and then the provider refuses calls. That
+    # is a budget decision, not an outage, so a prepaid credential going dark is
+    # reported as paused instead of failing the job or reading as stale.
+    #   prepaid | auto-reload | free | none (mock)
+    funding: str = ""
+
+    @property
+    def prepaid(self) -> bool:
+        return self.funding == "prepaid"
 
     @property
     def available(self) -> bool:

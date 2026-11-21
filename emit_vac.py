@@ -165,12 +165,13 @@ def derive(inputs: dict[str, bytes]) -> tuple[dict[str, bytes], dict]:
         "suite-fingerprint.json": (json.dumps(fp, indent=1) + "\n").encode(),
     }
     verdicts = {v: sum(1 for r in rows if r["verdict"] == v)
-                for v in ("regressed", "improved", "unchanged", "baseline", "no-data")}
+                for v in ("regressed", "improved", "unchanged", "baseline", "no-data",
+                          "paused")}
     numbers = {
         "rows": len(rows),
         "regressed": verdicts["regressed"], "improved": verdicts["improved"],
         "unchanged": verdicts["unchanged"], "baseline": verdicts["baseline"],
-        "no_data": verdicts["no-data"],
+        "no_data": verdicts["no-data"], "paused": verdicts["paused"],
         "series": len(series),
         "points": sum(len(p) for p in series.values()),
         "tasks": fp["tasks"],

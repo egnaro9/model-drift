@@ -40,7 +40,7 @@ class ModelStatus:
     label: str
     latest: Optional[float]      # latest accuracy, or None if no runs
     delta: Optional[float]       # vs previous run
-    verdict: str                 # regressed | improved | unchanged | baseline | no-data
+    verdict: str                 # regressed | improved | unchanged | baseline | no-data | paused
     when: Optional[str]
     graded: Optional[int] = None  # calls actually graded in the latest run; sets the floor
 
@@ -294,11 +294,19 @@ def fill_graded_from_metrics(statuses: List[ModelStatus], metrics: dict) -> None
 
 
 def results_md(statuses: List[ModelStatus]) -> str:
-    icon = {"regressed": "🔴", "improved": "🟢", "unchanged": "⚪", "baseline": "🔵", "no-data": "⚫"}
+    icon = {"regressed": "🔴", "improved": "🟢", "unchanged": "⚪", "baseline": "🔵", "no-data": "⚫",
+            "paused": "⏸"}
     rows = []
     for s in statuses:
         if s.latest is None:
             rows.append(f"| {s.label} | — | — | — | ⚫ no runs yet |")
+            continue
+        if s.verdict == "paused":
+            # Prepaid credit ran out (auto-reload off). The accuracy is the last
+            # trusted run's, kept visible but not compared against anything.
+            since = s.observed_when or s.when or "—"
+            rows.append(f"| {s.label} | {s.latest*100:.1f}% | — | — | "
+                        f"⏸ paused (prepaid credit, last run {since}) |")
             continue
         d = "—" if s.delta is None else f"{s.delta*100:+.1f} pts"
         floor = min_detectable_change(s.graded)

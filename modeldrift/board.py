@@ -47,6 +47,11 @@ def statuses_from_series(series: Dict[str, List[dict]],
     a stale-but-honest number rather than a regression.
     """
     out = []
+    # The newest day any registry model was probed: the board's "today". A prepaid
+    # model whose newest point is older than that has stopped reporting while the
+    # rest of the board moved on, which is what a spent balance looks like.
+    newest = max(((series.get(m["id"]) or [{}])[-1].get("t") or "")[:10]
+                 for m in registry) if registry else ""
     for m in registry:
         label = m.get("label") or m["id"]
         raw = series.get(m["id"]) or []
@@ -85,6 +90,13 @@ def statuses_from_series(series: Dict[str, List[dict]],
         g = last.get("graded")
         graded = int(g) if g else None
         when = (last.get("t") or "")[:10] or None
+        if (m.get("funding") == "prepaid" and newest
+                and (raw[-1].get("t") or "")[:10] < newest):
+            # Last good number kept and shown, no delta: nothing new was measured,
+            # so nothing moved. Never a regression, never a finding.
+            out.append(ModelStatus(m["id"], label, last["acc"], None, "paused",
+                                   when, graded, **seen))
+            continue
         if len(pts) < 2:
             out.append(ModelStatus(m["id"], label, last["acc"], None, "baseline",
                                    when, graded, **seen))
