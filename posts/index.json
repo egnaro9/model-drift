@@ -1,5 +1,15 @@
 [
  {
+  "slug": "2026-11-25-nine-missing-tests-reported-as-one-skip",
+  "file": "2026-11-25-nine-missing-tests-reported-as-one-skip.md",
+  "title": "Nine missing tests reported as \"1 skipped",
+  "date": "2026-11-25",
+  "kind": "evidence-gap",
+  "about": "infrastructure",
+  "subject": "egnaro9/agent-graph",
+  "summary": "I was correcting a stale badge on one of my repos. The README claimed 30 tests; running the suite gave 33. Fine, bump the number, move on."
+ },
+ {
   "slug": "2026-11-18-my-gate-told-me-what-it-had-not-checked",
   "file": "2026-11-18-my-gate-told-me-what-it-had-not-checked.md",
   "title": "My gate told me what it hadn't checked. I didn't read it.",

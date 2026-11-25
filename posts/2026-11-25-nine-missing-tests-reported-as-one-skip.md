@@ -6,7 +6,7 @@ about: infrastructure
 subject: egnaro9/agent-graph
 fingerprint: evidence-gap:egnaro9/agent-graph:0e2b468
 destination: https://erikhill.dev/notes/2026-11-25-nine-missing-tests-reported-as-one-skip/
-status: draft
+status: published
 ---
 
 # Nine missing tests reported as "1 skipped"
