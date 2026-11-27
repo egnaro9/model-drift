@@ -41,6 +41,7 @@
  "repeat-flip:anthropic:claude-sonnet-5/fact-planet:anthropic:claude-sonnet-5/fact-planet",
  "repeat-flip:anthropic:claude-sonnet-5/json-word-count:anthropic:claude-sonnet-5/json-word-count",
  "repeat-flip:anthropic:claude-sonnet-5/sort-magnitude:anthropic:claude-sonnet-5/sort-magnitude",
+ "repeat-flip:google:gemini-3.1-flash-lite/compare-decimals:google:gemini-3.1-flash-lite/compare-decimals",
  "repeat-flip:google:gemini-3.1-flash-lite/compare-negatives:google:gemini-3.1-flash-lite/compare-negatives",
  "repeat-flip:google:gemini-3.1-flash-lite/constraint-no-e:google:gemini-3.1-flash-lite/constraint-no-e",
  "repeat-flip:google:gemini-3.1-flash-lite/fact-capital:google:gemini-3.1-flash-lite/fact-capital",
