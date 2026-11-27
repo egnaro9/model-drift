@@ -496,7 +496,20 @@ def main(argv: Optional[List[str]] = None) -> int:
     for m in models:
         by_cred.setdefault(m.key_env, []).append(m)
     dark_ids = {id(m) for m in dark}
-    out_cold = [cred for cred, ms in by_cred.items() if all(id(m) in dark_ids for m in ms)]
+    all_dark = [cred for cred, ms in by_cred.items() if all(id(m) in dark_ids for m in ms)]
+    # A prepaid credential (auto-reload OFF) is expected to go dark when its balance
+    # runs out. That is a budget the owner chose, not an outage, so it is named here
+    # and the board shows those models as paused, but it does not turn the job red
+    # every day until someone tops it up. Auto-reload and free credentials still do.
+    spent = [c for c in all_dark if all(m.prepaid for m in by_cred[c])]
+    out_cold = [c for c in all_dark if c not in spent]
+    if spent:
+        print("\n  PAUSED — prepaid credit exhausted (auto-reload is off), nothing recorded:")
+        for cred in sorted(spent):
+            ms = by_cred[cred]
+            print(f"    {cred} ({ms[0].provider}): {', '.join(m.label for m in ms)}")
+        print("  Expected once a prepaid balance is spent. Top it up to resume; until")
+        print("  then the board marks these models paused, not regressed.")
     if out_cold:
         print("\n  PROVIDERS DARK — every call failed, nothing recorded:")
         for cred in sorted(out_cold):
