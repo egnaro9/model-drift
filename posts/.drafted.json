@@ -57,6 +57,7 @@
  "repeat-flip:google:gemini-3.1-pro/fmt-exact-token:google:gemini-3.1-pro/fmt-exact-token",
  "repeat-flip:google:gemini-3.1-pro/fmt-repeat-join:google:gemini-3.1-pro/fmt-repeat-join",
  "repeat-flip:google:gemini-3.1-pro/fmt-uppercase:google:gemini-3.1-pro/fmt-uppercase",
+ "repeat-flip:google:gemini-3.1-pro/if-json:google:gemini-3.1-pro/if-json",
  "repeat-flip:google:gemini-3.1-pro/json-word-count:google:gemini-3.1-pro/json-word-count",
  "repeat-flip:google:gemini-3.1-pro/needle-extract:google:gemini-3.1-pro/needle-extract",
  "repeat-flip:google:gemini-3.1-pro/no-overrefuse-kill:google:gemini-3.1-pro/no-overrefuse-kill",
